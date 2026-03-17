@@ -304,7 +304,8 @@ int main(void)
             }
             
             // 处理JPEG帧（根据参数决定是否进行火焰检测）
-            process_jpeg_frame(do_fire_detection);
+            //process_jpeg_frame(do_fire_detection);
+						process_jpeg_frame(0);
         }
         
         // ----- 4. 数据保存（暂时禁用，数据通过ESP8266发送） -----

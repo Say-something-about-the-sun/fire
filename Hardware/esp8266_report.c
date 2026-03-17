@@ -130,21 +130,14 @@ void ESP8266_Report_Init(void)
 // 读取烟雾传感器数据
 void ESP8266_Report_ReadSmokeSensor(SensorDataPacket* packet)
 {
-    u16 smoke_adc = Smoke_Get_ADC_Value();
+    // 直接调用获取浓度的函数（内部已经读取过一次ADC了）
     float smoke_ppm = Smoke_Get_Concentration();
     
-    packet->smoke_adc = smoke_adc;
+    packet->smoke_adc = Smoke_Get_ADC_Value(); // 如果一定要记录ADC，可以留着
     packet->smoke_ppm = smoke_ppm;
     
     // 烟雾检测逻辑
-    if(smoke_ppm > 50.0)
-    {
-        packet->smoke_detected = 1;
-    }
-    else
-    {
-        packet->smoke_detected = 0;
-    }
+    packet->smoke_detected = (smoke_ppm > 50.0f) ? 1 : 0;
 }
 
 // 从ESP32获取火焰传感器数据
@@ -241,9 +234,10 @@ void ESP8266_Report_CollectSensorData(SensorDataPacket* packet)
     // 1. 读取烟雾传感器数据
     ESP8266_Report_ReadSmokeSensor(packet);
     
-    // 2. 请求ESP32火焰传感器数据（暂时禁用，隔离问题）
-    // ESP8266_Report_RequestESP32Data(packet);
-    // delay_ms(100);  // 等待ESP32响应
+	
+    // 2. 请求ESP32火焰传感器数据
+     //ESP8266_Report_RequestESP32Data(packet);
+    //delay_ms(100);  // 等待ESP32响应
     
     // 临时填充ESP32数据（模拟数据）
     packet->flame_adc = 34500;
@@ -252,8 +246,8 @@ void ESP8266_Report_CollectSensorData(SensorDataPacket* packet)
     packet->temperature = 25.5;
     
     // 3. 填充时间戳
-    RTC_Get_Time(packet->timestamp);
-    
+    //RTC_Get_Time(packet->timestamp);
+    strcpy(packet->timestamp, "2026-01-01 00:00:00");
     // 4. 填充火焰检测详细信息（图像检测）
     packet->image_fire_detected = g_latest_fire_result.fire_detected;
     packet->image_confidence = g_latest_fire_result.confidence;
@@ -345,8 +339,8 @@ ESP8266_Status ESP8266_Report_SendJSON(JsonDataPacket* json)
 {
     char cmd[32];
     
-    // 1. 🚨 彻底删掉致命的 AT+CIPSTATUS 检查！
-    // 不去问 ESP8266 连着没有，因为高负载下极易漏读导致死锁。直接开始发！
+    // 1.删掉 AT+CIPSTATUS 检查！
+    // 
     
     // 2. 告诉 ESP8266 准备接收多长的数据
     sprintf(cmd, "AT+CIPSEND=%d\r\n", json->json_len);
@@ -370,7 +364,7 @@ ESP8266_Status ESP8266_Report_SendJSON(JsonDataPacket* json)
     // 5. 让数据飞一会儿
     delay_ms(100);
     
-    // 6. 事后像冲马桶一样，暴力清空串口接收区！
+    // 6. 暴力清空串口接收区！
     // 把残留的 "SEND OK" 之类的废话全部丢弃，保证下一次发送环境绝对干净。
     USART3_RX_STA = 0;
     memset(USART3_RX_BUF, 0, USART3_RX_BUF_SIZE);
@@ -387,18 +381,18 @@ void ESP8266_Report_SendSensorData(void)
     //printf("[ESP8266 Report] Starting to send sensor data...\r\n");
     
     // 1. 采集传感器数据
-    printf("[ESP8266 Report] Collecting sensor data...\r\n");
+    //printf("[ESP8266 Report] Collecting sensor data...\r\n");
     ESP8266_Report_CollectSensorData(&sensor_packet);
     
     // 2. JSON拼装
-    printf("[ESP8266 Report] Packaging JSON...\r\n");
+    //printf("[ESP8266 Report] Packaging JSON...\r\n");
     ESP8266_Report_PackageJSON(&sensor_packet, &json_packet);
     
     // 打印JSON内容（调试用）
     //printf("[ESP8266 Report] JSON content: %s\r\n", json_packet.json_str);
     
     // 3. 发送JSON数据
-    printf("[ESP8266 Report] Sending JSON (%d bytes)...\r\n", json_packet.json_len);
+    //printf("[ESP8266 Report] Sending JSON (%d bytes)...\r\n", json_packet.json_len);
     ESP8266_Report_SendJSON(&json_packet);
     
     printf("[ESP8266 Report] Sensor data sent completed\r\n");

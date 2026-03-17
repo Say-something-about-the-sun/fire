@@ -34,7 +34,7 @@ u8 jpeg_decoder_load_rows(uint16_t start_row, uint8_t row_count);
 u16 jpeg_decoder_get_pixel(uint8_t buffer_index, uint16_t x, uint16_t y_in_buffer);
 void jpeg_decoder_process_with_row_buffer(void);
 u8 jpeg_decoder_process(const uint8_t* jpeg_data, uint32_t jpeg_size);
-
+JpegDecodeState* jpeg_decoder_get_state(void);
 // 外部变量声明
 extern JpegDecodeState decode_state;
 

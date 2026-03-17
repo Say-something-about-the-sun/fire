@@ -19,7 +19,7 @@ static void Smoke_ADC_Init(void)
     // 3. 配置ADC2的常规配置
     ADC_InitStruct.ADC_Resolution = ADC_Resolution_12b; // 12位分辨率
     ADC_InitStruct.ADC_ScanConvMode = DISABLE; // 单通道模式
-    ADC_InitStruct.ADC_ContinuousConvMode = ENABLE; // 连续转换
+	ADC_InitStruct.ADC_ContinuousConvMode = DISABLE; // 不连续转换
     ADC_InitStruct.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None; // 无外部触发
     ADC_InitStruct.ADC_DataAlign = ADC_DataAlign_Right; // 右对齐
     ADC_InitStruct.ADC_NbrOfConversion = 1; // 转换通道数
@@ -39,11 +39,24 @@ void Smoke_Sensor_Init(void)
 }
 
 // 获取PA1的ADC值
+// [smoke.c]
 uint16_t Smoke_Get_ADC_Value(void)
 {
-    ADC_SoftwareStartConv(ADC2); // 软件启动ADC2转换
-    while(!ADC_GetFlagStatus(ADC2, ADC_FLAG_EOC)); // 等待转换完成
-    return ADC_GetConversionValue(ADC2); // 返回12位ADC值（0-4095）
+    uint32_t timeout = 0;
+    
+    ADC_SoftwareStartConv(ADC2); 
+    
+    // 【关键修复】：加上超时等待，防止死锁
+    while(!ADC_GetFlagStatus(ADC2, ADC_FLAG_EOC)) 
+    {
+        timeout++;
+        if(timeout > 10000) // 超过一定时间直接跳出
+        {
+            printf("[Smoke] ADC Timeout Error!\r\n");
+            return 0; 
+        }
+    }
+    return ADC_GetConversionValue(ADC2); 
 }
 
 // 获取烟雾浓度（PPM）
