@@ -1,0 +1,29 @@
+*** Using Compiler 'V5.06 update 3 (build 300)', folder: 'D:\QRS\MDK514\ARM\ARMCC\Bin'
+Build target 'Target 1'
+compiling ov5640_hw.c...
+Hardware\ov5640_hw.c(481): warning:  #870-D: invalid multibyte character sequence
+      printf("  å°?è¯?è¯?å?å¯?å­?å™?0x3008...\r\n");
+Hardware\ov5640_hw.c(488): warning:  #870-D: invalid multibyte character sequence
+          printf("  å¯?å­?å™?0x3008å€?: 0x%02X\r\n", id_h);
+Hardware\ov5640_hw.c(488): warning:  #870-D: invalid multibyte character sequence
+          printf("  å¯?å­?å™?0x3008å€?: 0x%02X\r\n", id_h);
+Hardware\ov5640_hw.c(492): warning:  #870-D: invalid multibyte character sequence
+      printf("  è¯?å?å¯?å­?å™?0x300A...\r\n");
+Hardware\ov5640_hw.c(499): warning:  #870-D: invalid multibyte character sequence
+          printf("  å¯?å­?å™?0x300Aå€?: 0x%02X\r\n", id_h);
+Hardware\ov5640_hw.c(499): warning:  #870-D: invalid multibyte character sequence
+          printf("  å¯?å­?å™?0x300Aå€?: 0x%02X\r\n", id_h);
+Hardware\ov5640_hw.c(503): warning:  #870-D: invalid multibyte character sequence
+      printf("  è¯?å?å¯?å­?å™?0x300B...\r\n");
+Hardware\ov5640_hw.c(510): warning:  #870-D: invalid multibyte character sequence
+          printf("  å¯?å­?å™?0x300Bå€?: 0x%02X\r\n", id_l);
+Hardware\ov5640_hw.c(510): warning:  #870-D: invalid multibyte character sequence
+          printf("  å¯?å­?å™?0x300Bå€?: 0x%02X\r\n", id_l);
+Hardware\ov5640_hw.c(518): warning:  #1-D: last line of file ends without a newline
+  }
+Hardware\ov5640_hw.c: 10 warnings, 0 errors
+linking...
+Program Size: Code=22064 RO-data=2424 RW-data=36 ZI-data=32588  
+FromELF: creating hex file...
+".\Objects\fire watch.axf" - 0 Error(s), 10 Warning(s).
+Build Time Elapsed:  00:00:03
