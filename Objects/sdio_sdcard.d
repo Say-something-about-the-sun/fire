@@ -1,5 +1,5 @@
-.\objects\sdio_sdcard.o: Hardware\sdio_sdcard.c
-.\objects\sdio_sdcard.o: Hardware\sdio_sdcard.h
+.\objects\sdio_sdcard.o: SDcard\sdio_sdcard.c
+.\objects\sdio_sdcard.o: SDcard\sdio_sdcard.h
 .\objects\sdio_sdcard.o: .\Start\stm32f4xx.h
 .\objects\sdio_sdcard.o: .\CMSIS\core_cm4.h
 .\objects\sdio_sdcard.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdint.h

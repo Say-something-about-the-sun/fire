@@ -116,9 +116,12 @@ void UsageFault_Handler(void)
   * @param  None
   * @retval None
   */
+
+/*
 void SVC_Handler(void)
 {
 }
+*/
 
 /**
   * @brief  This function handles Debug Monitor exception.
@@ -134,10 +137,10 @@ void DebugMon_Handler(void)
   * @param  None
   * @retval None
   */
-void PendSV_Handler(void)
+/*void PendSV_Handler(void)
 {
 }
-
+*/
 
 
 
@@ -148,10 +151,11 @@ void PendSV_Handler(void)
   * @retval None
   */
 
-void SysTick_Handler(void)
+/*void SysTick_Handler(void)
 {
-	 g_ms_ticks++;  // 毫秒计数器递增
+	g_ms_ticks++;  // 毫秒计数器递增
 }
+*/
 
 /******************************************************************************/
 /*                 STM32F4xx Peripherals Interrupt Handlers                   */

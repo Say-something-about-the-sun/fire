@@ -1,5 +1,5 @@
-.\objects\sdcard_jpeg.o: Hardware\sdcard_jpeg.c
-.\objects\sdcard_jpeg.o: Hardware\sdcard_jpeg.h
+.\objects\sdcard_jpeg.o: SDcard\sdcard_jpeg.c
+.\objects\sdcard_jpeg.o: SDcard\sdcard_jpeg.h
 .\objects\sdcard_jpeg.o: .\FatFS\ff.h
 .\objects\sdcard_jpeg.o: .\FatFS\integer.h
 .\objects\sdcard_jpeg.o: .\FatFS\ffconf.h
@@ -43,5 +43,5 @@
 .\objects\sdcard_jpeg.o: .\System\sys\sys.h
 .\objects\sdcard_jpeg.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\sdcard_jpeg.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h
-.\objects\sdcard_jpeg.o: Hardware\ov5640.h
-.\objects\sdcard_jpeg.o: Hardware\sccb.h
+.\objects\sdcard_jpeg.o: .\ov5640\ov5640.h
+.\objects\sdcard_jpeg.o: .\ov5640\sccb.h

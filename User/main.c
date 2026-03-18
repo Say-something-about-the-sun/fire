@@ -19,6 +19,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+// 引入 FreeRTOS 头文件
+#include "FreeRTOS.h"
+#include "task.h"
+
 
 // 摄像头参数
 #define CAMERA_WIDTH  320
@@ -51,6 +55,15 @@ u16 g_max_flame_adc = 0;            // 最大火焰ADC值
 float g_temp_sum = 0;               // 温度总和
 float g_max_temperature = 0;        // 最高温度
 
+/* ================== FreeRTOS 任务句柄与函数声明 ================== */
+TaskHandle_t StartTask_Handler;
+TaskHandle_t CameraTask_Handler;
+TaskHandle_t ReportTask_Handler;
+
+void start_task(void *pvParameters);
+void camera_task(void *pvParameters);
+void report_task(void *pvParameters);
+/* ==================================== */
 
 // OV5640色调设置函数（参考探索者项目）
 void OV5640_Hue_Set(u8 hue)
@@ -170,7 +183,7 @@ void generate_daily_report(void)
 
 int main(void)
 {
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
     delay_init(168);
     uart_init(921600);
     
@@ -182,11 +195,8 @@ int main(void)
     // printf("========================================\r\n\r\n");
     
     // 1. 初始化RTC
-    // printf("[1] Initializing RTC...\r\n");
     RTC_Init_Custom();
-    
     // 2. 初始化JPEG和串口系统
-    // printf("[2] Initializing JPEG Serial System...\r\n");
     jpeg_serial_init();
     
     // 3. 初始化摄像头
@@ -196,167 +206,126 @@ int main(void)
         while(1);
     }
     
-    // OV5640_Init()已经设置了JPEG模式和基本参数，这里只需要设置输出尺寸
     // printf("[3.5] Setting output size to %dx%d...\r\n", CAMERA_WIDTH, CAMERA_HEIGHT);
     OV5640_OutSize_Set(4, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-    
-    // 色调设置（参考探索者项目：ATK_MC5640_HUE_6 = 0度，用于修复颜色偏移问题）
+    // 色调设置
     OV5640_Hue_Set(0);
-    
-    // printf("[OK] Camera parameters configured! Resolution: %dx%d\r\n", CAMERA_WIDTH, CAMERA_HEIGHT);
-    
+   
     // 4. 初始化烟雾传感器
-    // printf("[4] Initializing Smoke Sensor...\r\n");
     Smoke_Sensor_Init();
-    // printf("[OK] Smoke sensor initialized!\r\n");
     
     // 5. 初始化USART2（用于ESP32通信）
-    // printf("[5] Initializing USART2 (communicate with ESP32)...\r\n");
+    
     USART2_Init(115200);
     USART2_ConfigInterrupt();
-    // printf("[OK] USART2 initialized!\r\n");
     
     // 6. 初始化ESP8266（WiFi通信）
-    // printf("[6] Initializing ESP8266...\r\n");
     USART3_Init(115200);  // 初始化USART3，波特率115200
     USART3_ConfigInterrupt();  // 配置USART3中断
     ESP8266_Init();
     ESP8266_Report_Init();  // 初始化ESP8266报告模块
-    // printf("[OK] ESP8266 initialized!\r\n");
+    
     
     // 7. 初始化SD卡数据管理器（暂时禁用）
-    // printf("[7] SD Card Data Manager disabled for now\r\n");
     
     // 8. 初始化DCMI（后初始化DCMI）
-    // printf("[8] Initializing DCMI...\r\n");
+    
     My_DCMI_Init();
     
     // 9. 启动捕获
-    // printf("[9] Starting capture...\r\n");
     
     // 启动第一帧
     DCMI_StartOneFrame();
     
     // printf("\r\n[OK] System initialized! Monitoring...\r\n");
     // printf("========================================\r\n\r\n");
+    printf("[OK] Hardware initialized! Starting FreeRTOS Scheduler...\r\n");
+		
+	
     
-    // 时间变量
-    u32 last_sensor_time = 0;         // 上次传感器采集时间
-    u32 last_save_time = 0;            // 上次数据保存时间
-    u32 last_daily_time = 0;           // 上次生成日报时间
-    u32 last_cleanup_time = 0;         // 上次清理数据时间
-    u32 last_status_time = 0;          // 上次打印状态时间
+    // 2. 创建【启动任务】 (分配 256 字节栈，优先级最低设为 1)
+    xTaskCreate((TaskFunction_t )start_task,            
+                (const char* )"start_task",          
+                (uint16_t       )256,                   
+                (void* )NULL,                  
+                (UBaseType_t    )1,                     
+                (TaskHandle_t* )&StartTask_Handler);   
+
+    // 3. 开启 FreeRTOS 任务调度器！系统从此由 OS 接管！
+    vTaskStartScheduler();
     
-    // 帧计数器（用于控制火焰检测频率）
+    // 如果系统内存不足导致调度器启动失败，才会运行到这里
+    while(1) {
+        printf("[ERROR] FreeRTOS Scheduler failed to start! Check Memory.\r\n");
+        delay_ms(1000);
+    }
+}
+
+/* ================== FreeRTOS 任务实现 ================== */
+
+// 【启动任务】：只负责把干活的任务创建出来，然后自杀
+void start_task(void *pvParameters)
+{
+    taskENTER_CRITICAL(); // 进入临界区，禁止中断打断任务创建
+
+    // 创建图像处理任务：给足 4KB 栈(1024*4)，中等优先级 2
+    xTaskCreate(camera_task, "CameraTask", 1024, NULL, 2, &CameraTask_Handler);
+    
+    // 创建上报任务：给足 4KB 栈(1024*4)，最高优先级 3（保证准时发送，不被图像卡住）
+    xTaskCreate(report_task, "ReportTask", 1024, NULL, 3, &ReportTask_Handler);
+
+    vTaskDelete(StartTask_Handler); // 任务全部创建完毕，删除自己
+    
+    taskEXIT_CRITICAL(); // 退出临界区
+}
+
+// 【图像处理任务】：取代了原来的 100ms 计时器
+void camera_task(void *pvParameters)
+{
     static u32 frame_counter = 0;
     
     while(1)
     {
-        u32 current_time = millis();
+        // 1. 处理图像帧
+        frame_counter++;
         
-        // 调试：打印时间值
-        static u32 last_debug_time = 0;
-        if(current_time - last_debug_time >= 1000)  // 每1秒打印一次
-        {
-            last_debug_time = current_time;
-            printf("[DEBUG] current_time=%lu, last_sensor_time=%lu, diff=%lu\r\n", 
-                   current_time, last_sensor_time, current_time - last_sensor_time);
-        }
+        // 判断是否需要进行火焰检测 (如果你想开启，传入1，目前按你代码传入0)
+        u8 do_fire_detection = 0;
+        /* if(frame_counter >= FIRE_DETECT_INTERVAL) {
+            do_fire_detection = 1;
+            frame_counter = 0;
+        } 
+        */
         
-        // ----- 1. 每1秒打印一次状态 ----- (暂时禁用，避免干扰JPEG数据传输)
-        // if(current_time - last_status_time >= 1000)
-        // {
-        //     last_status_time = current_time;
-        //     printf("[Status] Frames: %d, Dropped: %d, Raw: %d, Processed: %d, Records: %d, Alerts: %d\r\n", 
-        //            jpeg_serial_get_frame_count(), 
-        //            jpeg_serial_get_dropped_frames(),
-        //            g_raw_frame_count,
-        //            g_processed_frame_count,
-        //            g_record_count,
-        //            g_fire_alert_count + g_smoke_alert_count);
-        // }
+        // printf("[Camera Task] Processing JPEG frame...\r\n");
+        process_jpeg_frame(0); 
         
-        // ----- 2. 传感器数据采集和发送（每5秒） ----- 
-        if(current_time - last_sensor_time >= SENSOR_INTERVAL)
-        {
-            last_sensor_time = current_time;
-            
-            // 发送传感器数据到ESP8266
-            ESP8266_Report_SendSensorData();
-        }
-        
-        // ----- 3. 图像采集和处理 -----
-        // 直接调用process_jpeg_frame，让函数内部检查缓冲区状态
-        static u32 last_process_time = 0;
-        if(current_time - last_process_time >= 100) {  // 每100ms处理一次
-            last_process_time = current_time;
-            
-            printf("[MAIN] Calling process_jpeg_frame\r\n");
-            
-            // 处理当前帧数据
-            frame_counter++;
-            
-            // 判断是否需要进行火焰检测
-            u8 do_fire_detection = 0;
-            if(frame_counter >= FIRE_DETECT_INTERVAL) {
-                do_fire_detection = 1;
-                frame_counter = 0;  // 重置计数器
-            }
-            
-            // 处理JPEG帧（根据参数决定是否进行火焰检测）
-            //process_jpeg_frame(do_fire_detection);
-						process_jpeg_frame(0);
-        }
-        
-        // ----- 4. 数据保存（暂时禁用，数据通过ESP8266发送） -----
-        // if(current_time - last_save_time >= DATA_SAVE_INTERVAL)
-        // {
-        //     last_save_time = current_time;
-        //     g_record_count++;
-        // }
-        
-        // ----- 5. 生成日报（暂时禁用） -----
-        // if(current_time - last_daily_time >= DAILY_REPORT_INTERVAL)
-        // {
-        //     last_daily_time = current_time;
-        //     generate_daily_report();
-        // }
-        
-        // ----- 6. 清理过期数据（暂时禁用） -----
-        // if(current_time - last_cleanup_time >= CLEANUP_INTERVAL)
-        // {
-        //     last_cleanup_time = current_time;
-        //     SD_DataManager_CleanupOldData();
-        // }
-        
-        // ----- 7. 检查SD卡空间（暂时禁用） -----
-        // u8 space_status = SD_DataManager_CheckSpace();
-        // if(space_status == 2)  // 空间严重不足
-        // {
-        //     printf("[WARNING] SD card space critical! Performing emergency cleanup...\r\n");
-        //     SD_DataManager_EmergencyCleanup();
-        // }
-        // else if(space_status == 1)  // 空间不足
-        // {
-        //     printf("[WARNING] SD card space low!\r\n");
-        // }
-        
-        // ----- 8. 检查USART DMA发送是否完成 ----- 
+        // 2. 检查 USART DMA 发送是否完成
         if(usart1_dma_complete)
         {
-            // 释放发送完成的缓冲区
             if(current_send_buf != NULL) {
                 current_send_buf->state = BUF_IDLE;
                 current_send_buf = NULL;
-							// 清除完成标志
-            usart1_dma_complete = 0;
+                usart1_dma_complete = 0;
             }
-            
-            
-            
         }
         
-        delay_ms(1);
+        // 3. OS 延时 100 毫秒（挂起当前任务，把 CPU 让给别的任务！）
+        vTaskDelay(100);
     }
 }
 
+// 【传感器上报任务】：取代了原来的 5 秒计时器
+void report_task(void *pvParameters)
+{
+    while(1)
+    {
+        // 1. 采集并发送传感器数据
+        // printf("[Report Task] Wake up to send data!\r\n");
+        ESP8266_Report_SendSensorData();
+        
+        // 2. 发送完毕后，任务进入休眠 5000 毫秒！
+        // 这 5 秒内，这个任务绝对不会占用哪怕 0.001% 的 CPU！
+        vTaskDelay(5000);
+    }
+}

@@ -1,5 +1,5 @@
-.\objects\sd_data_manager.o: Hardware\sd_data_manager.c
-.\objects\sd_data_manager.o: Hardware\sd_data_manager.h
+.\objects\sd_data_manager.o: SDcard\sd_data_manager.c
+.\objects\sd_data_manager.o: SDcard\sd_data_manager.h
 .\objects\sd_data_manager.o: .\System\sys\sys.h
 .\objects\sd_data_manager.o: .\Start\stm32f4xx.h
 .\objects\sd_data_manager.o: .\CMSIS\core_cm4.h
@@ -36,8 +36,8 @@
 .\objects\sd_data_manager.o: .\Library\inc\stm32f4xx_dac.h
 .\objects\sd_data_manager.o: .\Library\inc\stm32f4xx_dcmi.h
 .\objects\sd_data_manager.o: .\Library\inc\stm32f4xx_fsmc.h
-.\objects\sd_data_manager.o: Hardware\SDCard.h
-.\objects\sd_data_manager.o: Hardware\RTC.h
+.\objects\sd_data_manager.o: SDcard\SDCard.h
+.\objects\sd_data_manager.o: .\Hardware\RTC.h
 .\objects\sd_data_manager.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\sd_data_manager.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h
 .\objects\sd_data_manager.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdlib.h

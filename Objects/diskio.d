@@ -38,6 +38,6 @@
 .\objects\diskio.o: .\Library\inc\stm32f4xx_fsmc.h
 .\objects\diskio.o: .\System\delay\delay.h
 .\objects\diskio.o: .\System\sys\sys.h
-.\objects\diskio.o: .\Hardware\sdio_sdcard.h
+.\objects\diskio.o: .\SDcard\sdio_sdcard.h
 .\objects\diskio.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\diskio.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h

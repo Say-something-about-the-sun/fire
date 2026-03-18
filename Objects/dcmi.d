@@ -1,4 +1,4 @@
-.\objects\dcmi.o: Hardware\dcmi.c
+.\objects\dcmi.o: ov5640\dcmi.c
 .\objects\dcmi.o: .\System\sys\sys.h
 .\objects\dcmi.o: .\Start\stm32f4xx.h
 .\objects\dcmi.o: .\CMSIS\core_cm4.h
@@ -35,10 +35,10 @@
 .\objects\dcmi.o: .\Library\inc\stm32f4xx_dac.h
 .\objects\dcmi.o: .\Library\inc\stm32f4xx_dcmi.h
 .\objects\dcmi.o: .\Library\inc\stm32f4xx_fsmc.h
-.\objects\dcmi.o: Hardware\dcmi.h
+.\objects\dcmi.o: ov5640\dcmi.h
 .\objects\dcmi.o: .\System\delay\delay.h
 .\objects\dcmi.o: .\System\usart\usart.h
 .\objects\dcmi.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h
-.\objects\dcmi.o: Hardware\jpeg_serial.h
-.\objects\dcmi.o: Hardware\led.h
+.\objects\dcmi.o: .\Hardware\jpeg_serial.h
+.\objects\dcmi.o: .\Hardware\led.h
 .\objects\dcmi.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h

@@ -1,5 +1,5 @@
-.\objects\esp8266.o: Hardware\ESP8266.c
-.\objects\esp8266.o: Hardware\ESP8266.h
+.\objects\esp8266.o: ESP8266\ESP8266.c
+.\objects\esp8266.o: ESP8266\ESP8266.h
 .\objects\esp8266.o: .\System\sys\sys.h
 .\objects\esp8266.o: .\Start\stm32f4xx.h
 .\objects\esp8266.o: .\CMSIS\core_cm4.h

@@ -1,5 +1,5 @@
-.\objects\sdcard.o: Hardware\SDCard.c
-.\objects\sdcard.o: Hardware\SDCard.h
+.\objects\sdcard.o: SDcard\SDCard.c
+.\objects\sdcard.o: SDcard\SDCard.h
 .\objects\sdcard.o: .\System\sys\sys.h
 .\objects\sdcard.o: .\Start\stm32f4xx.h
 .\objects\sdcard.o: .\CMSIS\core_cm4.h

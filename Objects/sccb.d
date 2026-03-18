@@ -1,4 +1,4 @@
-.\objects\sccb.o: Hardware\sccb.c
+.\objects\sccb.o: ov5640\sccb.c
 .\objects\sccb.o: .\System\sys\sys.h
 .\objects\sccb.o: .\Start\stm32f4xx.h
 .\objects\sccb.o: .\CMSIS\core_cm4.h
@@ -35,5 +35,5 @@
 .\objects\sccb.o: .\Library\inc\stm32f4xx_dac.h
 .\objects\sccb.o: .\Library\inc\stm32f4xx_dcmi.h
 .\objects\sccb.o: .\Library\inc\stm32f4xx_fsmc.h
-.\objects\sccb.o: Hardware\sccb.h
+.\objects\sccb.o: ov5640\sccb.h
 .\objects\sccb.o: .\System\delay\delay.h

@@ -91,7 +91,7 @@ void uart_init(u32 bound){
 	//Usart1 NVIC ����
   NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;//����1�ж�ͨ��
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=3;//��ռ���ȼ�3
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority =3;		//�����ȼ�3
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority =0;		//�����ȼ�3
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			//IRQͨ��ʹ��
 	NVIC_Init(&NVIC_InitStructure);	//����ָ���Ĳ�����ʼ��VIC�Ĵ�����
 
@@ -200,8 +200,8 @@ void usart1_dma_init(void)
     
     // ����DMA�ж�
     NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream7_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 7;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
     
