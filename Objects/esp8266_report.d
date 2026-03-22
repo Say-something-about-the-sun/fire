@@ -36,16 +36,11 @@
 .\objects\esp8266_report.o: .\Library\inc\stm32f4xx_dac.h
 .\objects\esp8266_report.o: .\Library\inc\stm32f4xx_dcmi.h
 .\objects\esp8266_report.o: .\Library\inc\stm32f4xx_fsmc.h
-.\objects\esp8266_report.o: ESP8266\ESP8266.h
 .\objects\esp8266_report.o: .\Hardware\fire_detection.h
 .\objects\esp8266_report.o: .\Hardware\image_preprocess.h
 .\objects\esp8266_report.o: .\System\usart3\usart3.h
 .\objects\esp8266_report.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h
-.\objects\esp8266_report.o: .\System\usart2\usart2.h
-.\objects\esp8266_report.o: .\System\delay\delay.h
-.\objects\esp8266_report.o: .\Hardware\RTC.h
 .\objects\esp8266_report.o: .\Hardware\smoke.h
+.\objects\esp8266_report.o: .\Hardware\RTC.h
 .\objects\esp8266_report.o: .\Hardware\jpeg_serial.h
 .\objects\esp8266_report.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h
-.\objects\esp8266_report.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdlib.h
-.\objects\esp8266_report.o: .\Cjson\cJSON.h

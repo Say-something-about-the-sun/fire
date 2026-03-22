@@ -44,6 +44,5 @@
 .\objects\jpeg_serial.o: Hardware\image_preprocess.h
 .\objects\jpeg_serial.o: Hardware\fire_detection.h
 .\objects\jpeg_serial.o: .\ESP8266\esp8266_report.h
-.\objects\jpeg_serial.o: .\ESP8266\ESP8266.h
 .\objects\jpeg_serial.o: Hardware\led.h
 .\objects\jpeg_serial.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h

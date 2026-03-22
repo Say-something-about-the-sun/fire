@@ -335,7 +335,7 @@
               <MiscControls>--diag_suppress=177 --cpu Cortex-M4.fp </MiscControls>
               <Define>STM32F40_41xxx,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\CMSIS;.\Hardware;.\Library\inc;.\Library\src;.\Start;.\System;.\User;.\System\delay;.\System\sys;.\System\usart;.\System\usart2;.\System\usart3;.\FatFS;.\FatFS\option;.\Cjson;.\TJpgDec;.\FreeRTOS\ARM_CM4F;.\FreeRTOS\include;.\FreeRTOS\src</IncludePath>
+              <IncludePath>.\CMSIS;.\Hardware;.\Library\inc;.\Library\src;.\Start;.\System;.\User;.\System\delay;.\System\sys;.\System\usart;.\System\usart2;.\System\usart3;.\FatFS;.\FatFS\option;.\Cjson;.\TJpgDec;.\FreeRTOS\ARM_CM4F;.\FreeRTOS\include;.\FreeRTOS\src;.\ov5640;.\SDcard;.\ESP8266</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -900,81 +900,6 @@
           <GroupName>Hardware</GroupName>
           <Files>
             <File>
-              <FileName>ov5640.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Hardware\ov5640.h</FilePath>
-            </File>
-            <File>
-              <FileName>ov5640.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\ov5640.c</FilePath>
-            </File>
-            <File>
-              <FileName>dcmi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\dcmi.c</FilePath>
-            </File>
-            <File>
-              <FileName>dcmi.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Hardware\dcmi.h</FilePath>
-            </File>
-            <File>
-              <FileName>sccb.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\sccb.c</FilePath>
-            </File>
-            <File>
-              <FileName>sccb.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Hardware\sccb.h</FilePath>
-            </File>
-            <File>
-              <FileName>ov5640cfg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Hardware\ov5640cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>sdio_sdcard.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\sdio_sdcard.c</FilePath>
-            </File>
-            <File>
-              <FileName>sdio_sdcard.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Hardware\sdio_sdcard.h</FilePath>
-            </File>
-            <File>
-              <FileName>SDCard.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\SDCard.c</FilePath>
-            </File>
-            <File>
-              <FileName>SDCard.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Hardware\SDCard.h</FilePath>
-            </File>
-            <File>
-              <FileName>sdcard_jpeg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\sdcard_jpeg.c</FilePath>
-            </File>
-            <File>
-              <FileName>sdcard_jpeg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Hardware\sdcard_jpeg.h</FilePath>
-            </File>
-            <File>
-              <FileName>ESP8266.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\ESP8266.c</FilePath>
-            </File>
-            <File>
-              <FileName>ESP8266.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Hardware\ESP8266.h</FilePath>
-            </File>
-            <File>
               <FileName>smoke.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Hardware\smoke.c</FilePath>
@@ -1045,16 +970,6 @@
               <FilePath>.\Hardware\fire_detection.h</FilePath>
             </File>
             <File>
-              <FileName>sd_data_manager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\sd_data_manager.c</FilePath>
-            </File>
-            <File>
-              <FileName>sd_data_manager.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Hardware\sd_data_manager.h</FilePath>
-            </File>
-            <File>
               <FileName>led.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Hardware\led.c</FilePath>
@@ -1063,16 +978,6 @@
               <FileName>led.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Hardware\led.h</FilePath>
-            </File>
-            <File>
-              <FileName>esp8266_report.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\esp8266_report.c</FilePath>
-            </File>
-            <File>
-              <FileName>esp8266_report.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Hardware\esp8266_report.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1208,6 +1113,116 @@
               <FileName>port.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\FreeRTOS\ARM_CM4F\port.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>SDcard</GroupName>
+          <Files>
+            <File>
+              <FileName>sd_data_manager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDcard\sd_data_manager.c</FilePath>
+            </File>
+            <File>
+              <FileName>sd_data_manager.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDcard\sd_data_manager.h</FilePath>
+            </File>
+            <File>
+              <FileName>SDCard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDcard\SDCard.c</FilePath>
+            </File>
+            <File>
+              <FileName>SDCard.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDcard\SDCard.h</FilePath>
+            </File>
+            <File>
+              <FileName>sdcard_jpeg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDcard\sdcard_jpeg.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdcard_jpeg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDcard\sdcard_jpeg.h</FilePath>
+            </File>
+            <File>
+              <FileName>sdio_sdcard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SDcard\sdio_sdcard.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdio_sdcard.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SDcard\sdio_sdcard.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>esp8266</GroupName>
+          <Files>
+            <File>
+              <FileName>ESP8266.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ESP8266\ESP8266.c</FilePath>
+            </File>
+            <File>
+              <FileName>ESP8266.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ESP8266\ESP8266.h</FilePath>
+            </File>
+            <File>
+              <FileName>esp8266_report.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ESP8266\esp8266_report.c</FilePath>
+            </File>
+            <File>
+              <FileName>esp8266_report.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ESP8266\esp8266_report.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ov5640</GroupName>
+          <Files>
+            <File>
+              <FileName>dcmi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ov5640\dcmi.c</FilePath>
+            </File>
+            <File>
+              <FileName>dcmi.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ov5640\dcmi.h</FilePath>
+            </File>
+            <File>
+              <FileName>ov5640.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ov5640\ov5640.c</FilePath>
+            </File>
+            <File>
+              <FileName>ov5640.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ov5640\ov5640.h</FilePath>
+            </File>
+            <File>
+              <FileName>ov5640cfg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ov5640\ov5640cfg.h</FilePath>
+            </File>
+            <File>
+              <FileName>sccb.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ov5640\sccb.c</FilePath>
+            </File>
+            <File>
+              <FileName>sccb.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ov5640\sccb.h</FilePath>
             </File>
           </Files>
         </Group>

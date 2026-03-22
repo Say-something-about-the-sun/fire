@@ -2,8 +2,12 @@
 
 #include "usart2.h"
 #include "delay.h"
+#include <string.h>
+#include <stdio.h>
 
 // ESP32数据接收缓冲区定义
+ESP32_SensorData g_esp32_data;
+
 u8 ESP32_RX_BUF[ESP32_RX_BUF_SIZE];
 u16 ESP32_RX_STA = 0;
 
@@ -134,5 +138,51 @@ void USART2_IRQHandler(void)
     }
 		
 		
+}
+
+
+void USART2_Process_ESP32_Data(void)
+{
+    // 检查是否接收到完整的一帧数据 (以 \r\n 结尾)
+    if(ESP32_RX_STA & 0x8000)
+    {
+        // 1. 获取数据长度，并添加字符串结束符
+        u16 len = ESP32_RX_STA & 0x3FFF;
+        ESP32_RX_BUF[len] = '\0'; 
+        
+        char* str = (char*)ESP32_RX_BUF;
+        
+        // 2. 判断是否是【时间数据】： TIME:YYYY-MM-DD HH:MM:SS
+        if(strncmp(str, "TIME:", 5) == 0)
+        {
+            // 提取时间字符串，跳过 "TIME:" 这5个字符
+            strncpy(g_esp32_data.ntp_time, str + 5, sizeof(g_esp32_data.ntp_time) - 1);
+            g_esp32_data.ntp_time[sizeof(g_esp32_data.ntp_time) - 1] = '\0';
+            g_esp32_data.time_updated = 1; // 标记时间已更新
+            
+            // 给 ESP32 回复 OK (虽然只有发送数据时才强制等OK，但回一个更稳妥)
+            USART2_Send_String("OK\r\n");
+        }
+        // 3. 判断是否是【传感器数据】： FLAME_AO:xxx,FLAME_DO:x,FIRE:x
+        else if(strncmp(str, "FLAME_AO:", 9) == 0)
+        {
+            int ao = 0, do_val = 0, fire = 0;
+            
+            // 使用 sscanf 提取对应格式的数字
+            if(sscanf(str, "FLAME_AO:%d,FLAME_DO:%d,FIRE:%d", &ao, &do_val, &fire) == 3)
+            {
+                g_esp32_data.flame_adc = (u16)ao;
+                g_esp32_data.flame_do = (u8)do_val;
+                g_esp32_data.fire_detected = (u8)fire;
+            }
+            
+            // 🚨 关键：必须给 ESP32 回复 OK，否则 ESP32 的 waitForSTM32Response() 会苦等2秒！
+            USART2_Send_String("OK\r\n");
+        }
+        
+        // 4. 清空接收缓冲区，准备接收下一轮数据
+        ESP32_RX_STA = 0;
+        memset(ESP32_RX_BUF, 0, ESP32_RX_BUF_SIZE);
+    }
 }
 

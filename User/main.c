@@ -220,7 +220,7 @@ int main(void)
     USART2_ConfigInterrupt();
     
     // 6. 初始化ESP8266（WiFi通信）
-    USART3_Init(115200);  // 初始化USART3，波特率115200
+    USART3_Init(9600);  // 初始化USART3，波特率9600
     USART3_ConfigInterrupt();  // 配置USART3中断
     ESP8266_Init();
     ESP8266_Report_Init();  // 初始化ESP8266报告模块
@@ -256,6 +256,7 @@ int main(void)
     
     // 如果系统内存不足导致调度器启动失败，才会运行到这里
     while(1) {
+			 
         printf("[ERROR] FreeRTOS Scheduler failed to start! Check Memory.\r\n");
         delay_ms(1000);
     }
@@ -286,6 +287,8 @@ void camera_task(void *pvParameters)
     
     while(1)
     {
+			// ==================== 每次循环都检查并解析 ESP32 数据 ====================
+        USART2_Process_ESP32_Data();
         // 1. 处理图像帧
         frame_counter++;
         
