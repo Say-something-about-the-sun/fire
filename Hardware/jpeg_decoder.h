@@ -6,7 +6,7 @@
 #include "sys.h"
 
 // JPEG缓冲区地址（内部SRAM）
-#define JPEG_BUF_ADDR       0x20000000      // 内部SRAM起始地址
+
 #define JPEG_MAX_SIZE       (32*1024)       // 每帧最大32KB
 
 // RGB缓冲区配置（外部SRAM）

@@ -4,6 +4,7 @@
 #include "delay.h"
 #include <string.h>
 #include <stdio.h>
+#include <RTC.h>
 
 // ESP32数据接收缓冲区定义
 ESP32_SensorData g_esp32_data;
@@ -152,15 +153,22 @@ void USART2_Process_ESP32_Data(void)
         
         char* str = (char*)ESP32_RX_BUF;
         
-        // 2. 判断是否是【时间数据】： TIME:YYYY-MM-DD HH:MM:SS
+       // 2. 判断是否是【时间数据】： TIME:YYYY-MM-DD HH:MM:SS
         if(strncmp(str, "TIME:", 5) == 0)
         {
-            // 提取时间字符串，跳过 "TIME:" 这5个字符
+            // 提取时间字符串，存入全局变量备份（可选）
             strncpy(g_esp32_data.ntp_time, str + 5, sizeof(g_esp32_data.ntp_time) - 1);
             g_esp32_data.ntp_time[sizeof(g_esp32_data.ntp_time) - 1] = '\0';
-            g_esp32_data.time_updated = 1; // 标记时间已更新
+            g_esp32_data.time_updated = 1; 
             
-            // 给 ESP32 回复 OK (虽然只有发送数据时才强制等OK，但回一个更稳妥)
+            // 🚨 【核心修复】：直接调用你封装好的 RTC_Set_Time 函数！
+            // str+5 刚好指向 "YYYY-MM-DD HH:MM:SS"，完美契合你的 sscanf 格式
+            RTC_Set_Time(str + 5); 
+            
+            // 打印调试信息，确认校准成功
+            printf("[RTC] Synced with ESP32: %s\r\n", str + 5);
+            
+            // 回复 OK
             USART2_Send_String("OK\r\n");
         }
         // 3. 判断是否是【传感器数据】： FLAME_AO:xxx,FLAME_DO:x,FIRE:x

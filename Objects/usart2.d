@@ -37,3 +37,6 @@
 .\objects\usart2.o: .\Library\inc\stm32f4xx_dcmi.h
 .\objects\usart2.o: .\Library\inc\stm32f4xx_fsmc.h
 .\objects\usart2.o: .\System\delay\delay.h
+.\objects\usart2.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h
+.\objects\usart2.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\usart2.o: .\Hardware\RTC.h

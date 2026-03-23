@@ -4,6 +4,7 @@
 #include "RTC.h"
 #include "jpeg_serial.h"
 #include <stdio.h>
+#include "usart2.h"
 #include <string.h>
 
 
@@ -19,22 +20,21 @@ void ESP8266_Report_Init(void)
 // 2. 采集传感器数据 
 static void ESP8266_Report_CollectSensorData(SensorDataPacket* packet)
 {
-    // 获取时间
+    // ================= 1. 获取时间 =================
+    // 因为 RTC 已经被 USART2 中断实时校准过了，所以直接读取 RTC 即可获得完美同步的走动时间！
     RTC_Get_Time(packet->timestamp);
     
-    // 获取烟雾
+    // ================= 2. STM32 本地传感器 =================
+    // 烟雾传感器 (直连在 STM32)
     packet->smoke_ppm = Smoke_Get_Concentration();
     packet->smoke_adc = Smoke_Get_ADC_Value();
     packet->smoke_detected = (packet->smoke_ppm > 50.0f) ? 1 : 0;
     
-    // 临时填充其他数据（请根据你的实际情况接入真实函数）
-    packet->flame_adc = 34500;
-    packet->flame_do = 0;
-    packet->fire_detected = 0;
-    packet->temperature = 25.5f;
-    packet->temp_detected = 1;
+    // 预留的温湿度传感器 (暂时填充安全默认值，等你以后加代码)
+    packet->temperature = 25.5f; 
+    packet->temp_detected = 0;   
     
-    // 获取图像处理结果
+    // ================= 3. 图像处理结果 (OV5640) =================
     packet->image_fire_detected = g_latest_fire_result.fire_detected;
     packet->image_confidence = g_latest_fire_result.confidence;
     packet->fire_area = g_latest_fire_result.fire_area;
@@ -45,11 +45,40 @@ static void ESP8266_Report_CollectSensorData(SensorDataPacket* packet)
     // 帧统计
     packet->frame_count = jpeg_serial_get_frame_count();
     packet->dropped_frames = jpeg_serial_get_dropped_frames();
-    
-    // 风险等级 (临时定死，或者接入你的计算函数)
-    packet->risk_level = packet->smoke_detected ? 2 : 0;
-    packet->confidence = 85.5f;
+
+    // ================= 4. 来自 ESP32 的协处理器数据 =================
+    // 直接读取 USART2 中断解析后存入的全局变量
+    packet->flame_adc = g_esp32_data.flame_adc;
+    packet->flame_do = g_esp32_data.flame_do;
+    packet->fire_detected = g_esp32_data.fire_detected;
+
+    // ================= 5. 智能多维度风险评估模型 =================
+    u8 current_risk = 0;
+    float current_confidence = 0.0f;
+
+    // 致命危险 (Level 3)：视觉图像确认起火，或 ESP32 发现明火
+    if (packet->image_fire_detected || packet->fire_detected || packet->flame_do == 1) 
+    {
+        current_risk = 3; 
+        current_confidence = packet->image_fire_detected ? packet->image_confidence : 85.0f;
+    } 
+    // 潜在危险 (Level 1)：仅有烟雾超标，无明火信号
+    else if (packet->smoke_detected)
+    {
+        current_risk = 1;
+        current_confidence = 60.0f;
+    }
+    // 正常安全 (Level 0)
+    else 
+    {
+        current_risk = 0; 
+        current_confidence = 100.0f; 
+    }
+
+    packet->risk_level = current_risk;
+    packet->confidence = current_confidence;
 }
+
 
 // 3. 将数据打包成 JSON 字符串 (防死机纯整数版)
 static void ESP8266_Report_PackageJSON(SensorDataPacket* packet, JsonDataPacket* json)

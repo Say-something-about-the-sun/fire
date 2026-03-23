@@ -6,6 +6,7 @@
 #include "tjpgd.h"
 #include "extsram.h"
 
+
 // 外部SRAM RGB缓冲区配置
 #define RGB_BUF_SIZE       (320 * 240 * 2)       // RGB565格式：150KB
 #define RGB_BUF_ADDR       0x68000000            // 外部SRAM起始地址（FSMC映射）
@@ -14,8 +15,11 @@
 #define ROW_BUFFER_HEIGHT  8                      // 缓存8行
 #define ROW_BUFFER_WIDTH   320                    // 每行320像素
 #define ROW_BUFFER_SIZE    (ROW_BUFFER_WIDTH * ROW_BUFFER_HEIGHT * 2)  // 8×320×2=5120字节
-#define JPEG_BUF_ADDR       0x20000000
+#define JPEG_MAX_SIZE       (32*1024)
 
+
+
+extern uint8_t jpeg_buf_a;
 
 // 外部SRAM RGB缓冲区
 #define rgb_buffer  ((u16*)RGB_BUF_ADDR)  // RGB565格式（外部SRAM）
@@ -24,7 +28,7 @@
 __align(4) u16 row_buffer[ROW_BUFFER_HEIGHT][ROW_BUFFER_WIDTH];
 
 // TJpgDec解码工作区
-__align(4) uint8_t work[ 8192];  // 解码工作区
+__align(4) uint8_t work[ 16384];  // 解码工作区
 
 // 解码状态
 typedef struct {
@@ -125,7 +129,22 @@ u8 jpeg_decoder_decode(const uint8_t* jpeg_data, uint32_t jpeg_size)
     uint32_t start_time, end_time;
     jpeg_stream_t stream;
 
-	
+	// 🚨 终极探针：检查是否发生了恐怖的“DMA内存踩踏”！
+    printf("\r\n--- MEMORY CHECK ---\r\n");
+    printf("JPEG Data Addr (DMA) : 0x%08X\r\n", (uint32_t)jpeg_data);
+    printf("TJpgDec Work Addr    : 0x%08X\r\n", (uint32_t)work);
+    
+    // 计算地址差值
+    int diff = (int)((uint32_t)work - (uint32_t)jpeg_data);
+    if(diff < 0) diff = -diff;
+    printf("Distance             : %d bytes\r\n", diff);
+    
+    // 如果工作区和DMA缓冲区的距离小于32KB，说明互相重叠了！
+    if(diff < 32768) {
+        printf("🚨 DANGER: Memory Overlap Detected! DMA is crushing the workspace!\r\n");
+    }
+    printf("--------------------\r\n");
+		
      // 初始化stream
     stream.data = jpeg_data;      // 直接使用传入的jpeg_data
     stream.size = jpeg_size;

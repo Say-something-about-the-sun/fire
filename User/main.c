@@ -246,7 +246,7 @@ int main(void)
     // 2. 创建【启动任务】 (分配 256 字节栈，优先级最低设为 1)
     xTaskCreate((TaskFunction_t )start_task,            
                 (const char* )"start_task",          
-                (uint16_t       )256,                   
+                (uint16_t       )1024,                   
                 (void* )NULL,                  
                 (UBaseType_t    )1,                     
                 (TaskHandle_t* )&StartTask_Handler);   
@@ -292,16 +292,21 @@ void camera_task(void *pvParameters)
         // 1. 处理图像帧
         frame_counter++;
         
-        // 判断是否需要进行火焰检测 (如果你想开启，传入1，目前按你代码传入0)
-        u8 do_fire_detection = 0;
-        /* if(frame_counter >= FIRE_DETECT_INTERVAL) {
-            do_fire_detection = 1;
-            frame_counter = 0;
-        } 
-        */
+        // 判断是否需要进行火焰检测 (如果你想开启，传入1)
         
-        // printf("[Camera Task] Processing JPEG frame...\r\n");
-        process_jpeg_frame(0); 
+			u8 do_fire_detection = 0;
+        if(frame_counter >= 5) 
+        {
+            do_fire_detection = 1;
+            frame_counter = 0; // 计数器清零
+        }
+			
+        
+        // 🚨 【核心修复】：把原来的 process_jpeg_frame(0) 替换掉！
+        // 传入 do_fire_detection，让它根据计划开启扫描
+        process_jpeg_frame(do_fire_detection);
+      
+      
         
         // 2. 检查 USART DMA 发送是否完成
         if(usart1_dma_complete)

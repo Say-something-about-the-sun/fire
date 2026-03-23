@@ -11,11 +11,6 @@
 #define USART2_TX_PORT GPIOA
 #define USART2_RX_PORT GPIOA
 
-// ESP32数据接收缓冲区定义
-#define ESP32_RX_BUF_SIZE 128
-extern u8 ESP32_RX_BUF[ESP32_RX_BUF_SIZE];
-extern u16 ESP32_RX_STA;
-
 
 typedef struct {
     char ntp_time[25];    // NTP时间字符串 (如 "2026-03-22 21:56:28")
@@ -27,6 +22,13 @@ typedef struct {
 } ESP32_SensorData;
 
 
+
+// ESP32数据接收缓冲区定义
+#define ESP32_RX_BUF_SIZE 128
+extern u8 ESP32_RX_BUF[ESP32_RX_BUF_SIZE];
+extern u16 ESP32_RX_STA;
+extern ESP32_SensorData g_esp32_data;
+  
 
 // 函数声明
 void USART2_Init(u32 baudrate);

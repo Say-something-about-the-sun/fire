@@ -14,7 +14,6 @@
 
 // 内部SRAM JPEG缓冲区配置（双缓冲）
 #define JPEG_MAX_SIZE       (32*1024)       // 每帧最大32KB（320*240分辨率）
-#define JPEG_BUF_ADDR       0x20000000      // 内部SRAM起始地址
 
 // 检测缓冲区地址配置（外部SRAM）
 #define DETECT_RGB_BUF_ADDR 0x6804B000      // 检测用RGB缓冲区（HSV缓冲区之后）
@@ -398,27 +397,29 @@ u8 process_jpeg_frame(u8 do_fire_detection)
                 led_state = 0;
             }
             
-            // 根据参数决定是否进行火焰检测（频率控制）
+            // 根据参数决定是否进行火焰检测
             if(do_fire_detection) {
                 fire_detection_frame_count++;
                 
-                // 每隔N帧进行一次火焰检测，减少CPU占用
-                if(fire_detection_frame_count % FIRE_DETECTION_INTERVAL == 0) {
+                // 🚨 修复一：暂时注释掉内部限流，只要外部让测，我们就测！
+                // if(fire_detection_frame_count % FIRE_DETECTION_INTERVAL == 0) {
+                    
+                    printf("\r\n[Vision] 1. Start decoding JPEG...\r\n");
                     
                     // 1. 解码JPEG
-                    // 注意：这里解码器已经把真实的图像写到了内部正确的地址
-                    if(jpeg_decoder_process(&p[jpeg_start], jpeg_size) == 0) {
+                    int decode_res = jpeg_decoder_process(&p[jpeg_start], jpeg_size);
+                    
+                    if(decode_res == 0) {
+                        printf("[Vision] 2. Decode SUCCESS! Processing pixels...\r\n");
                         
-                        // 2. 【核心修复】动态获取解码后的真实地址和宽高！
-                        // 彻底抛弃 DETECT_RGB_BUF_ADDR 这个没初始化的毒瘤地址
                         JpegDecodeState* dec = jpeg_decoder_get_state();
                         
-                        // 3. RGB转HSV（使用正确的源地址 dec->dst_buf 和真实宽高）
+                        // 3. RGB转HSV
                         image_preprocess_frame_rgb_to_hsv(dec->dst_buf, 
                                                          (hsv_t*)DETECT_HSV_BUF_ADDR, 
                                                          dec->width, dec->height);
                         
-                        // 4. 火焰检测（传入真实的宽高防越界）
+                        // 4. 火焰检测
                         FireDetectionResult fire_result;
                         fire_detection_process_frame((hsv_t*)DETECT_HSV_BUF_ADDR, 
                                                     dec->width, dec->height, 
@@ -426,11 +427,21 @@ u8 process_jpeg_frame(u8 do_fire_detection)
                         
                         // 5. 更新火焰检测结果到报告模块
                         ESP8266_Report_UpdateFireDetectionResult(&fire_result);
+                        
+                        printf("[Vision] 3. Algorithm done! Fire: %d, Area: %d\r\n", 
+                               fire_result.fire_detected, fire_result.fire_area);
+                    } 
+                    else {
+                        // 🚨 修复二：如果解码失败，大声喊出来错在哪！
+                        printf("[Vision] ERROR: JPEG Decode FAILED! Error Code: %d\r\n", decode_res);
+                    }
+                // } 
+            }
                     }
                 }
-            }
-        }
-    }
+            
+        
+    
     
     // 处理完成后标记为空闲
     ready_buf->state = BUF_IDLE;

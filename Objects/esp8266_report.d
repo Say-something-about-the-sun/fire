@@ -43,4 +43,5 @@
 .\objects\esp8266_report.o: .\Hardware\smoke.h
 .\objects\esp8266_report.o: .\Hardware\RTC.h
 .\objects\esp8266_report.o: .\Hardware\jpeg_serial.h
+.\objects\esp8266_report.o: .\System\usart2\usart2.h
 .\objects\esp8266_report.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h
