@@ -33,6 +33,7 @@
 #define configGENERATE_RUN_TIME_STATS           0
 #define configUSE_TRACE_FACILITY                1
 #define configUSE_STATS_FORMATTING_FUNCTIONS    1
+#define configUSE_MUTEXES        1  // 1表示开启互斥锁
 
 /* 软件定时器相关配置 */
 #define configUSE_TIMERS                        1

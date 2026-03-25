@@ -45,3 +45,13 @@
 .\objects\esp8266_report.o: .\Hardware\jpeg_serial.h
 .\objects\esp8266_report.o: .\System\usart2\usart2.h
 .\objects\esp8266_report.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h
+.\objects\esp8266_report.o: .\dht11\dht11.h
+.\objects\esp8266_report.o: .\water_pump\water_pump.h
+.\objects\esp8266_report.o: .\FreeRTOS\include\FreeRTOS.h
+.\objects\esp8266_report.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stddef.h
+.\objects\esp8266_report.o: .\FreeRTOS\include\FreeRTOSConfig.h
+.\objects\esp8266_report.o: .\FreeRTOS\include\projdefs.h
+.\objects\esp8266_report.o: .\FreeRTOS\include\portable.h
+.\objects\esp8266_report.o: .\FreeRTOS\include\deprecated_definitions.h
+.\objects\esp8266_report.o: .\FreeRTOS\ARM_CM4F\portmacro.h
+.\objects\esp8266_report.o: .\FreeRTOS\include\mpu_wrappers.h

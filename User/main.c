@@ -18,10 +18,47 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include  "water_pump.h"
+#include "water_pump.h"
 
+
+#include <stdarg.h>
 // 引入 FreeRTOS 头文件
 #include "FreeRTOS.h"
 #include "task.h"
+#include "semphr.h"
+
+
+// 1. 定义一把全局串口互斥锁
+SemaphoreHandle_t Mutex_USART1;
+
+// 2. 打造工业级的安全打印函数
+void Safe_Printf(char *format, ...)
+{
+    // 如果操作系统已经启动，才使用锁机制
+    if(xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) 
+    {
+        // 拿锁：防止别的任务此时也想打印
+        xSemaphoreTake(Mutex_USART1, portMAX_DELAY);
+        
+        // 🚨 【核心防爆逻辑】：等待底层的 DMA 图片发送彻底结束！
+        // 只要 DMA (假设 USART1_TX 用的是 DMA2_Stream7) 还在工作，就挂起等待，绝不插嘴！
+        while ((DMA2_Stream7->CR & DMA_SxCR_EN) != RESET) {
+            vTaskDelay(1); 
+        }
+    }
+
+    // 调用底层的字符格式化发送
+    va_list args;
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
+
+    // 释放锁，让给别人用
+    if(xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) {
+        xSemaphoreGive(Mutex_USART1);
+    }
+}
 
 
 // 摄像头参数
@@ -214,6 +251,10 @@ int main(void)
     // 4. 初始化烟雾传感器
     Smoke_Sensor_Init();
     
+		//水泵初始化
+		WaterPump_Init();
+		//温湿度初始化
+		DHT11_Init();
     // 5. 初始化USART2（用于ESP32通信）
     
     USART2_Init(115200);
@@ -241,6 +282,10 @@ int main(void)
     // printf("========================================\r\n\r\n");
     printf("[OK] Hardware initialized! Starting FreeRTOS Scheduler...\r\n");
 		
+	
+	
+	// 创建这把互斥锁
+    Mutex_USART1 = xSemaphoreCreateMutex();
 	
     
     // 2. 创建【启动任务】 (分配 256 字节栈，优先级最低设为 1)

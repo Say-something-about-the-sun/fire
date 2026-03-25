@@ -46,3 +46,13 @@
 .\objects\jpeg_serial.o: .\ESP8266\esp8266_report.h
 .\objects\jpeg_serial.o: Hardware\led.h
 .\objects\jpeg_serial.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h
+.\objects\jpeg_serial.o: .\FreeRTOS\include\FreeRTOS.h
+.\objects\jpeg_serial.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stddef.h
+.\objects\jpeg_serial.o: .\FreeRTOS\include\FreeRTOSConfig.h
+.\objects\jpeg_serial.o: .\FreeRTOS\include\projdefs.h
+.\objects\jpeg_serial.o: .\FreeRTOS\include\portable.h
+.\objects\jpeg_serial.o: .\FreeRTOS\include\deprecated_definitions.h
+.\objects\jpeg_serial.o: .\FreeRTOS\ARM_CM4F\portmacro.h
+.\objects\jpeg_serial.o: .\FreeRTOS\include\mpu_wrappers.h
+.\objects\jpeg_serial.o: .\FreeRTOS\include\semphr.h
+.\objects\jpeg_serial.o: .\FreeRTOS\include\queue.h

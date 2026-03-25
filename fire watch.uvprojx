@@ -335,7 +335,7 @@
               <MiscControls>--diag_suppress=177 --cpu Cortex-M4.fp </MiscControls>
               <Define>STM32F40_41xxx,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\CMSIS;.\Hardware;.\Library\inc;.\Library\src;.\Start;.\System;.\User;.\System\delay;.\System\sys;.\System\usart;.\System\usart2;.\System\usart3;.\FatFS;.\FatFS\option;.\Cjson;.\TJpgDec;.\FreeRTOS\ARM_CM4F;.\FreeRTOS\include;.\FreeRTOS\src;.\ov5640;.\SDcard;.\ESP8266</IncludePath>
+              <IncludePath>.\CMSIS;.\Hardware;.\Library\inc;.\Library\src;.\Start;.\System;.\User;.\System\delay;.\System\sys;.\System\usart;.\System\usart2;.\System\usart3;.\FatFS;.\FatFS\option;.\Cjson;.\TJpgDec;.\FreeRTOS\ARM_CM4F;.\FreeRTOS\include;.\FreeRTOS\src;.\ov5640;.\SDcard;.\ESP8266;.\water_pump;.\dht11</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1228,6 +1228,26 @@
               <FileName>sccb.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\ov5640\sccb.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>water_pump</GroupName>
+          <Files>
+            <File>
+              <FileName>water_pump.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\water_pump\water_pump.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>dht11</GroupName>
+          <Files>
+            <File>
+              <FileName>dht11.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\dht11\dht11.c</FilePath>
             </File>
           </Files>
         </Group>

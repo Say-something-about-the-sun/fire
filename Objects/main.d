@@ -60,6 +60,8 @@
 .\objects\main.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h
 .\objects\main.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\main.o: .\Hardware\led.h
+.\objects\main.o: .\water_pump\water_pump.h
+.\objects\main.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdarg.h
 .\objects\main.o: .\FreeRTOS\include\FreeRTOS.h
 .\objects\main.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stddef.h
 .\objects\main.o: .\FreeRTOS\include\FreeRTOSConfig.h
@@ -70,3 +72,5 @@
 .\objects\main.o: .\FreeRTOS\include\mpu_wrappers.h
 .\objects\main.o: .\FreeRTOS\include\task.h
 .\objects\main.o: .\FreeRTOS\include\list.h
+.\objects\main.o: .\FreeRTOS\include\semphr.h
+.\objects\main.o: .\FreeRTOS\include\queue.h

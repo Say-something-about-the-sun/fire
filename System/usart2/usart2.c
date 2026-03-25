@@ -6,6 +6,13 @@
 #include <stdio.h>
 #include <RTC.h>
 
+#include "FreeRTOS.h"
+#include "semphr.h"
+
+extern SemaphoreHandle_t Mutex_USART1;
+void Safe_Printf(char *format, ...);
+
+
 // ESP32数据接收缓冲区定义
 ESP32_SensorData g_esp32_data;
 
@@ -166,7 +173,7 @@ void USART2_Process_ESP32_Data(void)
             RTC_Set_Time(str + 5); 
             
             // 打印调试信息，确认校准成功
-            printf("[RTC] Synced with ESP32: %s\r\n", str + 5);
+            Safe_Printf("[RTC] Synced with ESP32: %s\r\n", str + 5);
             
             // 回复 OK
             USART2_Send_String("OK\r\n");

@@ -12,6 +12,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "FreeRTOS.h"
+#include "semphr.h"
+
+extern SemaphoreHandle_t Mutex_USART1;
+void Safe_Printf(char *format, ...);
+
 // 内部SRAM JPEG缓冲区配置（双缓冲）
 #define JPEG_MAX_SIZE       (32*1024)       // 每帧最大32KB（320*240分辨率）
 
@@ -381,9 +387,14 @@ u8 process_jpeg_frame(u8 do_fire_detection)
         
         // 确保数据大小合理（至少100字节）
         if(jpeg_size > 100) {
-            // 始终发送图像到串口（显示）
+            
+					// 🚨 【加上这三行】：拿锁 -> 发图片指令 -> 瞬间还锁
+            // 这样能保证在启动 DMA 的瞬间，绝对没有人在 printf
+            if(Mutex_USART1 != NULL) xSemaphoreTake(Mutex_USART1, portMAX_DELAY);
+            
             serial_send_jpeg_data(&p[jpeg_start], jpeg_size);
             
+            if(Mutex_USART1 != NULL) xSemaphoreGive(Mutex_USART1);
             // 增加处理成功帧计数
             g_processed_frame_count++;
             

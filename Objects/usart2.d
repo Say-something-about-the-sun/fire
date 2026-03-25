@@ -40,3 +40,13 @@
 .\objects\usart2.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h
 .\objects\usart2.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\usart2.o: .\Hardware\RTC.h
+.\objects\usart2.o: .\FreeRTOS\include\FreeRTOS.h
+.\objects\usart2.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stddef.h
+.\objects\usart2.o: .\FreeRTOS\include\FreeRTOSConfig.h
+.\objects\usart2.o: .\FreeRTOS\include\projdefs.h
+.\objects\usart2.o: .\FreeRTOS\include\portable.h
+.\objects\usart2.o: .\FreeRTOS\include\deprecated_definitions.h
+.\objects\usart2.o: .\FreeRTOS\ARM_CM4F\portmacro.h
+.\objects\usart2.o: .\FreeRTOS\include\mpu_wrappers.h
+.\objects\usart2.o: .\FreeRTOS\include\semphr.h
+.\objects\usart2.o: .\FreeRTOS\include\queue.h
