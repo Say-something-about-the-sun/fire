@@ -83,6 +83,7 @@
 ".\objects\sccb.o"
 ".\objects\water_pump.o"
 ".\objects\dht11.o"
+".\objects\key.o"
 --library_type=microlib --strict --scatter ".\Objects\fire watch.sct"
 --summary_stderr --info summarysizes --map --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

@@ -61,6 +61,7 @@
 .\objects\main.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\main.o: .\Hardware\led.h
 .\objects\main.o: .\water_pump\water_pump.h
+.\objects\main.o: .\key\key.h
 .\objects\main.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdarg.h
 .\objects\main.o: .\FreeRTOS\include\FreeRTOS.h
 .\objects\main.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stddef.h

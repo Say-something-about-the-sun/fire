@@ -37,6 +37,8 @@ typedef struct {
     u8 pump_status;         // 水泵状态：1=喷水，0=关闭
     
 		
+		u8 system_mode;       // 0=自动(AI托管), 1=手动(人工接管)
+		u8 main_power_status; // 1=主电源通电, 0=跳闸断电
 		
 } SensorDataPacket;
 

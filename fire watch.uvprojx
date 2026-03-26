@@ -335,7 +335,7 @@
               <MiscControls>--diag_suppress=177 --cpu Cortex-M4.fp </MiscControls>
               <Define>STM32F40_41xxx,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\CMSIS;.\Hardware;.\Library\inc;.\Library\src;.\Start;.\System;.\User;.\System\delay;.\System\sys;.\System\usart;.\System\usart2;.\System\usart3;.\FatFS;.\FatFS\option;.\Cjson;.\TJpgDec;.\FreeRTOS\ARM_CM4F;.\FreeRTOS\include;.\FreeRTOS\src;.\ov5640;.\SDcard;.\ESP8266;.\water_pump;.\dht11</IncludePath>
+              <IncludePath>.\CMSIS;.\Hardware;.\Library\inc;.\Library\src;.\Start;.\System;.\User;.\System\delay;.\System\sys;.\System\usart;.\System\usart2;.\System\usart3;.\FatFS;.\FatFS\option;.\Cjson;.\TJpgDec;.\FreeRTOS\ARM_CM4F;.\FreeRTOS\include;.\FreeRTOS\src;.\ov5640;.\SDcard;.\ESP8266;.\water_pump;.\dht11;.\key</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1248,6 +1248,16 @@
               <FileName>dht11.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\dht11\dht11.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>key</GroupName>
+          <Files>
+            <File>
+              <FileName>key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\key\key.c</FilePath>
             </File>
           </Files>
         </Group>

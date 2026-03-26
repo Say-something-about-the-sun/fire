@@ -55,3 +55,4 @@
 .\objects\esp8266_report.o: .\FreeRTOS\include\deprecated_definitions.h
 .\objects\esp8266_report.o: .\FreeRTOS\ARM_CM4F\portmacro.h
 .\objects\esp8266_report.o: .\FreeRTOS\include\mpu_wrappers.h
+.\objects\esp8266_report.o: .\key\key.h

@@ -19,8 +19,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include  "water_pump.h"
-#include "water_pump.h"
-
+#include "key.h"
 
 #include <stdarg.h>
 // 引入 FreeRTOS 头文件
@@ -255,6 +254,10 @@ int main(void)
 		WaterPump_Init();
 		//温湿度初始化
 		DHT11_Init();
+		KEY_Init();
+		
+		
+		
     // 5. 初始化USART2（用于ESP32通信）
     
     USART2_Init(115200);

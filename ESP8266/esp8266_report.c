@@ -9,17 +9,18 @@
 #include "dht11.h"
 #include "water_pump.h"
 #include "FreeRTOS.h"
+#include "key.h"
+
 
 
 FireDetectionResult g_latest_fire_result;
 
 
+// 记录系统的两个核心物理状态 
+static u8 g_system_mode = 0;       // 0:自动模式(AI), 1:手动模式(人工)
+static u8 g_main_power_status = 1; // 1:通电正常, 0:跳闸断电
 
-// 💡 硬件演示宏定义 (请根据你的实际引脚修改)
-// 假设按键接 PE4(低电平按下)，电源 LED 接 PF9(低电平亮起)
-#define SHORT_CIRCUIT_BTN    GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_4)
-#define POWER_MAIN_LED_ON()  GPIO_ResetBits(GPIOF, GPIO_Pin_9)
-#define POWER_MAIN_LED_OFF() GPIO_SetBits(GPIOF, GPIO_Pin_9)
+
 
 /**
  * @brief  AI 核心决策中枢 (纯逻辑封装)
@@ -27,26 +28,23 @@ FireDetectionResult g_latest_fire_result;
  */
 static void AI_Fire_Decision_Center(SensorDataPacket* packet)
 {
-    // 提取核心特征
     u8 is_fire_real = packet->image_fire_detected || packet->fire_detected || packet->flame_do == 1;
 
-    // =========================================================
-    // 🧠 开始分级判定
-    // =========================================================
-    
     // 🔴 Level 3: 确认起火
     if (is_fire_real) 
     {
         packet->risk_level = 3; 
         packet->confidence = packet->image_fire_detected ? packet->image_confidence : 85.0f;
         
-        // 交叉验证：电气火灾 vs 普通火灾
-        if (packet->virtual_current > 10.0) {
-            POWER_MAIN_LED_OFF();  // 模拟切断总闸
-            WaterPump_Off();       // 绝对禁水！
-        } else {
-            POWER_MAIN_LED_OFF();  // 稳妥起见依然断电
-            WaterPump_On();        // 启动水泵物理灭火！
+        // 只有在自动模式 (0) 下，AI 才允许操作硬件
+        if (g_system_mode == 0) {
+            if (packet->virtual_current > 10.0) {
+                g_main_power_status = 0; // 虚拟跳闸
+                WaterPump_Off();         // 禁水
+            } else {
+                g_main_power_status = 0; // 虚拟跳闸
+                WaterPump_On();          // 喷水
+            }
         }
     } 
     // 🟠 Level 2: 高危预警 (过载或高温)
@@ -55,32 +53,27 @@ static void AI_Fire_Decision_Center(SensorDataPacket* packet)
         packet->risk_level = 2;
         packet->confidence = 90.0f; 
         
-        POWER_MAIN_LED_OFF();  // 预防性跳闸
-        WaterPump_Off();       
+        if (g_system_mode == 0) {
+            g_main_power_status = 0; // 预防性跳闸
+            WaterPump_Off();       
+        }
     }
-    // 🟡 Level 1: 潜在危险 (烟雾)
-    else if (packet->smoke_detected)
-    {
-        packet->risk_level = 1;
-        packet->confidence = 60.0f;
-        
-        POWER_MAIN_LED_ON();   // 不断电
-        WaterPump_Off();
-    }
-    // 🟢 Level 0: 正常安全
     else 
     {
-        packet->risk_level = 0; 
-        packet->confidence = 100.0f; 
+        packet->risk_level = (packet->smoke_detected) ? 1 : 0;
+        packet->confidence = (packet->smoke_detected) ? 60.0f : 100.0f;
         
-        POWER_MAIN_LED_ON();   
-        WaterPump_Off();       
+        if (g_system_mode == 0) { // 【自动恢复正常】
+            g_main_power_status = 1; 
+            WaterPump_Off();       
+        }
     }
 
-    // 最终硬件状态回读，确保云端数据与物理引脚状态绝对一致
+    // 将最终的状态打包给发往云端的 packet
     packet->pump_status = WaterPump_GetStatus(); 
+    packet->system_mode = g_system_mode;
+    packet->main_power_status = g_main_power_status;
 }
-
 
 
 // 1. 初始化模块 (现在只需打印提示即可，真实的硬件初始化在 main 里的 USART3_Init)
@@ -138,21 +131,41 @@ static void ESP8266_Report_CollectSensorData(SensorDataPacket* packet)
     packet->temperature = (float)last_good_temp;
     packet->humidity = (float)last_good_humi;
 
-    // 6. 采集虚拟电流 (短路模拟)
-    if (SHORT_CIRCUIT_BTN == 0) { 
-        packet->virtual_current = 58.5;  
-    } else {
-        packet->virtual_current = 1.2;   
+    
+    // =========================================================
+    //  3. 实体按键交互逻辑 (状态机核心)
+    // =========================================================
+    
+    // 读取一次按键扫描结果 (不支持连按，按一下算一下)
+    u8 key_val = KEY_Scan(0);
+
+    // 👉 动作 A: [WK_UP 按键] 切换 自动/手动 模式
+    if (key_val == WKUP_PRES) {
+        g_system_mode = !g_system_mode; // 状态反转
     }
 
+    // 👉 动作 B: [KEY1 按键] 手动开关水泵
+    // 只有处于手动模式 (1) 时，按下 KEY1 才管用！
+    if (g_system_mode == 1 && key_val == KEY1_PRES) {
+        if (WaterPump_GetStatus() == 1) {
+            WaterPump_Off(); 
+        } else {
+            WaterPump_On();  
+        }
+    }
 
+    // 👉 动作 C: [KEY0 按键] 持续按住，模拟电线短路激增电流
+    // 这里不能用 key_val，必须直接读电平 (KEY0_VAL)，因为我们需要“按住生效，松开恢复”
+    if (KEY0_VAL == 0) { 
+        packet->virtual_current = 58.5;  // 恐怖短路电流
+    } else {
+        packet->virtual_current = 1.2;   // 正常待机电流
+    }
 
-
-
-    // ================= 5. 智能多维度风险评估模型 =================
+    // =========================================================
+    //  4. 数据全部就绪，呼叫 AI 大脑进行决策！
+    // =========================================================
     AI_Fire_Decision_Center(packet);
-		
-		
 }
 
 
@@ -218,8 +231,11 @@ static void ESP8266_Report_PackageJSON(SensorDataPacket* packet, JsonDataPacket*
         "\"confidence\":%d.%02d,"
         "\"frame_count\":%lu,"
         "\"dropped_frames\":%lu,"
-        "\"pump_status\":%d"            // 👈 注入水泵状态
-        "}\n",  // <--- 🚨 核心关键：必须以 \n 结尾！
+        "\"pump_status\":%d,"            // 👈 注入水泵状态
+        "\"system_mode\":%d,"            // 👈 新增：系统模式 (0自动/1手动)
+        "\"main_power_status\":%d"       // 👈 新增：主电网跳闸状态
+				
+				"}\n",  // <--- 🚨 核心关键：必须以 \n 结尾！
         packet->timestamp,
         packet->flame_adc,
         packet->flame_do,
@@ -241,8 +257,10 @@ static void ESP8266_Report_PackageJSON(SensorDataPacket* packet, JsonDataPacket*
         total_conf_int, total_conf_dec,
         packet->frame_count,
         packet->dropped_frames,
-        packet->pump_status             // 水泵状态参数
-    );
+        packet->pump_status,             // 水泵状态参数
+				packet->system_mode,             // 👈 填入系统模式变量
+        packet->main_power_status        // 👈 填入主电源变量
+		);
     
     json->json_len = (len > 0) ? (u16)len : 0;
 }
