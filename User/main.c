@@ -312,6 +312,21 @@ int main(void)
 
 /* ================== FreeRTOS 任务实现 ================== */
 
+
+// 声明外部的按键扫描任务函数 (实现在 esp8266_report.c 中)
+extern void button_scan_task(void *pvParameters);
+
+// 声明按键任务的句柄
+TaskHandle_t ButtonTask_Handler;
+
+
+
+
+
+
+
+
+
 // 【启动任务】：只负责把干活的任务创建出来，然后自杀
 void start_task(void *pvParameters)
 {
@@ -323,6 +338,10 @@ void start_task(void *pvParameters)
     // 创建上报任务：给足 4KB 栈(1024*4)，最高优先级 3（保证准时发送，不被图像卡住）
     xTaskCreate(report_task, "ReportTask", 1024, NULL, 3, &ReportTask_Handler);
 
+		// 3. 创建极速按键扫描任务：最高优先级 4
+    // 扫按键只需要几微秒，极少占用CPU。给它最高优先级，保证它每 20ms 绝对能打断摄像头，
+    xTaskCreate(button_scan_task, "ButtonTask", 128, NULL, 4, &ButtonTask_Handler);
+	
     vTaskDelete(StartTask_Handler); // 任务全部创建完毕，删除自己
     
     taskEXIT_CRITICAL(); // 退出临界区

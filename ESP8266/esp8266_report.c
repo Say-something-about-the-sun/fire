@@ -10,16 +10,55 @@
 #include "water_pump.h"
 #include "FreeRTOS.h"
 #include "key.h"
-
+#include "task.h"
 
 
 FireDetectionResult g_latest_fire_result;
 
 
-// 记录系统的两个核心物理状态 
-static u8 g_system_mode = 0;       // 0:自动模式(AI), 1:手动模式(人工)
-static u8 g_main_power_status = 1; // 1:通电正常, 0:跳闸断电
+// ==========================================
+// 🌐 定义跨任务共享的全局状态变量
+// ==========================================
+volatile u8 g_system_mode = 0;       // 0:自动模式, 1:手动模式
+volatile u8 g_main_power_status = 1; // 1:通电正常, 0:跳闸断电
+volatile float g_virtual_current = 1.2f; // 全局虚拟电流
 
+// ==========================================
+// 🚀 极速按键扫描任务 (每 20ms 执行一次，绝对丝滑)
+// ==========================================
+void button_scan_task(void *pvParameters)
+{
+    while(1)
+    {
+        // 1. 获取按键单次触发信号 (带消抖)
+        u8 key_val = KEY_Scan(0);
+
+        // 👉 动作 A: [WK_UP 按键] 切换 自动/手动 模式
+        if (key_val == WKUP_PRES) {
+            g_system_mode = !g_system_mode; 
+        }
+
+        // 👉 动作 B: [KEY1 按键] 手动开关水泵
+        if (g_system_mode == 1 && key_val == KEY1_PRES) {
+            if (WaterPump_GetStatus() == 1) {
+                WaterPump_Off(); 
+            } else {
+                WaterPump_On();  
+            }
+        }
+
+        // 👉 动作 C: [KEY0 按键] 实时电平监测，模拟电流短路
+        // 只要按住不松，电流就一直保持 58.5A
+        if (KEY0_VAL == 0) { 
+            g_virtual_current = 58.5f;  
+        } else {
+            g_virtual_current = 1.2f;   
+        }
+
+        // 🚨 极其关键：任务休眠 20 毫秒，让出 CPU 给摄像头和网络！
+        vTaskDelay(pdMS_TO_TICKS(20)); 
+    }
+}
 
 
 /**
@@ -117,7 +156,7 @@ static void ESP8266_Report_CollectSensorData(SensorDataPacket* packet)
 		// ==========================================
 // ==========================================
 		// ==========================================
-// 5. 采集温湿度 (带缓存机制)
+// 5. 采集温湿度 (带缓存机制)（dht11）
     static u8 last_good_temp = 25; 
     static u8 last_good_humi = 50; 
     u8 temp_val = 0, humi_val = 0;
@@ -136,33 +175,9 @@ static void ESP8266_Report_CollectSensorData(SensorDataPacket* packet)
     //  3. 实体按键交互逻辑 (状态机核心)
     // =========================================================
     
-    // 读取一次按键扫描结果 (不支持连按，按一下算一下)
-    u8 key_val = KEY_Scan(0);
-
-    // 👉 动作 A: [WK_UP 按键] 切换 自动/手动 模式
-    if (key_val == WKUP_PRES) {
-        g_system_mode = !g_system_mode; // 状态反转
-    }
-
-    // 👉 动作 B: [KEY1 按键] 手动开关水泵
-    // 只有处于手动模式 (1) 时，按下 KEY1 才管用！
-    if (g_system_mode == 1 && key_val == KEY1_PRES) {
-        if (WaterPump_GetStatus() == 1) {
-            WaterPump_Off(); 
-        } else {
-            WaterPump_On();  
-        }
-    }
-
-    // 👉 动作 C: [KEY0 按键] 持续按住，模拟电线短路激增电流
-    // 这里不能用 key_val，必须直接读电平 (KEY0_VAL)，因为我们需要“按住生效，松开恢复”
-    if (KEY0_VAL == 0) { 
-        packet->virtual_current = 58.5;  // 恐怖短路电流
-    } else {
-        packet->virtual_current = 1.2;   // 正常待机电流
-    }
-
-    // =========================================================
+   packet->virtual_current = g_virtual_current;
+		
+		// =========================================================
     //  4. 数据全部就绪，呼叫 AI 大脑进行决策！
     // =========================================================
     AI_Fire_Decision_Center(packet);

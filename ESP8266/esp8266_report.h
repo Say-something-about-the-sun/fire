@@ -52,6 +52,9 @@ typedef struct {
 void ESP8266_Report_Init(void);
 void ESP8266_Report_SendSensorData(void);
 void ESP8266_Report_UpdateFireDetectionResult(FireDetectionResult* result);
+void button_scan_task(void *pvParameters);
+
+
 
 extern SensorDataPacket g_sys_data;
 

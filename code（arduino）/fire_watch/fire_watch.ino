@@ -6,20 +6,25 @@
 // 功能：读取火焰传感器数据，接收STM32发送的时间，整合后传输给STM32
 
 // 定义引脚
-#define FLAME_SENSOR_AO 15  // 火焰传感器引脚（模拟输入）
-#define FLAME_SENSOR_DO 14  // 火焰传感器数字输出引脚
-#define TX_PIN 1           // 串口发送引脚（连接到STM32的RX）
-#define RX_PIN 3           // 串口接收引脚（连接到STM32的TX）
+#define FLAME_SENSOR_AO 4  // 火焰传感器引脚（模拟输入）
+#define FLAME_SENSOR_DO 5  // 火焰传感器数字输出引脚
+#define TX_PIN 17           // 串口发送引脚（连接到STM32的RX）
+#define RX_PIN 18           // 串口接收引脚（连接到STM32的TX）
 
 // 定义串口
-HardwareSerial SerialSTM32(1);  // 使用串口1与STM32通信
+HardwareSerial SerialSTM32(1);  // 使用串口2与STM32通信
 
 // 传感器阈值
 #define FLAME_THRESHOLD 1000  // 火焰传感器阈值
 
 // WiFi配置
+
+/**热点
 const char* ssid = "vivoS15e";
 const char* password = "11111111";
+*/
+const char* ssid = "TP-LINK_FF99";
+const char* password = "pq18782975992";
 
 // NTP配置
 WiFiUDP ntpUDP;
@@ -57,7 +62,7 @@ void setup() {
   
   Serial.println("========================================");
   Serial.println("  ESP32 Fire Monitoring System");
-  Serial.println("========================================\r\n");
+  Serial.println("========================================");
   
   // 连接WiFi
   Serial.println("[WiFi] Connecting to WiFi...");
@@ -91,7 +96,7 @@ void setup() {
     Serial.println("[WiFi] Will use time from STM32");
   }
   
-  Serial.println("\r\n[Main] System ready, starting main loop...\r\n");
+  Serial.println("\r\n[Main] System ready, starting main loop...");
   
   // 清空接收缓冲区
   memset(rxBuffer, 0, sizeof(rxBuffer));
@@ -103,7 +108,7 @@ void loop() {
   if (millis() - lastTimeSync >= TIME_SYNC_INTERVAL) {
     if (WiFi.status() == WL_CONNECTED) {
       syncNTPTime();
-      sendTimeToSTM32();
+      
     }
     lastTimeSync = millis();
   }
@@ -122,6 +127,17 @@ void loop() {
   
   // 等待STM32的确认信号
   waitForSTM32Response();
+
+
+// 增加延时，确保STM32处理完成
+  delay(500);
+
+  // 发送时间到STM32
+  sendTimeToSTM32();
+  
+
+  // 再次增加延时，确保STM32接收完成
+  delay(500);
   
   // 打印调试信息
   printDebugInfo();
@@ -131,14 +147,31 @@ void loop() {
 }
 
 // 同步NTP时间
+// 同步NTP时间
 void syncNTPTime() {
   Serial.println("[NTP] Syncing time...");
+  
+  // 检查WiFi连接状态
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("[NTP] WiFi not connected!");
+    return;
+  }
+  
+  Serial.print("[NTP] WiFi IP: ");
+  Serial.println(WiFi.localIP());
+  
+  // 检查NTP客户端状态
+  Serial.println("[NTP] Updating NTP client...");
   
   if (timeClient.update()) {
     unsigned long epochTime = timeClient.getEpochTime();
     
-    struct tm *timeinfo;
-    timeinfo = localtime(&epochTime);
+    Serial.print("[NTP] Epoch time: ");
+    Serial.println(epochTime);
+    
+    // 修复：将unsigned long转换为time_t
+    time_t time = (time_t)epochTime;
+    struct tm *timeinfo = localtime(&time);
     
     char timeStr[20];
     strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", timeinfo);
@@ -152,16 +185,38 @@ void syncNTPTime() {
     lastTimeSync = millis();
   } else {
     Serial.println("[NTP] Failed to sync time");
+    Serial.println("[NTP] Possible reasons:");
+    Serial.println("[NTP] 1. NTP server not reachable");
+    Serial.println("[NTP] 2. Network connection issue");
+    Serial.println("[NTP] 3. NTP server timeout");
   }
 }
 
-// 发送时间到STM32
+// 发送时间到STM32 (每次发送都实时计算最新的一秒)
 void sendTimeToSTM32() {
-  if (currentTime.length() > 0) {
-    String timeMsg = "TIME:" + currentTime + "\r\n";
+  if (timeReceived) {
+    // 1. 让 NTPClient 计算从上次网络同步到现在，过了多少秒
+    timeClient.update(); 
+    
+    // 2. 获取本地最新的 Unix 时间戳 (一直随时间跳动的)
+    unsigned long epochTime = timeClient.getEpochTime();
+    time_t t = (time_t)epochTime;
+    struct tm *timeinfo = localtime(&t);
+    
+    // 3. 重新格式化出当前的真实时间
+    char timeStr[20];
+    strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", timeinfo);
+    
+    // 4. 发送给 STM32
+    String timeMsg = "TIME:" + String(timeStr) + "\r\n";
     SerialSTM32.print(timeMsg);
-    Serial.print("[STM32] Sent time: ");
+    
+    Serial.print("[STM32] Sent live time: ");
     Serial.print(timeMsg);
+
+    // 等待数据发送完成
+    SerialSTM32.flush();
+    delay(100);
   }
 }
 
