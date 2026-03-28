@@ -40,6 +40,7 @@ String receivedJson = "";
 void connectWiFi();
 void connectMQTT();
 void processJsonAndSend(String jsonStr);
+void mqttCallback(char* topic, byte* payload, unsigned int length);
 
 // ==================== setup() ====================
 void setup() {
@@ -127,10 +128,17 @@ void connectMQTT() {
   
   if (mqttClient.connect(clientId, mqttUser, mqttPass)) {
     Serial.println(" connected!");
+    
+    // 1. 订阅原来的通道：接收你上传数据后的“成功回执”
     String replyTopic = "$sys/" + String(productId) + "/" + String(deviceId) + "/thing/property/post/reply";
     mqttClient.subscribe(replyTopic.c_str());
     Serial.println("Subscribed to reply topic!");
 
+    // 2. 👇 本次极其关键的新增：订阅“指令下发”通道！
+    // 只有订阅了这个，HBuilderX 按下的按钮指令才能砸到单片机头上！
+    String setTopic = "$sys/" + String(productId) + "/" + String(deviceId) + "/thing/property/set";
+    mqttClient.subscribe(setTopic.c_str());
+    Serial.println("Subscribed to SET command topic!");
 
   } else {
     Serial.print(" failed, rc=");
@@ -322,13 +330,70 @@ void processJsonAndSend(String jsonStr) {
     }
 }
 // ==================== 接收 OneNET 报错回执 ====================
+
+
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("\n[OneNET Reply] -> ");
+  // 1. 先把你原来的 payload 转换成完整的 String 字符串
+  String msg = "";
   for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
+    msg += (char)payload[i];
   }
-  Serial.println("\n");
+  
+  // 打印所有收到的 Topic 和内容 (完美保留了你原来的调试功能)
+  Serial.print("\n[OneNET Received] Topic: ");
+  Serial.println(topic);
+  Serial.print("[OneNET Payload] -> ");
+  Serial.println(msg);
+
+  // 2. 定义 OneNET 下发控制指令的专属 Topic
+  String set_topic = "$sys/PGs73D47Zf/stm32f407zgt6/thing/property/set";
+
+  // 3. 快递分拣：判断这是不是控制指令？
+  if (String(topic) == set_topic) {
+      // 分配 JSON 解析内存池
+      StaticJsonDocument<512> doc;
+      DeserializationError error = deserializeJson(doc, msg);
+      
+      if (!error) {
+          // 提取 params 里的 pump_status
+          if (doc.containsKey("params")) {
+              JsonObject params = doc["params"];
+              if (params.containsKey("pump_status")) {
+                  bool pump_cmd = params["pump_status"];
+                  
+                  // 🚀 核心动作：通过串口大喊，把指令转发给 STM32！
+                  // (STM32 的串口中断收到后，就会去控制水泵)
+                                  if (pump_cmd == true) {
+                    Serial.println("CMD:PUMP:1");      // 打印在电脑屏幕上
+                    stm32Serial.println("CMD:PUMP:1"); // 【关键修复】真正发给 STM32！
+                } else {
+                    Serial.println("CMD:PUMP:0");      // 打印在电脑屏幕上
+                    stm32Serial.println("CMD:PUMP:0"); // 【关键修复】真正发给 STM32！
+                }
+              }
+          }
+
+          // 4. 【必须动作】给 OneNET 回复签收确认单 (ACK)
+          // 如果不回复，HBuilderX 和 OneNET 网页上都会报“下发超时”！
+          String msg_id = doc["id"].as<String>();
+          String reply_topic = "$sys/PGs73D47Zf/stm32f407zgt6/thing/property/set_reply";
+          
+          // 按照 OneNET 要求，组装成功收到的 JSON 回复
+          String reply_payload = "{\"id\":\"" + msg_id + "\",\"code\":200,\"msg\":\"success\"}";
+          
+          mqttClient.publish(reply_topic.c_str(), reply_payload.c_str());
+          Serial.println("[Cloud CMD] -> 已成功向 OneNET 回复 ACK 确认包！");
+      } else {
+          Serial.println("[Cloud CMD Error] -> JSON 解析失败!");
+      }
+  } 
+  else {
+      // 如果不是 set_topic，那大概率就是你原来的 reply 回执。
+      // 因为上面第1步已经打印过了，这里不需要做任何处理，静静地看着就好。
+  }
 }
+
+
 
 
 

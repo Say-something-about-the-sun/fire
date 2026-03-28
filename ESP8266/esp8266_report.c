@@ -11,9 +11,16 @@
 #include "FreeRTOS.h"
 #include "key.h"
 #include "task.h"
+#include <string.h>
+
+
 
 
 FireDetectionResult g_latest_fire_result;
+
+
+extern u8 USART3_RX_BUF[];
+extern u16 USART3_RX_STA;
 
 
 // ==========================================
@@ -55,6 +62,42 @@ void button_scan_task(void *pvParameters)
             g_virtual_current = 1.2f;   
         }
 
+				
+				
+				// =========================================================
+        // ☁️ 监听云端下发的超级指令 (非阻塞式查询)
+        // =========================================================
+        if (USART3_RX_STA & 0x8000) // 如果标志位最高位为1，表示接收到了以回车换行结尾的一帧数据
+        {
+            // 给接收到的数据末尾加个 '\0'，把它变成标准 C 语言字符串
+            USART3_RX_BUF[USART3_RX_STA & 0x3FFF] = '\0'; 
+            
+            // 🔎 查找字符串中是否包含魔法口诀
+            if (strstr((const char*)USART3_RX_BUF, "CMD:PUMP:1") != NULL)
+            {
+                // 🚨 极其关键的安全逻辑：
+                // 必须强行把系统切入“手动模式”，否则你刚打开水泵，
+                // 下一微秒 AI 大脑发现没火灾，又会自动把它关掉！
+                g_system_mode = 1; 
+                WaterPump_On();
+                // printf("\r\n[Cloud CMD] 远程强制开启水泵！\r\n");
+            }
+            else if (strstr((const char*)USART3_RX_BUF, "CMD:PUMP:0") != NULL)
+            {
+                g_system_mode = 1; // 强行切入“手动模式”
+                WaterPump_Off();
+                // printf("\r\n[Cloud CMD] 远程强制关闭水泵！\r\n");
+            }
+            
+            // 🧹 清空接收标志位，准备接收云端的下一条指令
+            memset(USART3_RX_BUF, 0, sizeof(USART3_RX_BUF));
+						USART3_RX_STA = 0; 
+        }
+				
+				
+				
+				
+				
         // 🚨 极其关键：任务休眠 20 毫秒，让出 CPU 给摄像头和网络！
         vTaskDelay(pdMS_TO_TICKS(20)); 
     }

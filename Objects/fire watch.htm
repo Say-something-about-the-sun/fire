@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\fire watch.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\fire watch.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060300: Last Updated: Fri Mar 27 22:48:13 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060300: Last Updated: Sun Mar 29 00:30:41 2026
 <BR><P>
 <H3>Maximum Stack Usage =        456 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -432,6 +432,7 @@ Global Symbols
 <BR><BR>[Calls]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memset
 </UL>
 <BR>[Called By]<UL><LI><a href="#[116]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART2_Process_ESP32_Data
+<LI><a href="#[6d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;button_scan_task
 <LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESP8266_Report_PackageJSON
 <LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESP8266_SendATCommand
 </UL>
@@ -451,7 +452,8 @@ Global Symbols
 <P><STRONG><a name="[c4]"></a>strstr</STRONG> (Thumb, 36 bytes, Stack size 12 bytes, strstr.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 12<LI>Call Chain = strstr
 </UL>
-<BR>[Called By]<UL><LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESP8266_SendATCommand
+<BR>[Called By]<UL><LI><a href="#[6d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;button_scan_task
+<LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESP8266_SendATCommand
 </UL>
 
 <P><STRONG><a name="[118]"></a>strncpy</STRONG> (Thumb, 24 bytes, Stack size 8 bytes, strncpy.o(.text))
@@ -1610,7 +1612,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[32]"></a>USART3_IRQHandler</STRONG> (Thumb, 76 bytes, Stack size 8 bytes, usart3.o(i.USART3_IRQHandler))
+<P><STRONG><a name="[32]"></a>USART3_IRQHandler</STRONG> (Thumb, 138 bytes, Stack size 8 bytes, usart3.o(i.USART3_IRQHandler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = USART3_IRQHandler &rArr; USART_GetITStatus
 </UL>
 <BR>[Calls]<UL><LI><a href="#[10e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART_ReceiveData
@@ -1839,11 +1841,13 @@ Global Symbols
 
 <P><STRONG><a name="[1b1]"></a>__scatterload_zeroinit</STRONG> (Thumb, 14 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_zeroinit), UNUSED)
 
-<P><STRONG><a name="[6d]"></a>button_scan_task</STRONG> (Thumb, 102 bytes, Stack size 0 bytes, esp8266_report.o(i.button_scan_task))
+<P><STRONG><a name="[6d]"></a>button_scan_task</STRONG> (Thumb, 184 bytes, Stack size 0 bytes, esp8266_report.o(i.button_scan_task))
 <BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = button_scan_task &rArr; KEY_Scan &rArr; delay_ms &rArr; vTaskDelay &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_ReadInputDataBit
 <LI><a href="#[ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskDelay
+<LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;strstr
+<LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memclr
 <LI><a href="#[8d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WaterPump_On
 <LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WaterPump_Off
 <LI><a href="#[8e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WaterPump_GetStatus

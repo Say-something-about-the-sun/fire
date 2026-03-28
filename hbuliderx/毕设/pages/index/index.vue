@@ -164,8 +164,8 @@ export default {
 			smokePpm: "0.00",
 			smokeDetected: false,
 			temperature: "0.0",
-			humidity: "0.0",          // 新增：湿度
-			current: "0.00",          // 新增：电流
+			humidity: "0.0",          
+			current: "0.00",          
 			
 			// === 控制状态 ===
 			system_mode: 0,           // 0:自动, 1:手动
@@ -180,7 +180,7 @@ export default {
 		this.fetchDataFromOneNet();
 		this.timer = setInterval(() => {
 			this.fetchDataFromOneNet();
-		}, 3000); // 建议刷新频率调快到 3 秒，体验更好
+		}, 3000); 
 	},
 	onUnload() {
 		if (this.timer) clearInterval(this.timer);
@@ -193,10 +193,10 @@ export default {
 			this.currentTab = e.detail.current;
 		},
 		
+		// 1. 上行链路：从云端拉取数据 (GET)
 		fetchDataFromOneNet() {
 			const productId = "PGs73D47Zf";
 			const deviceName = "stm32f407zgt6";
-			// 注意：实际项目中 Token 过期需要重新生成，测试阶段暂用你的静态 Token
 			const token = "version=2018-10-31&res=products%2FPGs73D47Zf%2Fdevices%2Fstm32f407zgt6&et=1805469231&method=sha1&sign=snpTD9lxQKVsom7omCk5XnSUCG8%3D";
 
 			uni.request({
@@ -208,7 +208,6 @@ export default {
 						let now = new Date();
 						this.lastUpdateTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
 						
-						// 解析所有返回的数据
 						res.data.data.forEach(item => {
 							const val = item.value;
 							switch(item.identifier) {
@@ -227,7 +226,6 @@ export default {
 								case 'flame_do': this.flameDo = val; break;
 								case 'fire_detected': this.esp32FireDetected = val; break;
 								
-								// 👇 本次补全的新增物模型解析 👇
 								case 'humidity': this.humidity = val; break;
 								case 'current': this.current = val; break;
 								case 'system_mode': this.system_mode = val; break;
@@ -239,29 +237,66 @@ export default {
 			});
 		},
 		
-		// 强制开关水泵按钮的触发函数
+		// 2. 下行链路：向云端发送控制指令 (POST)
 		sendPumpCommand() {
-			// 交互优化：如果 STM32 处于 AI 自动托管模式，提醒用户先切换模式
 			if (this.system_mode === 0) {
 				uni.showToast({
-					title: 'AI托管中，请先在开发板按下 WK_UP 切换为手动模式',
+					title: 'AI托管中，请先在开发板切换为手动模式',
 					icon: 'none',
 					duration: 3000
 				});
 				return;
 			}
 			
-			// 弹出安全确认框
 			uni.showModal({
 				title: '控制指令下发',
 				content: `确定要强制 ${this.pump_status ? '关闭' : '开启'} 水泵吗？`,
 				success: (res) => {
 					if (res.confirm) {
-						let targetState = this.pump_status ? 0 : 1; // 取反
+						// 显示加载动画，防止用户狂点
+						uni.showLoading({ title: '指令下发中...' });
 						
-						// 模拟成功效果 (下一步我们将在这里写实际的 API 请求代码)
-						uni.showToast({ title: '指令已下发云端', icon: 'success' });
-						console.log(`准备向 OneNET 发送指令 -> pump_cmd: ${targetState}`);
+						// 确定目标状态：当前是关，目标就是开(true)；反之亦然
+						let targetState = !this.pump_status; 
+						
+						const productId = "PGs73D47Zf";
+						const deviceName = "stm32f407zgt6";
+						const token = "version=2018-10-31&res=products%2FPGs73D47Zf%2Fdevices%2Fstm32f407zgt6&et=1805469231&method=sha1&sign=snpTD9lxQKVsom7omCk5XnSUCG8%3D";
+
+						// 发起真实的 POST 请求
+						uni.request({
+							url: 'https://iot-api.heclouds.com/thingmodel/set-device-property',
+							method: 'POST',
+							header: { 
+								'Authorization': token,
+								'Content-Type': 'application/json' // 必须指定 JSON 格式
+							},
+							data: {
+								product_id: productId,
+								device_name: deviceName,
+								params: {
+									// 这里的标识符必须和 OneNET 物模型里的一致！
+									pump_status: targetState 
+								}
+							},
+							success: (response) => {
+								uni.hideLoading();
+								
+								// OneNET 平台成功下发通常返回 code === 0
+								if (response.data && response.data.code === 0) {
+									uni.showToast({ title: '指令已成功到达云端', icon: 'success' });
+									console.log("OneNET 响应:", response.data);
+								} else {
+									uni.showToast({ title: '下发失败: ' + response.data.msg, icon: 'none' });
+									console.error("OneNET 报错:", response.data);
+								}
+							},
+							fail: (err) => {
+								uni.hideLoading();
+								uni.showToast({ title: '网络请求失败，请检查网络', icon: 'none' });
+								console.error("网络请求错误:", err);
+							}
+						});
 					}
 				}
 			});
@@ -269,6 +304,7 @@ export default {
 	}
 }
 </script>
+
 
 <style>
 /* 基础样式保持不变 */

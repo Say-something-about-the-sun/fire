@@ -89,26 +89,48 @@ void USART3_Send_Data(u8* data, u16 len)
 
 // USART3中断处理函数（纯净透传模式，接收所有字符）
 // 纯净版 USART3 中断服务函数（专为 ESP8266 AT 指令优化）
+// ===================================================
+// 完美适配云端指令解析的 USART3 中断服务函数
+// 能够精准识别 \r\n 结尾的数据帧，并置位 0x8000
+// ===================================================
 void USART3_IRQHandler(void)
 {
-    u8 res;
+    u8 Res;
+    
     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET) // 接收到数据
     {
-        res = USART_ReceiveData(USART3); // 读取数据
+        Res = USART_ReceiveData(USART3); // 读取接收到的1个字节数据
         
-        // 只要缓冲区没满，就一直存入数据，不做任何 \r\n 判断
-        if(USART3_RX_STA < USART3_RX_BUF_SIZE - 1)
+        if((USART3_RX_STA & 0x8000) == 0) // 如果之前的一帧还没被 task 处理完，就不收新数据
         {
-            USART3_RX_BUF[USART3_RX_STA] = res;
-            USART3_RX_STA++;
-            // 实时保证字符串以 \0 结尾，方便后续使用 strstr 函数匹配
-            USART3_RX_BUF[USART3_RX_STA] = '\0'; 
+            if(USART3_RX_STA & 0x4000) // 已经接收到了回车符 0x0d (\r)
+            {
+                if(Res != 0x0a) {
+                    USART3_RX_STA = 0; // 接收错误,不是 \n，重新开始
+                } else {
+                    USART3_RX_STA |= 0x8000; // 完美接收到 \n，最高位置 1，触发大脑解析！
+                }
+            }
+            else // 还没收到 \r
+            {
+                if(Res == 0x0d) {
+                    USART3_RX_STA |= 0x4000; // 收到 \r，标记一下
+                } else {
+                    // 把数据存入缓冲区
+                    USART3_RX_BUF[USART3_RX_STA & 0X3FFF] = Res;
+                    USART3_RX_STA++;
+                    // 防止缓冲区溢出
+                    if(USART3_RX_STA > (USART3_RX_BUF_SIZE - 1)) {
+                        USART3_RX_STA = 0; // 接收错误，重新开始
+                    }
+                }
+            }
         }
     }
-		
-		if(USART_GetFlagStatus(USART3, USART_FLAG_ORE) != RESET) // 注意：在usart2.c改成USART2，usart3.c改成USART3
+    
+    // 清除硬件 ORE 溢出错误标志位，防止单片机死机
+    if(USART_GetFlagStatus(USART3, USART_FLAG_ORE) != RESET) 
     {
-        USART_ReceiveData(USART3); // 读取一次数据即可清除硬件 ORE 标志位，解救单片机
+        USART_ReceiveData(USART3); 
     }
-		
 }
