@@ -88,6 +88,16 @@ void button_scan_task(void *pvParameters)
                 WaterPump_Off();
                 // printf("\r\n[Cloud CMD] 远程强制关闭水泵！\r\n");
             }
+						else if (strstr((const char*)USART3_RX_BUF, "CMD:MODE:0") != NULL)
+						{
+								g_system_mode = 0; // 恢复自动模式
+								printf("=> 已恢复 AI 自动托管！\r\n");
+						}
+						else if (strstr((const char*)USART3_RX_BUF, "CMD:MODE:1") != NULL)
+						{
+								g_system_mode = 1; // 强行切入手动模式
+								printf("=> 已切入人工接管模式！\r\n");
+						}
             
             // 🧹 清空接收标志位，准备接收云端的下一条指令
             memset(USART3_RX_BUF, 0, sizeof(USART3_RX_BUF));

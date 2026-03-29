@@ -115,9 +115,15 @@
 					        </text>
 					    </view>
 					
-					    <button class="force-btn" :class="pump_status ? 'btn-danger' : 'btn-primary'" @click="sendPumpCommand">
-					        强制 {{ pump_status ? '关闭' : '开启' }} 水泵
-					    </button>
+						<view class="btn-group">
+							<button class="force-btn" :class="pump_status ? 'btn-danger' : 'btn-primary'" @click="sendPumpCommand">
+								强制 {{ pump_status ? '关闭' : '开启' }} 水泵
+							</button>
+							
+							<button class="restore-btn" v-if="system_mode === 1" @click="restoreAutoMode">
+								🔄 恢复 AI 自动托管
+							</button>
+						</view>
 					</view>
 					
 					<view class="status-panel">
@@ -193,7 +199,7 @@ export default {
 			this.currentTab = e.detail.current;
 		},
 		
-		// 1. 上行链路：从云端拉取数据 (GET)
+		// 1. 上行链路：从云端拉取数据
 		fetchDataFromOneNet() {
 			const productId = "PGs73D47Zf";
 			const deviceName = "stm32f407zgt6";
@@ -226,10 +232,13 @@ export default {
 								case 'flame_do': this.flameDo = val; break;
 								case 'fire_detected': this.esp32FireDetected = val; break;
 								
-								case 'humidity': this.humidity = val; break;
-								case 'current': this.current = val; break;
-								case 'system_mode': this.system_mode = val; break;
-								case 'pump_status': this.pump_status = val; break;
+								// 强转类型，防止 UI 渲染出错
+								case 'humidity': this.humidity = Number(val).toFixed(1); break;
+								case 'current': this.current = Number(val).toFixed(2); break;
+								case 'system_mode': this.system_mode = Number(val); break;
+								case 'pump_status': 
+									this.pump_status = (val === true || val === 'true' || val === 1 || val === '1'); 
+									break;
 							}
 						});
 					}
@@ -237,66 +246,74 @@ export default {
 			});
 		},
 		
-		// 2. 下行链路：向云端发送控制指令 (POST)
-		sendPumpCommand() {
-			if (this.system_mode === 0) {
-				uni.showToast({
-					title: 'AI托管中，请先在开发板切换为手动模式',
-					icon: 'none',
-					duration: 3000
-				});
-				return;
-			}
+		// 2. 下行链路核心代码：发送任意控制指令给云端
+		sendControlCommand(payloadParams, loadingMsg, successMsg) {
+			uni.showLoading({ title: loadingMsg });
 			
+			const productId = "PGs73D47Zf";
+			const deviceName = "stm32f407zgt6";
+			const token = "version=2018-10-31&res=products%2FPGs73D47Zf%2Fdevices%2Fstm32f407zgt6&et=1805469231&method=sha1&sign=snpTD9lxQKVsom7omCk5XnSUCG8%3D";
+
+			uni.request({
+				url: 'https://iot-api.heclouds.com/thingmodel/set-device-property',
+				method: 'POST',
+				header: { 
+					'Authorization': token,
+					'Content-Type': 'application/json' 
+				},
+				data: {
+					product_id: productId,
+					device_name: deviceName,
+					params: payloadParams // 动态注入指令内容
+				},
+				success: (response) => {
+					uni.hideLoading();
+					if (response.data && response.data.code === 0) {
+						uni.showToast({ title: successMsg, icon: 'success' });
+					} else {
+						uni.showToast({ title: '下发失败', icon: 'none' });
+						console.error("OneNET 报错:", response.data);
+					}
+				},
+				fail: (err) => {
+					uni.hideLoading();
+					uni.showToast({ title: '网络请求失败', icon: 'none' });
+				}
+			});
+		},
+
+		// 动作 A：强制开启/关闭水泵 (不再拦截自动模式！)
+		sendPumpCommand() {
 			uni.showModal({
-				title: '控制指令下发',
-				content: `确定要强制 ${this.pump_status ? '关闭' : '开启'} 水泵吗？`,
+				title: '紧急介入确认',
+				content: `确定要强制 ${this.pump_status ? '关闭' : '开启'} 水泵吗？系统将切入人工接管模式！`,
 				success: (res) => {
 					if (res.confirm) {
-						// 显示加载动画，防止用户狂点
-						uni.showLoading({ title: '指令下发中...' });
-						
-						// 确定目标状态：当前是关，目标就是开(true)；反之亦然
 						let targetState = !this.pump_status; 
-						
-						const productId = "PGs73D47Zf";
-						const deviceName = "stm32f407zgt6";
-						const token = "version=2018-10-31&res=products%2FPGs73D47Zf%2Fdevices%2Fstm32f407zgt6&et=1805469231&method=sha1&sign=snpTD9lxQKVsom7omCk5XnSUCG8%3D";
-
-						// 发起真实的 POST 请求
-						uni.request({
-							url: 'https://iot-api.heclouds.com/thingmodel/set-device-property',
-							method: 'POST',
-							header: { 
-								'Authorization': token,
-								'Content-Type': 'application/json' // 必须指定 JSON 格式
-							},
-							data: {
-								product_id: productId,
-								device_name: deviceName,
-								params: {
-									// 这里的标识符必须和 OneNET 物模型里的一致！
-									pump_status: targetState 
-								}
-							},
-							success: (response) => {
-								uni.hideLoading();
-								
-								// OneNET 平台成功下发通常返回 code === 0
-								if (response.data && response.data.code === 0) {
-									uni.showToast({ title: '指令已成功到达云端', icon: 'success' });
-									console.log("OneNET 响应:", response.data);
-								} else {
-									uni.showToast({ title: '下发失败: ' + response.data.msg, icon: 'none' });
-									console.error("OneNET 报错:", response.data);
-								}
-							},
-							fail: (err) => {
-								uni.hideLoading();
-								uni.showToast({ title: '网络请求失败，请检查网络', icon: 'none' });
-								console.error("网络请求错误:", err);
-							}
-						});
+						// 调用封装好的发送函数，打包 pump_status
+						this.sendControlCommand(
+							{ "pump_status": targetState }, 
+							'强切水泵中...', 
+							'指令已送达硬件'
+						);
+					}
+				}
+			});
+		},
+		
+		// 动作 B：恢复 AI 自动托管 (下发 system_mode: 0)
+		restoreAutoMode() {
+			uni.showModal({
+				title: '权限交还确认',
+				content: '确定要将控制权交还给 AI 自动托管吗？水泵状态将由火情识别算法重新接管。',
+				success: (res) => {
+					if (res.confirm) {
+						// 调用封装好的发送函数，打包 system_mode
+						this.sendControlCommand(
+							{ "system_mode": 0 }, 
+							'切换模式中...', 
+							'AI 已成功接管'
+						);
 					}
 				}
 			});
@@ -305,9 +322,8 @@ export default {
 }
 </script>
 
-
 <style>
-/* 基础样式保持不变 */
+/* ... (基础样式保留不变) ... */
 page { background-color: #f0f2f5; height: 100%; }
 .container { display: flex; flex-direction: column; height: 100vh; }
 .header { padding: 50rpx 40rpx 30rpx; color: #fff; transition: background-color 0.4s; }
@@ -342,14 +358,14 @@ page { background-color: #f0f2f5; height: 100%; }
 .led-green { background: radial-gradient(circle at 30% 30%, #4caf50, #1b5e20); box-shadow: 0 0 15rpx #4caf50; }
 .led-red { background: radial-gradient(circle at 30% 30%, #f44336, #b71c1c); box-shadow: 0 0 20rpx #f44336; animation: blink 0.8s infinite; }
 
-/* 👇 本次新增的 控制中枢 CSS 👇 */
+/* ================= 控制中枢专属样式 ================= */
 .control-panel {
     margin: 10rpx 30rpx 24rpx;
     background-color: #fff;
     border-radius: 16rpx;
     padding: 30rpx 24rpx;
     box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
-    border-left: 8rpx solid #1890ff; /* 左侧科技蓝点缀 */
+    border-left: 8rpx solid #1890ff; 
 }
 .status-header {
     display: flex;
@@ -376,9 +392,15 @@ page { background-color: #f0f2f5; height: 100%; }
 }
 .status-label { color: #666; }
 .status-text { font-weight: bold; font-size: 32rpx; margin-left: 10rpx; }
-.pump-on { color: #1890ff; } /* 喷水时蓝色 */
-.pump-off { color: #999; }   /* 停机时灰色 */
+.pump-on { color: #1890ff; } 
+.pump-off { color: #999; }   
 
+/* 👇 按键组与新增按钮样式 👇 */
+.btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 20rpx; /* 两个按钮之间的间距 */
+}
 .force-btn {
     width: 100%;
     border-radius: 40rpx;
@@ -386,8 +408,18 @@ page { background-color: #f0f2f5; height: 100%; }
     font-weight: bold;
     letter-spacing: 2rpx;
 }
-/* 动态按钮颜色：水泵关着时是绿色(开机)，开着时是红色(强制停机) */
 .btn-primary { background-color: #2b9939 !important; color: #fff !important; }
 .btn-danger { background-color: #e53935 !important; color: #fff !important; }
+
+.restore-btn {
+    width: 100%;
+    border-radius: 40rpx;
+    font-size: 28rpx;
+    font-weight: bold;
+    color: #1890ff !important;
+    background-color: #e6f7ff !important;
+    border: 1px solid #91d5ff !important;
+}
+.restore-btn:active { background-color: #bae0ff !important; }
 
 </style>

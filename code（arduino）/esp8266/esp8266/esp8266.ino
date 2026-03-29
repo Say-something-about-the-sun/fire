@@ -349,44 +349,52 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   String set_topic = "$sys/PGs73D47Zf/stm32f407zgt6/thing/property/set";
 
   // 3. 快递分拣：判断这是不是控制指令？
-  if (String(topic) == set_topic) {
-      // 分配 JSON 解析内存池
-      StaticJsonDocument<512> doc;
-      DeserializationError error = deserializeJson(doc, msg);
-      
-      if (!error) {
-          // 提取 params 里的 pump_status
-          if (doc.containsKey("params")) {
-              JsonObject params = doc["params"];
-              if (params.containsKey("pump_status")) {
-                  bool pump_cmd = params["pump_status"];
-                  
-                  // 🚀 核心动作：通过串口大喊，把指令转发给 STM32！
-                  // (STM32 的串口中断收到后，就会去控制水泵)
-                                  if (pump_cmd == true) {
-                    Serial.println("CMD:PUMP:1");      // 打印在电脑屏幕上
-                    stm32Serial.println("CMD:PUMP:1"); // 【关键修复】真正发给 STM32！
+if (String(topic) == set_topic) {
+    // 分配 JSON 解析内存池
+    StaticJsonDocument<512> doc;
+    DeserializationError error = deserializeJson(doc, msg);
+    
+    if (!error) {
+        // 📦 只要收到 params 包裹，就把它拆开
+        if (doc.containsKey("params")) {
+            JsonObject params = doc["params"]; // 声明一次 params 即可
+            
+            // 🎯 提取动作一：水泵控制指令
+            if (params.containsKey("pump_status")) {
+                bool pump_cmd = params["pump_status"];
+                if (pump_cmd == true) {
+                    Serial.println("CMD:PUMP:1");      
+                    stm32Serial.println("CMD:PUMP:1"); 
                 } else {
-                    Serial.println("CMD:PUMP:0");      // 打印在电脑屏幕上
-                    stm32Serial.println("CMD:PUMP:0"); // 【关键修复】真正发给 STM32！
+                    Serial.println("CMD:PUMP:0");      
+                    stm32Serial.println("CMD:PUMP:0"); 
                 }
-              }
-          }
+            }
+            
+            // 🎯 提取动作二：模式切换指令 (必须放在 params 还在存活的范围内)
+            if (params.containsKey("system_mode")) {
+                int mode_cmd = params["system_mode"];
+                if (mode_cmd == 1) {
+                    Serial.println("CMD:MODE:1");      
+                    stm32Serial.println("CMD:MODE:1"); // 发给 STM32 (切为手动)
+                } else {
+                    Serial.println("CMD:MODE:0");      
+                    stm32Serial.println("CMD:MODE:0"); // 发给 STM32 (恢复自动)
+                }
+            }
+        } // params 包裹处理完毕
 
-          // 4. 【必须动作】给 OneNET 回复签收确认单 (ACK)
-          // 如果不回复，HBuilderX 和 OneNET 网页上都会报“下发超时”！
-          String msg_id = doc["id"].as<String>();
-          String reply_topic = "$sys/PGs73D47Zf/stm32f407zgt6/thing/property/set_reply";
-          
-          // 按照 OneNET 要求，组装成功收到的 JSON 回复
-          String reply_payload = "{\"id\":\"" + msg_id + "\",\"code\":200,\"msg\":\"success\"}";
-          
-          mqttClient.publish(reply_topic.c_str(), reply_payload.c_str());
-          Serial.println("[Cloud CMD] -> 已成功向 OneNET 回复 ACK 确认包！");
-      } else {
-          Serial.println("[Cloud CMD Error] -> JSON 解析失败!");
-      }
-  } 
+        // 4. 【必须动作】给 OneNET 回复签收确认单 (ACK)
+        String msg_id = doc["id"].as<String>();
+        String reply_topic = "$sys/PGs73D47Zf/stm32f407zgt6/thing/property/set_reply";
+        String reply_payload = "{\"id\":\"" + msg_id + "\",\"code\":200,\"msg\":\"success\"}";
+        
+        mqttClient.publish(reply_topic.c_str(), reply_payload.c_str());
+        Serial.println("[Cloud CMD] -> 已成功向 OneNET 回复 ACK 确认包！");
+    } else {
+        Serial.println("[Cloud CMD Error] -> JSON 解析失败!");
+    }
+}
   else {
       // 如果不是 set_topic，那大概率就是你原来的 reply 回执。
       // 因为上面第1步已经打印过了，这里不需要做任何处理，静静地看着就好。
