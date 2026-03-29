@@ -235,6 +235,8 @@ int main(void)
     // 2. 初始化JPEG和串口系统
     jpeg_serial_init();
     
+	
+	  Extsram_Init();
     // 3. 初始化摄像头
     // printf("[3] Initializing OV5640...\r\n");
     if( OV5640_Init() != 0) {

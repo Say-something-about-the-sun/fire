@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\fire watch.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\fire watch.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060300: Last Updated: Sun Mar 29 00:30:41 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060300: Last Updated: Sun Mar 29 20:46:30 2026
 <BR><P>
 <H3>Maximum Stack Usage =        456 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -927,6 +927,7 @@ Global Symbols
 <LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[13e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;jpeg_decoder_init
+<LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
 <P><STRONG><a name="[ca]"></a>FSMC_NORSRAMCmd</STRONG> (Thumb, 46 bytes, Stack size 0 bytes, stm32f4xx_fsmc.o(i.FSMC_NORSRAMCmd))
@@ -1773,6 +1774,7 @@ Global Symbols
 <LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Smoke_Get_ADC_Value
 <LI><a href="#[11d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART3_Init
 <LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART3_ConfigInterrupt
+<LI><a href="#[6d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;button_scan_task
 <LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OV5640_Init
 <LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESP8266_Report_Init
 <LI><a href="#[b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESP8266_Init
@@ -1841,7 +1843,7 @@ Global Symbols
 
 <P><STRONG><a name="[1b1]"></a>__scatterload_zeroinit</STRONG> (Thumb, 14 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_zeroinit), UNUSED)
 
-<P><STRONG><a name="[6d]"></a>button_scan_task</STRONG> (Thumb, 184 bytes, Stack size 0 bytes, esp8266_report.o(i.button_scan_task))
+<P><STRONG><a name="[6d]"></a>button_scan_task</STRONG> (Thumb, 234 bytes, Stack size 0 bytes, esp8266_report.o(i.button_scan_task))
 <BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = button_scan_task &rArr; KEY_Scan &rArr; delay_ms &rArr; vTaskDelay &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_ReadInputDataBit
@@ -1852,6 +1854,7 @@ Global Symbols
 <LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WaterPump_Off
 <LI><a href="#[8e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WaterPump_GetStatus
 <LI><a href="#[cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;KEY_Scan
+<LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> main.o(i.start_task)
 </UL>
@@ -2039,7 +2042,7 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESP8266_Report_CollectSensorData
 </UL>
 
-<P><STRONG><a name="[143]"></a>jpeg_serial_init</STRONG> (Thumb, 224 bytes, Stack size 16 bytes, jpeg_serial.o(i.jpeg_serial_init))
+<P><STRONG><a name="[143]"></a>jpeg_serial_init</STRONG> (Thumb, 226 bytes, Stack size 16 bytes, jpeg_serial.o(i.jpeg_serial_init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 152<LI>Call Chain = jpeg_serial_init &rArr; jpeg_decoder_init &rArr; Extsram_Init &rArr; __2printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;NVIC_Init
@@ -2076,13 +2079,14 @@ Global Symbols
 <LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DCMI_IRQHandler
 </UL>
 
-<P><STRONG><a name="[5d]"></a>main</STRONG> (Thumb, 186 bytes, Stack size 16 bytes, main.o(i.main))
+<P><STRONG><a name="[5d]"></a>main</STRONG> (Thumb, 190 bytes, Stack size 16 bytes, main.o(i.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 184<LI>Call Chain = main &rArr; vTaskStartScheduler &rArr; xTimerCreateTimerTask &rArr; xTaskCreate &rArr; pvPortMalloc &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[148]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;NVIC_PriorityGroupConfig
 <LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_Init
 <LI><a href="#[143]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;jpeg_serial_init
 <LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DCMI_StartOneFrame
+<LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Extsram_Init
 <LI><a href="#[f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_Init_Custom
 <LI><a href="#[10a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Smoke_Sensor_Init
 <LI><a href="#[11d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART3_Init
