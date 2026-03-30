@@ -4,7 +4,7 @@
 #include "lwip/mem.h"
 #include "lwip/memp.h"
 #include "lwip/init.h"
-#include "ethernetif.h" 
+#include "netif/ethernetif.h" 
 #include "lwip/lwip_timers.h"
 #include "lwip/tcp_impl.h"
 #include "lwip/ip_frag.h"
@@ -268,7 +268,7 @@ void lwip_dhcp_task(void *pvParameters)
 			break;
 		}
 //		vTaskDelay(100); 
-		delay_xms(250); //延时250ms
+		delay_ms(250); //延时250ms
 	}
 	lwip_comm_dhcp_delete(); //删除DHCP任务 
 }

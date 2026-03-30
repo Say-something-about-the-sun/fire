@@ -59,14 +59,14 @@
 #endif
 
 /* Uncomment the line below to allow custom configuration of the Ethernet driver buffers */    
-//#define CUSTOM_DRIVER_BUFFERS_CONFIG   
+#define CUSTOM_DRIVER_BUFFERS_CONFIG   
 
 #ifdef  CUSTOM_DRIVER_BUFFERS_CONFIG
 /* Redefinition of the Ethernet driver buffers size and count */   
  #define ETH_RX_BUF_SIZE    ETH_MAX_PACKET_SIZE /* buffer size for receive */
  #define ETH_TX_BUF_SIZE    ETH_MAX_PACKET_SIZE /* buffer size for transmit */
- #define ETH_RXBUFNB        20                  /* 20 Rx buffers of size ETH_RX_BUF_SIZE */
- #define ETH_TXBUFNB        5                   /* 5  Tx buffers of size ETH_TX_BUF_SIZE */
+ #define ETH_RXBUFNB        4                  /* 4 Rx buffers of size ETH_RX_BUF_SIZE */
+ #define ETH_TXBUFNB        4                   /* 4  Tx buffers of size ETH_TX_BUF_SIZE */
 #endif
 
 

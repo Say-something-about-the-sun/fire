@@ -13,7 +13,7 @@
 #define MEM_ALIGNMENT           4  
 
 //MEM_SIZE:heap内存的大小,如果在应用中有大量数据发送的话这个值最好设置大一点 
-#define MEM_SIZE               (10*1024) //内存堆大小（堆大小控制在 10KB
+#define MEM_SIZE               (5*1024) //内存堆大小（堆大小控制在 5KB
 
 //MEMP_NUM_PBUF:memp结构的pbuf数量,如果应用从ROM或者静态存储区发送大量数据时,这个值应该设置大一点
 #define MEMP_NUM_PBUF           20
@@ -36,7 +36,7 @@
 
 /* ---------- Pbuf选项---------- */
 //PBUF_POOL_SIZE:pbuf内存池个数. 
-#define PBUF_POOL_SIZE          10//设为 10 左右（约占 15KB）
+#define PBUF_POOL_SIZE        4//设为 4 左右
 
 //PBUF_POOL_BUFSIZE:每个pbuf内存池大小. 
 #define PBUF_POOL_BUFSIZE       512
@@ -54,13 +54,18 @@
 #define TCP_MSS                 (1500 - 40)	  //最大TCP分段,TCP_MSS = (MTU - IP报头大小 - TCP报头大小
 
 //TCP发送缓冲区大小(bytes).
-#define TCP_SND_BUF             (4*TCP_MSS)
+#define TCP_SND_BUF             (2*TCP_MSS)
 
 //TCP_SND_QUEUELEN: TCP发送缓冲区大小(pbuf).这个值最小为(2 * TCP_SND_BUF/TCP_MSS) 
-#define TCP_SND_QUEUELEN        (2* TCP_SND_BUF/TCP_MSS)
+#define TCP_SND_QUEUELEN        6
+#define TCP_SNDQUEUELOWAT       3
 
 //TCP发送窗口
-#define TCP_WND                 (2*TCP_MSS)
+#define TCP_WND                 (1*TCP_MSS)
+
+
+//关闭 TCP 参数健康检查
+//#define LWIP_DISABLE_TCP_SANITY_CHECKS  1
 
 
 /* ---------- ICMP选项---------- */
@@ -161,13 +166,13 @@
 #define LWIP_SO_RCVTIMEO                1 //通过定义LWIP_SO_RCVTIMEO使能netconn结构体中recv_timeout,使用recv_timeout可以避免阻塞线程
 
 //有关系统的选项
-#define TCPIP_MBOX_SIZE                 20
-#define DEFAULT_UDP_RECVMBOX_SIZE       2000
-#define DEFAULT_TCP_RECVMBOX_SIZE       2000
-#define DEFAULT_ACCEPTMBOX_SIZE         2000
-#define DEFAULT_THREAD_STACKSIZE        512
+#define TCPIP_MBOX_SIZE                 10
+#define DEFAULT_UDP_RECVMBOX_SIZE       10
+#define DEFAULT_TCP_RECVMBOX_SIZE       10
+#define DEFAULT_ACCEPTMBOX_SIZE         10
+#define DEFAULT_THREAD_STACKSIZE        256
 //内核任务堆栈大小
-#define TCPIP_THREAD_STACKSIZE        2048     //内核任务堆栈大小
+#define TCPIP_THREAD_STACKSIZE        512     //内核任务堆栈大小
 #define TCPIP_THREAD_PRIO               (configMAX_PRIORITIES - 2)				//内核任务优先级
 /*
    ----------------------------------------

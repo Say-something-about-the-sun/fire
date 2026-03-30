@@ -40,7 +40,7 @@
 #define BIG_ENDIAN 4321
 #endif
 
-#include "arch/cc.h"
+#include "cc.h"
 //#include "FreeRTOS.h"
 //#include "task.h"
 //#include "queue.h"

@@ -30,115 +30,59 @@ static void ETHERNET_NVICConfiguration(void);
 //LAN8720初始化
 //返回值:0,成功;
 //    其他,失败
+//LAN8720初始化
 u8 LAN8720_Init(void)
 {
-//	u8 rval=0;
-//	GPIO_InitTypeDef GPIO_InitStructure;
-//  
-//	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOC|RCC_AHB1Periph_GPIOG|RCC_AHB1Periph_GPIOD, ENABLE);//使能GPIO时钟 RMII接口
-//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);   //使能SYSCFG时钟 RMII接口属于系统配置，所以要打开系统配置时钟
-//  
-//	SYSCFG_ETH_MediaInterfaceConfig(SYSCFG_ETH_MediaInterface_RMII); //MAC和PHY之间使用RMII接口
-
-//	/*网络引脚设置 RMII接口
-//	  ETH_MDIO -------------------------> PA2
-//	  ETH_MDC --------------------------> PC1
-//	  ETH_RMII_REF_CLK------------------> PA1
-//	  ETH_RMII_CRS_DV ------------------> PA7
-//	  ETH_RMII_RXD0 --------------------> PC4
-//	  ETH_RMII_RXD1 --------------------> PC5
-//	  ETH_RMII_TX_EN -------------------> PG11
-//	  ETH_RMII_TXD0 --------------------> PG13
-//	  ETH_RMII_TXD1 --------------------> PG14
-//	  ETH_RESET-------------------------> PD3*/
-//					
-//	  //配置PA1 PA2 PA7
-//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_7;
-//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-//	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-//	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;  
-//	GPIO_Init(GPIOA, &GPIO_InitStructure);
-//	
-//	GPIO_PinAFConfig(GPIOA, GPIO_PinSource1, GPIO_AF_ETH); //引脚复用到网络接口上
-//	GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_ETH);
-//	GPIO_PinAFConfig(GPIOA, GPIO_PinSource7, GPIO_AF_ETH);
-
-//	//配置PC1,PC4 and PC5
-//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5;
-//	GPIO_Init(GPIOC, &GPIO_InitStructure);
-//	GPIO_PinAFConfig(GPIOC, GPIO_PinSource1, GPIO_AF_ETH); //引脚复用到网络接口上
-//	GPIO_PinAFConfig(GPIOC, GPIO_PinSource4, GPIO_AF_ETH);
-//	GPIO_PinAFConfig(GPIOC, GPIO_PinSource5, GPIO_AF_ETH);
-//                                
-//	//配置PG11, PG14 and PG13 
-//	GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_11 | GPIO_Pin_13 | GPIO_Pin_14;
-//	GPIO_Init(GPIOG, &GPIO_InitStructure);
-//	GPIO_PinAFConfig(GPIOG, GPIO_PinSource11, GPIO_AF_ETH);
-//	GPIO_PinAFConfig(GPIOG, GPIO_PinSource13, GPIO_AF_ETH);
-//	GPIO_PinAFConfig(GPIOG, GPIO_PinSource14, GPIO_AF_ETH);
-//	
-//	//配置PD3为推完输出
-//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
-//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-//	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;	//推完输出
-//	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;  
-//	GPIO_Init(GPIOD, &GPIO_InitStructure);
-//	
-//	LAN8720_RST=0;					//硬件复位LAN8720
-//	delay_ms(50);	
-//	LAN8720_RST=1;				 	//复位结束 
-//	ETHERNET_NVICConfiguration();	//设置中断优先级
-//	rval=ETH_MACDMA_Config();		//配置MAC及DMA
-//	return !rval;					//ETH的规则为:0,失败;1,成功;所以要取反一下 
-        u8 rval = 0;
-	GPIO_InitTypeDef   GPIO_InitStructure;
-	
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOG|
-	                       RCC_AHB1Periph_GPIOC,ENABLE);//使能GPIO时钟
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG,ENABLE);//使能SYSCLK时钟
-	
-   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;   
-  GPIO_Init(GPIOA, &GPIO_InitStructure);
-//	RCC_MCO1Config(RCC_MCO1Source_HSE, RCC_MCO1Div_1);
-	
-	SYSCFG_ETH_MediaInterfaceConfig(SYSCFG_ETH_MediaInterface_RMII);//MAC和PHY之间使用RMII接口
-	//配置PA1 PA2 PA7
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_7;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(GPIOA,&GPIO_InitStructure);
-	
-	GPIO_PinAFConfig(GPIOA,GPIO_PinSource1,GPIO_AF_ETH);
-	GPIO_PinAFConfig(GPIOA,GPIO_PinSource2,GPIO_AF_ETH);
-	GPIO_PinAFConfig(GPIOA,GPIO_PinSource7,GPIO_AF_ETH);
-	
-	//配置PB11 PB12 PB13
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11|GPIO_Pin_13|GPIO_Pin_14;
-	GPIO_Init(GPIOG,&GPIO_InitStructure);
-	GPIO_PinAFConfig(GPIOG,GPIO_PinSource11,GPIO_AF_ETH);
-	GPIO_PinAFConfig(GPIOG,GPIO_PinSource13,GPIO_AF_ETH);
-	GPIO_PinAFConfig(GPIOG,GPIO_PinSource14,GPIO_AF_ETH);
-	//配置PC1 PC4 PC5
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1|GPIO_Pin_4|GPIO_Pin_5;
-	GPIO_Init(GPIOC,&GPIO_InitStructure);
-	GPIO_PinAFConfig(GPIOC,GPIO_PinSource1,GPIO_AF_ETH);
-	GPIO_PinAFConfig(GPIOC,GPIO_PinSource4,GPIO_AF_ETH);
-	GPIO_PinAFConfig(GPIOC,GPIO_PinSource5,GPIO_AF_ETH);
-	
-	ETHERNET_NVICConfiguration();
-	rval = ETH_MACDMA_Config();
-	return !rval;//ETH的规则为：0，失败；1，成功；所以这里要取反一下
+    u8 rval = 0;
+    GPIO_InitTypeDef GPIO_InitStructure;
     
-}
+    // 1. ?? 必须包含 GPIOD 的时钟（为了 PD3 复位引脚）
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOG|
+                           RCC_AHB1Periph_GPIOC|RCC_AHB1Periph_GPIOD, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+    
+    SYSCFG_ETH_MediaInterfaceConfig(SYSCFG_ETH_MediaInterface_RMII);
+    
+    //配置PA1 PA2 PA7
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_7;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_Init(GPIOA,&GPIO_InitStructure);
+    GPIO_PinAFConfig(GPIOA,GPIO_PinSource1,GPIO_AF_ETH);
+    GPIO_PinAFConfig(GPIOA,GPIO_PinSource2,GPIO_AF_ETH);
+    GPIO_PinAFConfig(GPIOA,GPIO_PinSource7,GPIO_AF_ETH);
+    
+    //配置PG11 PG13 PG14
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11|GPIO_Pin_13|GPIO_Pin_14;
+    GPIO_Init(GPIOG,&GPIO_InitStructure);
+    GPIO_PinAFConfig(GPIOG,GPIO_PinSource11,GPIO_AF_ETH);
+    GPIO_PinAFConfig(GPIOG,GPIO_PinSource13,GPIO_AF_ETH);
+    GPIO_PinAFConfig(GPIOG,GPIO_PinSource14,GPIO_AF_ETH);
+    
+    //配置PC1 PC4 PC5
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1|GPIO_Pin_4|GPIO_Pin_5;
+    GPIO_Init(GPIOC,&GPIO_InitStructure);
+    GPIO_PinAFConfig(GPIOC,GPIO_PinSource1,GPIO_AF_ETH);
+    GPIO_PinAFConfig(GPIOC,GPIO_PinSource4,GPIO_AF_ETH);
+    GPIO_PinAFConfig(GPIOC,GPIO_PinSource5,GPIO_AF_ETH);
+    
+    // 2. ?? 核心修复：配置 PD3 推挽输出，并执行硬件复位动作！
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;       // 普通输出模式
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_Init(GPIOD, &GPIO_InitStructure);
 
+    GPIO_ResetBits(GPIOD, GPIO_Pin_3); // 拉低复位引脚
+    delay_ms(50);                      // 等待 50ms 彻底复位
+    GPIO_SetBits(GPIOD, GPIO_Pin_3);   // 拉高释放复位
+    delay_ms(50);                      // 等待芯片内部初始化完成
+    
+    ETHERNET_NVICConfiguration();
+    rval = ETH_MACDMA_Config();
+    return !rval;
+}
 //以太网中断分组配置
 void ETHERNET_NVICConfiguration(void)
 {
@@ -317,25 +261,32 @@ u32 ETH_GetCurrentTxBuffer(void)
 //为ETH底层驱动申请内存
 //返回值:0,正常
 //    其他,失败
+//为ETH底层驱动申请内存
 u8 ETH_Mem_Malloc(void)
 { 
-	DMARxDscrTab=mymalloc(SRAMEX,ETH_RXBUFNB*sizeof(ETH_DMADESCTypeDef));//申请内存
-	DMATxDscrTab=mymalloc(SRAMEX,ETH_TXBUFNB*sizeof(ETH_DMADESCTypeDef));//申请内存  
-	Rx_Buff=mymalloc(SRAMEX,ETH_RX_BUF_SIZE*ETH_RXBUFNB);	//申请内存
-	Tx_Buff=mymalloc(SRAMEX,ETH_TX_BUF_SIZE*ETH_TXBUFNB);	//申请内存
-	if(!DMARxDscrTab||!DMATxDscrTab||!Rx_Buff||!Tx_Buff)
-	{
-		ETH_Mem_Free();
-		return 1;	//申请失败
-	}	
-	return 0;		//申请成功
+    // ?? 核心修复：以太网 DMA 只能使用内部 SRAM (SRAMIN)！
+    // 咱们前面辛辛苦苦腾出那么多内部内存，就是为了给它用的！
+    DMARxDscrTab=mymalloc(SRAMIN, ETH_RXBUFNB*sizeof(ETH_DMADESCTypeDef));
+    DMATxDscrTab=mymalloc(SRAMIN, ETH_TXBUFNB*sizeof(ETH_DMADESCTypeDef));  
+    Rx_Buff=mymalloc(SRAMIN, ETH_RX_BUF_SIZE*ETH_RXBUFNB);  
+    Tx_Buff=mymalloc(SRAMIN, ETH_TX_BUF_SIZE*ETH_TXBUFNB);  
+    
+    if(!DMARxDscrTab||!DMATxDscrTab||!Rx_Buff||!Tx_Buff)
+    {
+        ETH_Mem_Free();
+        return 1;   //申请失败
+    }   
+    return 0;       //申请成功
 }
 
 //释放ETH 底层驱动申请的内存
 void ETH_Mem_Free(void)
 { 
-	myfree(SRAMEX,DMARxDscrTab);//释放内存
-	myfree(SRAMEX,DMATxDscrTab);//释放内存
-	myfree(SRAMEX,Rx_Buff);		//释放内存
-	myfree(SRAMEX,Tx_Buff);		//释放内存  
+    // ?? 同理，改为 SRAMIN
+    myfree(SRAMIN, DMARxDscrTab);
+    myfree(SRAMIN, DMATxDscrTab);
+    myfree(SRAMIN, Rx_Buff);      
+    myfree(SRAMIN, Tx_Buff);       
 }
+
+

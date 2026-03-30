@@ -28,7 +28,8 @@ extern uint8_t jpeg_buf_a;
 __align(4) u16 row_buffer[ROW_BUFFER_HEIGHT][ROW_BUFFER_WIDTH];
 
 // TJpgDec解码工作区
-__align(4) uint8_t work[ 16384];  // 解码工作区
+u8 work[16384] __attribute__((at(0x10000000)));
+//__align(4) uint8_t work[ 8192];  // 解码工作区
 
 // 解码状态
 typedef struct {

@@ -118,10 +118,10 @@ void DCMI_DMA_Init(u32 DMA_Memory0BaseAddr,u16 DMA_BufferSize,u32 DMA_MemoryData
   DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Word;//存储器数据长度:32位（Word）
   DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
   DMA_InitStructure.DMA_Priority = DMA_Priority_High;//高优先级
-  DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Disable;// 启用FIFO模式
+		DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Disable;// 不启用FIFO模式
   DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_1QuarterFull;
-  DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;// 存储器突发4次传输
-  DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;// 外设突发4次传输
+  DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;// 存储器突发单次传输
+  DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;// 外设突发单次传输
   DMA_Init(DMA2_Stream1, &DMA_InitStructure);//初始化DMA Stream
 	
 } 

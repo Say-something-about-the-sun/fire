@@ -28,6 +28,10 @@
 #include "semphr.h"
 
 
+
+//lwip
+#include "malloc.h"
+
 // 1. 定义一把全局串口互斥锁
 SemaphoreHandle_t Mutex_USART1;
 
@@ -248,12 +252,30 @@ int main(void)
     OV5640_OutSize_Set(4, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
     // 色调设置
     OV5640_Hue_Set(0);
+		
+		// 唤醒 LwIP 协议栈
+my_mem_init(SRAMIN);  
+
+// 2. 捕获真实的错误码，并将延时换成裸机延时
+u8 lwip_state;
+printf("开始唤醒 LwIP...\r\n");
+
+while((lwip_state = lwip_comm_init()) != 0) 
+{
+    printf("LwIP 初始化失败! 错误码: %d\r\n", lwip_state);
+    
+    // 🚨 操作系统启动前，绝对不能用 vTaskDelay！必须用原生的裸机延时！
+    delay_ms(1000); 
+}
+printf("LwIP 唤醒成功! 网卡已就绪!\r\n");
+
    
     // 4. 初始化烟雾传感器
     Smoke_Sensor_Init();
     
 		//水泵初始化
 		WaterPump_Init();
+		
 		//温湿度初始化
 		DHT11_Init();
 		KEY_Init();

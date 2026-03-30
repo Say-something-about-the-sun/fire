@@ -1,0 +1,9 @@
+.\objects\netdb.o: LWIP\lwip-1.4.1\src\api\netdb.c
+.\objects\netdb.o: .\LWIP\lwip-1.4.1\src\include\lwip/netdb.h
+.\objects\netdb.o: .\LWIP\lwip-1.4.1\src\include\lwip/opt.h
+.\objects\netdb.o: .\LWIP\lwip_app\lwip_comm\lwipopts.h
+.\objects\netdb.o: .\LWIP\lwip-1.4.1\src\include\lwip/debug.h
+.\objects\netdb.o: .\LWIP\lwip-1.4.1\src\include\lwip/arch.h
+.\objects\netdb.o: .\LWIP\arch\cc.h
+.\objects\netdb.o: .\LWIP\arch\cpu.h
+.\objects\netdb.o: .\LWIP\lwip-1.4.1\src\include\lwip/opt.h
