@@ -118,13 +118,26 @@ void button_scan_task(void *pvParameters)
  * @brief  AI 核心决策中枢 (纯逻辑封装)
  * @param  packet: 已经采集好全部数据的结构体指针
  */
+/**
+ * @brief  AI 核心决策中枢 (加入继电器防抖与火力锁定)
+ * @param  packet: 已经采集好全部数据的结构体指针
+ */
 static void AI_Fire_Decision_Center(SensorDataPacket* packet)
 {
     u8 is_fire_real = packet->image_fire_detected || packet->fire_detected || packet->flame_do == 1;
 
-    // 🔴 Level 3: 确认起火
-    if (is_fire_real) 
+    // 🚀 [核心修复] 静态火灾锁定计数器
+    // 作用：只要检测到一次火灾，强制系统维持紧急状态 N 帧，无视后续的视觉闪烁！
+    static u8 fire_latch_counter = 0; 
+    
+    if (is_fire_real) {
+        fire_latch_counter = 20; // 只要看到一次火，强制锁定起火状态约 2~3 秒 (假设每秒跑10帧)
+    }
+
+    // 🔴 Level 3: 确认起火 (只要锁定器不为0，就认定大火还在烧！)
+    if (fire_latch_counter > 0) 
     {
+        fire_latch_counter--;    // 消耗一帧锁定时间
         packet->risk_level = 3; 
         packet->confidence = packet->image_fire_detected ? packet->image_confidence : 85.0f;
         
@@ -132,10 +145,10 @@ static void AI_Fire_Decision_Center(SensorDataPacket* packet)
         if (g_system_mode == 0) {
             if (packet->virtual_current > 10.0) {
                 g_main_power_status = 0; // 虚拟跳闸
-                WaterPump_Off();         // 禁水
+                WaterPump_Off();         // 禁水防触电
             } else {
                 g_main_power_status = 0; // 虚拟跳闸
-                WaterPump_On();          // 喷水
+                WaterPump_On();          // 💦 稳定输出：这回继电器绝对能稳稳吸合！
             }
         }
     } 
@@ -150,12 +163,13 @@ static void AI_Fire_Decision_Center(SensorDataPacket* packet)
             WaterPump_Off();       
         }
     }
+    // 🟢 Level 1/0: 正常或仅烟雾
     else 
     {
         packet->risk_level = (packet->smoke_detected) ? 1 : 0;
         packet->confidence = (packet->smoke_detected) ? 60.0f : 100.0f;
         
-        if (g_system_mode == 0) { // 【自动恢复正常】
+        if (g_system_mode == 0) { 
             g_main_power_status = 1; 
             WaterPump_Off();       
         }

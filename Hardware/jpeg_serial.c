@@ -437,6 +437,11 @@ u8 process_jpeg_frame(u8 do_fire_detection)
                                                     dec->width, dec->height, 
                                                     &fire_result);
                         
+											
+											
+											extern FireDetectionResult g_latest_fire_result; // 声明引用外部全局变量
+											g_latest_fire_result = fire_result;              // 将结果塞进全局抽屉！
+											
                         // 5. 更新火焰检测结果到报告模块
                         ESP8266_Report_UpdateFireDetectionResult(&fire_result);
                         
@@ -447,7 +452,7 @@ u8 process_jpeg_frame(u8 do_fire_detection)
                         // 🚨 修复二：如果解码失败，大声喊出来错在哪！
                         printf("[Vision] ERROR: JPEG Decode FAILED! Error Code: %d\r\n", decode_res);
                     }
-                // } 
+                
             }
                     }
                 }

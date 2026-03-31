@@ -22,70 +22,71 @@ Dialog DLL:      TCM.DLL V1.14.14.0
  
 <h2>Project:</h2>
 C:\Users\mywife\Desktop\毕业材料\毕设（基于stm32的火情监测系统）\code（keil\fire watch.uvprojx
-Project File Date:  03/27/2026
+Project File Date:  03/31/2026
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 3 (build 300)', folder: 'D:\QRS\MDK514\ARM\ARMCC\Bin'
 Rebuild target 'Target 1'
 assembling startup_stm32f40_41xxx.s...
-compiling stm32f4xx_can.c...
 compiling stm32f4xx_cec.c...
 compiling system_stm32f4xx.c...
 compiling misc.c...
-compiling stm32f4xx_crc.c...
-compiling stm32f4xx_it.c...
+compiling stm32f4xx_can.c...
 compiling stm32f4xx_adc.c...
-compiling stm32f4xx_cryp_tdes.c...
+compiling stm32f4xx_it.c...
+compiling stm32f4xx_crc.c...
 compiling stm32f4xx_cryp_des.c...
 compiling stm32f4xx_cryp.c...
-compiling stm32f4xx_dbgmcu.c...
-compiling stm32f4xx_dac.c...
-compiling stm32f4xx_dcmi.c...
 compiling stm32f4xx_cryp_aes.c...
-compiling stm32f4xx_dfsdm.c...
+compiling stm32f4xx_cryp_tdes.c...
+compiling stm32f4xx_dcmi.c...
+compiling stm32f4xx_dac.c...
+compiling stm32f4xx_dbgmcu.c...
 compiling stm32f4xx_dma.c...
-compiling stm32f4xx_exti.c...
 compiling stm32f4xx_dsi.c...
 compiling stm32f4xx_dma2d.c...
 compiling stm32f4xx_flash.c...
+compiling stm32f4xx_exti.c...
+compiling stm32f4xx_dfsdm.c...
 compiling stm32f4xx_flash_ramfunc.c...
 compiling stm32f4xx_fmpi2c.c...
-compiling stm32f4xx_hash.c...
-compiling stm32f4xx_hash_sha1.c...
-compiling stm32f4xx_gpio.c...
-compiling stm32f4xx_i2c.c...
-compiling stm32f4xx_hash_md5.c...
 compiling stm32f4xx_fsmc.c...
+compiling stm32f4xx_hash.c...
+compiling stm32f4xx_gpio.c...
+compiling stm32f4xx_hash_sha1.c...
+compiling stm32f4xx_hash_md5.c...
+compiling stm32f4xx_i2c.c...
 compiling stm32f4xx_iwdg.c...
+compiling stm32f4xx_pwr.c...
 compiling stm32f4xx_lptim.c...
 compiling stm32f4xx_qspi.c...
-compiling stm32f4xx_ltdc.c...
-compiling stm32f4xx_pwr.c...
 compiling stm32f4xx_rng.c...
+compiling stm32f4xx_ltdc.c...
 compiling stm32f4xx_rcc.c...
-compiling stm32f4xx_rtc.c...
-compiling stm32f4xx_sai.c...
-compiling stm32f4xx_sdio.c...
-compiling stm32f4xx_syscfg.c...
-compiling stm32f4xx_spi.c...
 compiling stm32f4xx_spdifrx.c...
+compiling stm32f4xx_sdio.c...
+compiling stm32f4xx_sai.c...
+compiling stm32f4xx_syscfg.c...
+compiling stm32f4xx_rtc.c...
+compiling stm32f4xx_spi.c...
 compiling stm32f4xx_tim.c...
-compiling stm32f4xx_usart.c...
 compiling stm32f4xx_wwdg.c...
-compiling delay.c...
 compiling sys.c...
+compiling stm32f4xx_usart.c...
 compiling usart3.c...
 System\usart3\usart3.c(44): warning:  #870-D: invalid multibyte character sequence
       printf("[USART3] 鍒?濮?鍖?瀹?鎴?锛?娉?鐗?鐜?: %lu\r\n", bound);
 System\usart3\usart3.c: 1 warning, 0 errors
+compiling delay.c...
 compiling usart.c...
 compiling usart2.c...
+compiling RTC.c...
+compiling image_preprocess.c...
+compiling fire_detection.c...
 compiling smoke.c...
 Hardware\smoke.c(55): warning:  #223-D: function "printf" declared implicitly
               printf("[Smoke] ADC Timeout Error!\r\n");
 Hardware\smoke.c: 1 warning, 0 errors
-compiling RTC.c...
-compiling fire_detection.c...
 compiling extsram.c...
 compiling jpeg_decoder.c...
 Hardware\jpeg_decoder.c(134): warning:  #223-D: function "printf" declared implicitly
@@ -97,11 +98,10 @@ Hardware\jpeg_decoder.c(130): warning:  #550-D: variable "end_time" was set but 
 Hardware\jpeg_decoder.c(281): warning:  #223-D: function "printf" declared implicitly
           printf("[JPEG Decoder] No decoded image\r\n");
 Hardware\jpeg_decoder.c: 4 warnings, 0 errors
-compiling image_preprocess.c...
 compiling jpeg_serial.c...
 Hardware\jpeg_decoder.h(41): warning:  #1-D: last line of file ends without a newline
   #endif /* __JPEG_DECODER_H */
-Hardware\jpeg_serial.c(489): warning:  #223-D: function "DCMI_DMA_Init" declared implicitly
+Hardware\jpeg_serial.c(494): warning:  #223-D: function "DCMI_DMA_Init" declared implicitly
       DCMI_DMA_Init((u32)jpeg_buf_a, JPEG_MAX_SIZE / 4, DMA_MemoryDataSize_Word, DMA_MemoryInc_Enable);
 Hardware\jpeg_serial.c: 2 warnings, 0 errors
 compiling syscall.c...
@@ -109,8 +109,6 @@ FatFS\option\syscall.c(13): warning:  #9-D: nested comment is not allowed
   /*------------------------------------------------------------------------*/
 FatFS\option\syscall.c: 1 warning, 0 errors
 compiling cc936.c...
-compiling led.c...
-compiling tjpgd.c...
 compiling ff.c...
 compiling cJSON.c...
 Cjson\cJSON.c(55): warning:  #1293-D: assignment in condition
@@ -124,7 +122,11 @@ Cjson\cJSON.c(423): warning:  #1293-D: assignment in condition
 Cjson\cJSON.c(535): warning:  #1293-D: assignment in condition
   		if (!(new_item=cJSON_New_Item()))	return 0; /* memory fail */
 Cjson\cJSON.c: 5 warnings, 0 errors
+compiling tjpgd.c...
+compiling led.c...
 compiling diskio.c...
+compiling list.c...
+compiling event_groups.c...
 compiling main.c...
 User\main.c(261): warning:  #870-D: invalid multibyte character sequence
   printf("寮�濮?鍞?閱? LwIP...\r\n");
@@ -141,16 +143,14 @@ User\main.c(280): warning:  #223-D: function "DHT11_Init" declared implicitly
 User\main.c(301): warning:  #223-D: function "My_DCMI_Init" declared implicitly
       My_DCMI_Init();
 User\main.c: 7 warnings, 0 errors
-compiling croutine.c...
-compiling list.c...
 compiling heap_4.c...
-compiling event_groups.c...
+compiling croutine.c...
 compiling queue.c...
 compiling tasks.c...
+compiling sdcard_jpeg.c...
+compiling port.c...
 compiling SDCard.c...
 compiling timers.c...
-compiling port.c...
-compiling sdcard_jpeg.c...
 compiling sd_data_manager.c...
 SDcard\sd_data_manager.c(928): warning:  #223-D: function "delay_ms" declared implicitly
               delay_ms(WRITE_RETRY_DELAY_MS);
@@ -161,28 +161,29 @@ SDcard\sd_data_manager.c(950): warning:  #223-D: function "delay_ms" declared im
 SDcard\sd_data_manager.c(960): warning:  #223-D: function "delay_ms" declared implicitly
               delay_ms(WRITE_RETRY_DELAY_MS);
 SDcard\sd_data_manager.c: 4 warnings, 0 errors
-compiling sdio_sdcard.c...
 compiling ESP8266.c...
+compiling sdio_sdcard.c...
 compiling dcmi.c...
 compiling ov5640.c...
 ov5640\ov5640.c(11): warning:  #47-D: incompatible redefinition of macro "OV5640_ADDR" (declared at line 27 of "ov5640\sccb.h")
   #define OV5640_ADDR     0X78        //OV5640鐨?IIC鍦?鍧�
 ov5640\ov5640.c: 1 warning, 0 errors
+compiling sccb.c...
+compiling dht11.c...
 compiling esp8266_report.c...
 ESP8266\esp8266_report.c(94): warning:  #870-D: invalid multibyte character sequence
   								printf("=> 宸?鎭?澶? AI 鑷?鍔?鎵?绠?锛?\r\n");
-ESP8266\esp8266_report.c(133): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+ESP8266\esp8266_report.c(146): warning:  #1035-D: single-precision operand implicitly converted to double-precision
               if (packet->virtual_current > 10.0) {
-ESP8266\esp8266_report.c(143): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+ESP8266\esp8266_report.c(156): warning:  #1035-D: single-precision operand implicitly converted to double-precision
       else if (packet->virtual_current > 10.0 || packet->temperature > 60.0)
-ESP8266\esp8266_report.c(143): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+ESP8266\esp8266_report.c(156): warning:  #1035-D: single-precision operand implicitly converted to double-precision
       else if (packet->virtual_current > 10.0 || packet->temperature > 60.0)
-ESP8266\esp8266_report.c(351): warning:  #223-D: function "Safe_Printf" declared implicitly
+ESP8266\esp8266_report.c(365): warning:  #223-D: function "Safe_Printf" declared implicitly
   Safe_Printf("[ESP8266 Report] Pushed JSON to Gateway (%d bytes)\r\n", json_packet.json_len);
 ESP8266\esp8266_report.c: 5 warnings, 0 errors
-compiling sccb.c...
-compiling dht11.c...
 compiling water_pump.c...
+compiling key.c...
 compiling def.c...
 compiling dns.c...
 compiling dhcp.c...
@@ -617,7 +618,6 @@ LWIP\lwip-1.4.1\src\core\dhcp.c(1682): warning:  #223-D: function "LWIP_PLATFORM
 LWIP\lwip-1.4.1\src\core\dhcp.c(1682): warning:  #174-D: expression has no effect
     LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_TRACE,
 LWIP\lwip-1.4.1\src\core\dhcp.c: 160 warnings, 0 errors
-compiling key.c...
 compiling netif.c...
 LWIP\lwip-1.4.1\src\core\netif.c(200): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
     LWIP_DEBUGF(NETIF_DEBUG, ("netif: added interface %c%c IP addr ",
@@ -788,7 +788,6 @@ LWIP\lwip-1.4.1\src\core\raw.c(335): warning:  #223-D: function "LWIP_PLATFORM_D
     
 WIP_DEBUGF(RAW_DEBUG | LWIP_DBG_TRACE, ("raw_new\n"));
 LWIP\lwip-1.4.1\src\core\raw.c: 11 warnings, 0 errors
-compiling lwip_sys.c...
 compiling mem.c...
 LWIP\lwip-1.4.1\src\core\mem.c(318): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
       
@@ -806,8 +805,122 @@ LWIP\lwip-1.4.1\src\core\mem.c(629): warning:  #174-D: expression has no effect
     
 WIP_DEBUGF(MEM_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("mem_malloc: could not allocate %"S16_F" bytes\n", (s16_t)size));
 LWIP\lwip-1.4.1\src\core\mem.c: 5 warnings, 0 errors
-compiling init.c...
 compiling stats.c...
+compiling init.c...
+compiling memp.c...
+LWIP\lwip-1.4.1\src\core\memp.c(435): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      
+WIP_DEBUGF(MEMP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("memp_malloc: out of memory in pool %s\n", memp_desc[type]));
+LWIP\lwip-1.4.1\src\core\memp.c(435): warning:  #174-D: expression has no effect
+      
+WIP_DEBUGF(MEMP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("memp_malloc: out of memory in pool %s\n", memp_desc[type]));
+LWIP\lwip-1.4.1\src\core\memp.c: 2 warnings, 0 errors
+compiling lwip_sys.c...
+compiling pbuf.c...
+LWIP\lwip-1.4.1\src\core\pbuf.c(212): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloc(length=%"U16_F")\n", length));
+LWIP\lwip-1.4.1\src\core\pbuf.c(212): warning:  #174-D: expression has no effect
+    
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloc(length=%"U16_F")\n", length));
+LWIP\lwip-1.4.1\src\core\pbuf.c(240): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloc: allocated pbuf %p\n", (void *)p));
+LWIP\lwip-1.4.1\src\core\pbuf.c(240): warning:  #174-D: expression has no effect
+      
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloc: allocated pbuf %p\n", (void *)p));
+LWIP\lwip-1.4.1\src\core\pbuf.c(328): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+        LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_LEVEL_SERIOUS,
+LWIP\lwip-1.4.1\src\core\pbuf.c(328): warning:  #174-D: expression has no effect
+        LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_LEVEL_SERIOUS,
+LWIP\lwip-1.4.1\src\core\pbuf.c(347): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloc(length=%"U16_F") == %p\n", length, (void *)p));
+LWIP\lwip-1.4.1\src\core\pbuf.c(347): warning:  #174-D: expression has no effect
+    
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloc(length=%"U16_F") == %p\n", length, (void *)p));
+LWIP\lwip-1.4.1\src\core\pbuf.c(347): warning:  #174-D: expression has no effect
+    
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloc(length=%"U16_F") == %p\n", length, (void *)p));
+LWIP\lwip-1.4.1\src\core\pbuf.c(371): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloced_custom(length=%"U16_F")\n", length));
+LWIP\lwip-1.4.1\src\core\pbuf.c(371): warning:  #174-D: expression has no effect
+    
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloced_custom(length=%"U16_F")\n", length));
+LWIP\lwip-1.4.1\src\core\pbuf.c(396): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_LEVEL_WARNING, ("pbuf_alloced_custom(length=%"U16_F") buffer too short\n", length));
+LWIP\lwip-1.4.1\src\core\pbuf.c(396): warning:  #174-D: expression has no effect
+      
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_LEVEL_WARNING, ("pbuf_alloced_custom(length=%"U16_F") buffer too short\n", length));
+LWIP\lwip-1.4.1\src\core\pbuf.c(550): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+        LWIP_DEBUGF( PBUF_DEBUG | LWIP_DBG_LEVEL_SERIOUS,
+LWIP\lwip-1.4.1\src\core\pbuf.c(550): warning:  #174-D: expression has no effect
+        LWIP_DEBUGF( PBUF_DEBUG | LWIP_DBG_LEVEL_SERIOUS,
+LWIP\lwip-1.4.1\src\core\pbuf.c(550): warning:  #174-D: expression has no effect
+        LWIP_DEBUGF( PBUF_DEBUG | LWIP_DBG_LEVEL_SERIOUS,
+LWIP\lwip-1.4.1\src\core\pbuf.c(578): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_header: old %p new %p (%"S16_F")\n",
+LWIP\lwip-1.4.1\src\core\pbuf.c(578): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_header: old %p new %p (%"S16_F")\n",
+LWIP\lwip-1.4.1\src\core\pbuf.c(578): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_header: old %p new %p (%"S16_F")\n",
+LWIP\lwip-1.4.1\src\core\pbuf.c(578): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_header: old %p new %p (%"S16_F")\n",
+LWIP\lwip-1.4.1\src\core\pbuf.c(627): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_LEVEL_SERIOUS,
+LWIP\lwip-1.4.1\src\core\pbuf.c(631): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_free(%p)\n", (void *)p));
+LWIP\lwip-1.4.1\src\core\pbuf.c(631): warning:  #174-D: expression has no effect
+    
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_free(%p)\n", (void *)p));
+LWIP\lwip-1.4.1\src\core\pbuf.c(658): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+        
+WIP_DEBUGF( PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_free: deallocating %p\n", (void *)p));
+LWIP\lwip-1.4.1\src\core\pbuf.c(658): warning:  #174-D: expression has no effect
+        
+WIP_DEBUGF( PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_free: deallocating %p\n", (void *)p));
+LWIP\lwip-1.4.1\src\core\pbuf.c(686): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+        
+WIP_DEBUGF( PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_free: %p has ref %"U16_F", ending here.\n", (void *)p, ref));
+LWIP\lwip-1.4.1\src\core\pbuf.c(686): warning:  #174-D: expression has no effect
+        
+WIP_DEBUGF( PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_free: %p has ref %"U16_F", ending here.\n", (void *)p, ref));
+LWIP\lwip-1.4.1\src\core\pbuf.c(686): warning:  #174-D: expression has no effect
+        
+WIP_DEBUGF( PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_free: %p has ref %"U16_F", ending here.\n", (void *)p, ref));
+LWIP\lwip-1.4.1\src\core\pbuf.c(791): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_chain: %p references %p\n", (void *)h, (void *)t));
+LWIP\lwip-1.4.1\src\core\pbuf.c(791): warning:  #174-D: expression has no effect
+    
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_chain: %p references %p\n", (void *)h, (void *)t));
+LWIP\lwip-1.4.1\src\core\pbuf.c(791): warning:  #174-D: expression has no effect
+    
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_chain: %p references %p\n", (void *)h, (void *)t));
+LWIP\lwip-1.4.1\src\core\pbuf.c(820): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_dechain: unreferencing %p\n", (void *)q));
+LWIP\lwip-1.4.1\src\core\pbuf.c(820): warning:  #174-D: expression has no effect
+      
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_dechain: unreferencing %p\n", (void *)q));
+LWIP\lwip-1.4.1\src\core\pbuf.c(823): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+        LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE,
+LWIP\lwip-1.4.1\src\core\pbuf.c(823): warning:  #174-D: expression has no effect
+        LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE,
+LWIP\lwip-1.4.1\src\core\pbuf.c(856): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_copy(%p, %p)\n",
+LWIP\lwip-1.4.1\src\core\pbuf.c(856): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_copy(%p, %p)\n",
+LWIP\lwip-1.4.1\src\core\pbuf.c(856): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_copy(%p, %p)\n",
+LWIP\lwip-1.4.1\src\core\pbuf.c(902): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_copy: end of chain reached.\n"));
+LWIP\lwip-1.4.1\src\core\pbuf.c: 39 warnings, 0 errors
+compiling autoip.c...
 compiling tcp.c...
 LWIP\lwip-1.4.1\src\core\tcp.c(394): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
         
@@ -1141,6 +1254,168 @@ LWIP\lwip-1.4.1\src\core\tcp_in.c(1606): warning:  #223-D: function "LWIP_PLATFO
             
 WIP_DEBUGF(TCP_INPUT_DEBUG, ("tcp_parseopt: bad length\n"));
 LWIP\lwip-1.4.1\src\core\tcp_in.c: 84 warnings, 0 errors
+compiling udp.c...
+LWIP\lwip-1.4.1\src\core\udp.c(171): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(171): warning:  #174-D: expression has no effect
+      LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(185): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(UDP_DEBUG, ("udp_input: received datagram of length %"U16_F"\n", p->tot_len));
+LWIP\lwip-1.4.1\src\core\udp.c(185): warning:  #174-D: expression has no effect
+    
+WIP_DEBUGF(UDP_DEBUG, ("udp_input: received datagram of length %"U16_F"\n", p->tot_len));
+LWIP\lwip-1.4.1\src\core\udp.c(194): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(194): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(194): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(194): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(194): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(194): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+        LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
+        LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
+        LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
+        LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
+        LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
+        LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
+        LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
+        LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
+        LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
+        LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
+        LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(292): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      
+WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE, ("udp_input: calculating checksum\n"));
+LWIP\lwip-1.4.1\src\core\udp.c(410): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+        
+WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE, ("udp_input: not for us.\n"));
+LWIP\lwip-1.4.1\src\core\udp.c(506): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE, ("udp_send\n"));
+LWIP\lwip-1.4.1\src\core\udp.c(517): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("udp_send: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
+LWIP\lwip-1.4.1\src\core\udp.c(517): warning:  #174-D: expression has no effect
+      LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("udp_send: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
+LWIP\lwip-1.4.1\src\core\udp.c(517): warning:  #174-D: expression has no effect
+      LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("udp_send: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
+LWIP\lwip-1.4.1\src\core\udp.c(517): warning:  #174-D: expression has no effect
+      LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("udp_send: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
+LWIP\lwip-1.4.1\src\core\udp.c(517): warning:  #174-D: expression has no effect
+      LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("udp_send: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
+LWIP\lwip-1.4.1\src\core\udp.c(579): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      
+WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE, ("udp_send: not yet bound to a port, binding now\n"));
+LWIP\lwip-1.4.1\src\core\udp.c(582): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+        
+WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_LEVEL_SERIOUS, ("udp_send: forced port bind failed\n"));
+LWIP\lwip-1.4.1\src\core\udp.c(593): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+        
+WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_LEVEL_SERIOUS, ("udp_send: could not allocate header\n"));
+LWIP\lwip-1.4.1\src\core\udp.c(601): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(601): warning:  #174-D: expression has no effect
+      LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(601): warning:  #174-D: expression has no effect
+      LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(607): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      
+WIP_DEBUGF(UDP_DEBUG, ("udp_send: added header in given pbuf %p\n", (void *)p));
+LWIP\lwip-1.4.1\src\core\udp.c(607): warning:  #174-D: expression has no effect
+      
+WIP_DEBUGF(UDP_DEBUG, ("udp_send: added header in given pbuf %p\n", (void *)p));
+LWIP\lwip-1.4.1\src\core\udp.c(647): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(UDP_DEBUG, ("udp_send: sending datagram of length %"U16_F"\n", q->tot_len));
+LWIP\lwip-1.4.1\src\core\udp.c(647): warning:  #174-D: expression has no effect
+    
+WIP_DEBUGF(UDP_DEBUG, ("udp_send: sending datagram of length %"U16_F"\n", q->tot_len));
+LWIP\lwip-1.4.1\src\core\udp.c(698): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      
+WIP_DEBUGF(UDP_DEBUG, ("udp_send: UDP packet length %"U16_F"\n", q->tot_len));
+LWIP\lwip-1.4.1\src\core\udp.c(698): warning:  #174-D: expression has no effect
+      
+WIP_DEBUGF(UDP_DEBUG, ("udp_send: UDP packet length %"U16_F"\n", q->tot_len));
+LWIP\lwip-1.4.1\src\core\udp.c(724): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      
+WIP_DEBUGF(UDP_DEBUG, ("udp_send: UDP checksum 0x%04"X16_F"\n", udphdr->chksum));
+LWIP\lwip-1.4.1\src\core\udp.c(724): warning:  #174-D: expression has no effect
+      
+WIP_DEBUGF(UDP_DEBUG, ("udp_send: UDP checksum 0x%04"X16_F"\n", udphdr->chksum));
+LWIP\lwip-1.4.1\src\core\udp.c(725): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      
+WIP_DEBUGF(UDP_DEBUG, ("udp_send: ip_output_if (,,,,IP_PROTO_UDP,)\n"));
+LWIP\lwip-1.4.1\src\core\udp.c(771): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE, ("udp_bind(ipaddr = "));
+LWIP\lwip-1.4.1\src\core\udp.c(772): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+p_addr_debug_print(UDP_DEBUG, ipaddr);
+LWIP\lwip-1.4.1\src\core\udp.c(772): warning:  #174-D: expression has no effect
+    
+p_addr_debug_print(UDP_DEBUG, ipaddr);
+LWIP\lwip-1.4.1\src\core\udp.c(772): warning:  #174-D: expression has no effect
+    
+p_addr_debug_print(UDP_DEBUG, ipaddr);
+LWIP\lwip-1.4.1\src\core\udp.c(772): warning:  #174-D: expression has no effect
+    
+p_addr_debug_print(UDP_DEBUG, ipaddr);
+LWIP\lwip-1.4.1\src\core\udp.c(772): warning:  #174-D: expression has no effect
+    
+p_addr_debug_print(UDP_DEBUG, ipaddr);
+LWIP\lwip-1.4.1\src\core\udp.c(773): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE, (", port = %"U16_F")\n", port));
+LWIP\lwip-1.4.1\src\core\udp.c(773): warning:  #174-D: expression has no effect
+    
+WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE, (", port = %"U16_F")\n", port));
+LWIP\lwip-1.4.1\src\core\udp.c(802): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+          LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(802): warning:  #174-D: expression has no effect
+          LWIP_DEBUGF(UDP_DEBUG,
+LWIP\lwip-1.4.1\src\core\udp.c(816): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+        
+WIP_DEBUGF(UDP_DEBUG, ("udp_bind: out of free UDP ports\n"));
+LWIP\lwip-1.4.1\src\core\udp.c(828): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
+LWIP\lwip-1.4.1\src\core\udp.c(828): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
+LWIP\lwip-1.4.1\src\core\udp.c(828): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
+LWIP\lwip-1.4.1\src\core\udp.c(828): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
+LWIP\lwip-1.4.1\src\core\udp.c(828): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
+LWIP\lwip-1.4.1\src\core\udp.c(828): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
+LWIP\lwip-1.4.1\src\core\udp.c(886): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
+LWIP\lwip-1.4.1\src\core\udp.c(886): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
+LWIP\lwip-1.4.1\src\core\udp.c(886): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
+LWIP\lwip-1.4.1\src\core\udp.c(886): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
+LWIP\lwip-1.4.1\src\core\udp.c(886): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
+LWIP\lwip-1.4.1\src\core\udp.c(886): warning:  #174-D: expression has no effect
+    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
+LWIP\lwip-1.4.1\src\core\udp.c: 67 warnings, 0 errors
 compiling tcp_out.c...
 LWIP\lwip-1.4.1\src\core\tcp_out.c(165): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
       
@@ -1346,281 +1621,7 @@ LWIP\lwip-1.4.1\src\core\tcp_out.c(1481): warning:  #174-D: expression has no ef
 LWIP\lwip-1.4.1\src\core\tcp_out.c(1481): warning:  #174-D: expression has no effect
     LWIP_DEBUGF(TCP_DEBUG, ("tcp_zero_window_probe: seqno %"U32_F
 LWIP\lwip-1.4.1\src\core\tcp_out.c: 88 warnings, 0 errors
-compiling memp.c...
-LWIP\lwip-1.4.1\src\core\memp.c(435): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      
-WIP_DEBUGF(MEMP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("memp_malloc: out of memory in pool %s\n", memp_desc[type]));
-LWIP\lwip-1.4.1\src\core\memp.c(435): warning:  #174-D: expression has no effect
-      
-WIP_DEBUGF(MEMP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("memp_malloc: out of memory in pool %s\n", memp_desc[type]));
-LWIP\lwip-1.4.1\src\core\memp.c: 2 warnings, 0 errors
-compiling udp.c...
-LWIP\lwip-1.4.1\src\core\udp.c(171): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(171): warning:  #174-D: expression has no effect
-      LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(185): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(UDP_DEBUG, ("udp_input: received datagram of length %"U16_F"\n", p->tot_len));
-LWIP\lwip-1.4.1\src\core\udp.c(185): warning:  #174-D: expression has no effect
-    
-WIP_DEBUGF(UDP_DEBUG, ("udp_input: received datagram of length %"U16_F"\n", p->tot_len));
-LWIP\lwip-1.4.1\src\core\udp.c(194): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(194): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(194): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(194): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(194): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(194): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-        LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
-        LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
-        LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
-        LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
-        LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
-        LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
-        LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
-        LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
-        LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
-        LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(232): warning:  #174-D: expression has no effect
-        LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(292): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      
-WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE, ("udp_input: calculating checksum\n"));
-LWIP\lwip-1.4.1\src\core\udp.c(410): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-        
-WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE, ("udp_input: not for us.\n"));
-LWIP\lwip-1.4.1\src\core\udp.c(506): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE, ("udp_send\n"));
-LWIP\lwip-1.4.1\src\core\udp.c(517): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("udp_send: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
-LWIP\lwip-1.4.1\src\core\udp.c(517): warning:  #174-D: expression has no effect
-      LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("udp_send: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
-LWIP\lwip-1.4.1\src\core\udp.c(517): warning:  #174-D: expression has no effect
-      LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("udp_send: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
-LWIP\lwip-1.4.1\src\core\udp.c(517): warning:  #174-D: expression has no effect
-      LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("udp_send: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
-LWIP\lwip-1.4.1\src\core\udp.c(517): warning:  #174-D: expression has no effect
-      LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("udp_send: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
-LWIP\lwip-1.4.1\src\core\udp.c(579): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      
-WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE, ("udp_send: not yet bound to a port, binding now\n"));
-LWIP\lwip-1.4.1\src\core\udp.c(582): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-        
-WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_LEVEL_SERIOUS, ("udp_send: forced port bind failed\n"));
-LWIP\lwip-1.4.1\src\core\udp.c(593): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-        
-WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_LEVEL_SERIOUS, ("udp_send: could not allocate header\n"));
-LWIP\lwip-1.4.1\src\core\udp.c(601): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(601): warning:  #174-D: expression has no effect
-      LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(601): warning:  #174-D: expression has no effect
-      LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(607): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      
-WIP_DEBUGF(UDP_DEBUG, ("udp_send: added header in given pbuf %p\n", (void *)p));
-LWIP\lwip-1.4.1\src\core\udp.c(607): warning:  #174-D: expression has no effect
-      
-WIP_DEBUGF(UDP_DEBUG, ("udp_send: added header in given pbuf %p\n", (void *)p));
-LWIP\lwip-1.4.1\src\core\udp.c(647): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(UDP_DEBUG, ("udp_send: sending datagram of length %"U16_F"\n", q->tot_len));
-LWIP\lwip-1.4.1\src\core\udp.c(647): warning:  #174-D: expression has no effect
-    
-WIP_DEBUGF(UDP_DEBUG, ("udp_send: sending datagram of length %"U16_F"\n", q->tot_len));
-LWIP\lwip-1.4.1\src\core\udp.c(698): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      
-WIP_DEBUGF(UDP_DEBUG, ("udp_send: UDP packet length %"U16_F"\n", q->tot_len));
-LWIP\lwip-1.4.1\src\core\udp.c(698): warning:  #174-D: expression has no effect
-      
-WIP_DEBUGF(UDP_DEBUG, ("udp_send: UDP packet length %"U16_F"\n", q->tot_len));
-LWIP\lwip-1.4.1\src\core\udp.c(724): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      
-WIP_DEBUGF(UDP_DEBUG, ("udp_send: UDP checksum 0x%04"X16_F"\n", udphdr->chksum));
-LWIP\lwip-1.4.1\src\core\udp.c(724): warning:  #174-D: expression has no effect
-      
-WIP_DEBUGF(UDP_DEBUG, ("udp_send: UDP checksum 0x%04"X16_F"\n", udphdr->chksum));
-LWIP\lwip-1.4.1\src\core\udp.c(725): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      
-WIP_DEBUGF(UDP_DEBUG, ("udp_send: ip_output_if (,,,,IP_PROTO_UDP,)\n"));
-LWIP\lwip-1.4.1\src\core\udp.c(771): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE, ("udp_bind(ipaddr = "));
-LWIP\lwip-1.4.1\src\core\udp.c(772): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-p_addr_debug_print(UDP_DEBUG, ipaddr);
-LWIP\lwip-1.4.1\src\core\udp.c(772): warning:  #174-D: expression has no effect
-    
-p_addr_debug_print(UDP_DEBUG, ipaddr);
-LWIP\lwip-1.4.1\src\core\udp.c(772): warning:  #174-D: expression has no effect
-    
-p_addr_debug_print(UDP_DEBUG, ipaddr);
-LWIP\lwip-1.4.1\src\core\udp.c(772): warning:  #174-D: expression has no effect
-    
-p_addr_debug_print(UDP_DEBUG, ipaddr);
-LWIP\lwip-1.4.1\src\core\udp.c(772): warning:  #174-D: expression has no effect
-    
-p_addr_debug_print(UDP_DEBUG, ipaddr);
-LWIP\lwip-1.4.1\src\core\udp.c(773): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE, (", port = %"U16_F")\n", port));
-LWIP\lwip-1.4.1\src\core\udp.c(773): warning:  #174-D: expression has no effect
-    
-WIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE, (", port = %"U16_F")\n", port));
-LWIP\lwip-1.4.1\src\core\udp.c(802): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-          LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(802): warning:  #174-D: expression has no effect
-          LWIP_DEBUGF(UDP_DEBUG,
-LWIP\lwip-1.4.1\src\core\udp.c(816): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-        
-WIP_DEBUGF(UDP_DEBUG, ("udp_bind: out of free UDP ports\n"));
-LWIP\lwip-1.4.1\src\core\udp.c(828): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
-LWIP\lwip-1.4.1\src\core\udp.c(828): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
-LWIP\lwip-1.4.1\src\core\udp.c(828): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
-LWIP\lwip-1.4.1\src\core\udp.c(828): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
-LWIP\lwip-1.4.1\src\core\udp.c(828): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
-LWIP\lwip-1.4.1\src\core\udp.c(828): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
-LWIP\lwip-1.4.1\src\core\udp.c(886): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
-LWIP\lwip-1.4.1\src\core\udp.c(886): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
-LWIP\lwip-1.4.1\src\core\udp.c(886): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
-LWIP\lwip-1.4.1\src\core\udp.c(886): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
-LWIP\lwip-1.4.1\src\core\udp.c(886): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
-LWIP\lwip-1.4.1\src\core\udp.c(886): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
-LWIP\lwip-1.4.1\src\core\udp.c: 67 warnings, 0 errors
-compiling autoip.c...
-compiling pbuf.c...
-LWIP\lwip-1.4.1\src\core\pbuf.c(212): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloc(length=%"U16_F")\n", length));
-LWIP\lwip-1.4.1\src\core\pbuf.c(212): warning:  #174-D: expression has no effect
-    
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloc(length=%"U16_F")\n", length));
-LWIP\lwip-1.4.1\src\core\pbuf.c(240): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloc: allocated pbuf %p\n", (void *)p));
-LWIP\lwip-1.4.1\src\core\pbuf.c(240): warning:  #174-D: expression has no effect
-      
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloc: allocated pbuf %p\n", (void *)p));
-LWIP\lwip-1.4.1\src\core\pbuf.c(328): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-        LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_LEVEL_SERIOUS,
-LWIP\lwip-1.4.1\src\core\pbuf.c(328): warning:  #174-D: expression has no effect
-        LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_LEVEL_SERIOUS,
-LWIP\lwip-1.4.1\src\core\pbuf.c(347): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloc(length=%"U16_F") == %p\n", length, (void *)p));
-LWIP\lwip-1.4.1\src\core\pbuf.c(347): warning:  #174-D: expression has no effect
-    
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloc(length=%"U16_F") == %p\n", length, (void *)p));
-LWIP\lwip-1.4.1\src\core\pbuf.c(347): warning:  #174-D: expression has no effect
-    
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloc(length=%"U16_F") == %p\n", length, (void *)p));
-LWIP\lwip-1.4.1\src\core\pbuf.c(371): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloced_custom(length=%"U16_F")\n", length));
-LWIP\lwip-1.4.1\src\core\pbuf.c(371): warning:  #174-D: expression has no effect
-    
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_alloced_custom(length=%"U16_F")\n", length));
-LWIP\lwip-1.4.1\src\core\pbuf.c(396): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_LEVEL_WARNING, ("pbuf_alloced_custom(length=%"U16_F") buffer too short\n", length));
-LWIP\lwip-1.4.1\src\core\pbuf.c(396): warning:  #174-D: expression has no effect
-      
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_LEVEL_WARNING, ("pbuf_alloced_custom(length=%"U16_F") buffer too short\n", length));
-LWIP\lwip-1.4.1\src\core\pbuf.c(550): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-        LWIP_DEBUGF( PBUF_DEBUG | LWIP_DBG_LEVEL_SERIOUS,
-LWIP\lwip-1.4.1\src\core\pbuf.c(550): warning:  #174-D: expression has no effect
-        LWIP_DEBUGF( PBUF_DEBUG | LWIP_DBG_LEVEL_SERIOUS,
-LWIP\lwip-1.4.1\src\core\pbuf.c(550): warning:  #174-D: expression has no effect
-        LWIP_DEBUGF( PBUF_DEBUG | LWIP_DBG_LEVEL_SERIOUS,
-LWIP\lwip-1.4.1\src\core\pbuf.c(578): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_header: old %p new %p (%"S16_F")\n",
-LWIP\lwip-1.4.1\src\core\pbuf.c(578): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_header: old %p new %p (%"S16_F")\n",
-LWIP\lwip-1.4.1\src\core\pbuf.c(578): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_header: old %p new %p (%"S16_F")\n",
-LWIP\lwip-1.4.1\src\core\pbuf.c(578): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_header: old %p new %p (%"S16_F")\n",
-LWIP\lwip-1.4.1\src\core\pbuf.c(627): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_LEVEL_SERIOUS,
-LWIP\lwip-1.4.1\src\core\pbuf.c(631): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_free(%p)\n", (void *)p));
-LWIP\lwip-1.4.1\src\core\pbuf.c(631): warning:  #174-D: expression has no effect
-    
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_free(%p)\n", (void *)p));
-LWIP\lwip-1.4.1\src\core\pbuf.c(658): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-        
-WIP_DEBUGF( PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_free: deallocating %p\n", (void *)p));
-LWIP\lwip-1.4.1\src\core\pbuf.c(658): warning:  #174-D: expression has no effect
-        
-WIP_DEBUGF( PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_free: deallocating %p\n", (void *)p));
-LWIP\lwip-1.4.1\src\core\pbuf.c(686): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-        
-WIP_DEBUGF( PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_free: %p has ref %"U16_F", ending here.\n", (void *)p, ref));
-LWIP\lwip-1.4.1\src\core\pbuf.c(686): warning:  #174-D: expression has no effect
-        
-WIP_DEBUGF( PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_free: %p has ref %"U16_F", ending here.\n", (void *)p, ref));
-LWIP\lwip-1.4.1\src\core\pbuf.c(686): warning:  #174-D: expression has no effect
-        
-WIP_DEBUGF( PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_free: %p has ref %"U16_F", ending here.\n", (void *)p, ref));
-LWIP\lwip-1.4.1\src\core\pbuf.c(791): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_chain: %p references %p\n", (void *)h, (void *)t));
-LWIP\lwip-1.4.1\src\core\pbuf.c(791): warning:  #174-D: expression has no effect
-    
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_chain: %p references %p\n", (void *)h, (void *)t));
-LWIP\lwip-1.4.1\src\core\pbuf.c(791): warning:  #174-D: expression has no effect
-    
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_chain: %p references %p\n", (void *)h, (void *)t));
-LWIP\lwip-1.4.1\src\core\pbuf.c(820): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_dechain: unreferencing %p\n", (void *)q));
-LWIP\lwip-1.4.1\src\core\pbuf.c(820): warning:  #174-D: expression has no effect
-      
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_dechain: unreferencing %p\n", (void *)q));
-LWIP\lwip-1.4.1\src\core\pbuf.c(823): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-        LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE,
-LWIP\lwip-1.4.1\src\core\pbuf.c(823): warning:  #174-D: expression has no effect
-        LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE,
-LWIP\lwip-1.4.1\src\core\pbuf.c(856): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_copy(%p, %p)\n",
-LWIP\lwip-1.4.1\src\core\pbuf.c(856): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_copy(%p, %p)\n",
-LWIP\lwip-1.4.1\src\core\pbuf.c(856): warning:  #174-D: expression has no effect
-    LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_copy(%p, %p)\n",
-LWIP\lwip-1.4.1\src\core\pbuf.c(902): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_copy: end of chain reached.\n"));
-LWIP\lwip-1.4.1\src\core\pbuf.c: 39 warnings, 0 errors
+compiling igmp.c...
 compiling icmp.c...
 LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(94): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
       
@@ -1699,21 +1700,6 @@ LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(328): warning:  #223-D: function "LWIP_PLAT
 WIP_DEBUGF(ICMP_DEBUG, ("\n"));
 LWIP\lwip-1.4.1\src\core\ipv4\icmp.c: 26 warnings, 0 errors
 compiling inet.c...
-compiling igmp.c...
-compiling timers.c...
-LWIP\lwip-1.4.1\src\core\timers.c(122): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(TIMERS_DEBUG, ("tcpip: ip_reass_tmr()\n"));
-LWIP\lwip-1.4.1\src\core\timers.c(138): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(TIMERS_DEBUG, ("tcpip: etharp_tmr()\n"));
-LWIP\lwip-1.4.1\src\core\timers.c(154): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(TIMERS_DEBUG, ("tcpip: dhcp_coarse_tmr()\n"));
-LWIP\lwip-1.4.1\src\core\timers.c(168): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(TIMERS_DEBUG, ("tcpip: dhcp_fine_tmr()\n"));
-LWIP\lwip-1.4.1\src\core\timers.c: 4 warnings, 0 errors
 compiling inet_chksum.c...
 LWIP\lwip-1.4.1\src\core\ipv4\inet_chksum.c(285): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
       LWIP_DEBUGF(INET_DEBUG, ("inet_chksum_pseudo(): checksumming pbuf %p (has next %p) \n",
@@ -1740,6 +1726,20 @@ LWIP\lwip-1.4.1\src\core\ipv4\inet_chksum.c(381): warning:  #174-D: expression h
     
 WIP_DEBUGF(INET_DEBUG, ("inet_chksum_pseudo(): pbuf chain lwip_chksum()=%"X32_F"\n", acc));
 LWIP\lwip-1.4.1\src\core\ipv4\inet_chksum.c: 10 warnings, 0 errors
+compiling timers.c...
+LWIP\lwip-1.4.1\src\core\timers.c(122): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(TIMERS_DEBUG, ("tcpip: ip_reass_tmr()\n"));
+LWIP\lwip-1.4.1\src\core\timers.c(138): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(TIMERS_DEBUG, ("tcpip: etharp_tmr()\n"));
+LWIP\lwip-1.4.1\src\core\timers.c(154): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(TIMERS_DEBUG, ("tcpip: dhcp_coarse_tmr()\n"));
+LWIP\lwip-1.4.1\src\core\timers.c(168): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(TIMERS_DEBUG, ("tcpip: dhcp_fine_tmr()\n"));
+LWIP\lwip-1.4.1\src\core\timers.c: 4 warnings, 0 errors
 compiling ip.c...
 LWIP\lwip-1.4.1\src\core\ipv4\ip.c(146): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
       LWIP_DEBUGF(IP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("ip_route: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
@@ -1852,8 +1852,6 @@ LWIP\lwip-1.4.1\src\core\ipv4\ip.c(828): warning:  #174-D: expression has no eff
       LWIP_DEBUGF(IP_DEBUG, ("ip_output: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
 LWIP\lwip-1.4.1\src\core\ipv4\ip.c: 46 warnings, 0 errors
 compiling ip_addr.c...
-compiling err.c...
-compiling netbuf.c...
 compiling ip_frag.c...
 LWIP\lwip-1.4.1\src\core\ipv4\ip_frag.c(132): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
         
@@ -1896,8 +1894,10 @@ LWIP\lwip-1.4.1\src\core\ipv4\ip_frag.c(609): warning:  #223-D: function "LWIP_P
     
 WIP_DEBUGF(IP_REASS_DEBUG,("ip_reass: nullreturn\n"));
 LWIP\lwip-1.4.1\src\core\ipv4\ip_frag.c: 16 warnings, 0 errors
-compiling netdb.c...
+compiling err.c...
+compiling netbuf.c...
 compiling netifapi.c...
+compiling netdb.c...
 compiling etharp.c...
 LWIP\lwip-1.4.1\src\netif\etharp.c(184): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
       
@@ -2125,11 +2125,6 @@ LWIP\lwip-1.4.1\src\api\api_lib.c(574): warning:  #174-D: expression has no effe
     
 WIP_DEBUGF(API_LIB_DEBUG, ("netconn_send: sending %"U16_F" bytes\n", buf->p->tot_len));
 LWIP\lwip-1.4.1\src\api\api_lib.c: 5 warnings, 0 errors
-compiling sys_arch.c...
-LWIP\arch\sys_arch.c(541): warning:  #167-D: argument of type "signed char *" is incompatible with parameter of type "const char *const"
-        result = xTaskCreate( thread, ( signed 
-ortCHAR * ) name, stacksize, arg, prio, &CreatedTask );
-LWIP\arch\sys_arch.c: 1 warning, 0 errors
 compiling api_msg.c...
 LWIP\lwip-1.4.1\src\api\api_msg.c(437): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
     
@@ -2185,6 +2180,11 @@ LWIP\lwip-1.4.1\src\api\tcpip.c(145): warning:  #174-D: expression has no effect
         
 WIP_DEBUGF(TCPIP_DEBUG, ("tcpip_thread: invalid message: %d\n", msg->type));
 LWIP\lwip-1.4.1\src\api\tcpip.c: 14 warnings, 0 errors
+compiling sys_arch.c...
+LWIP\arch\sys_arch.c(541): warning:  #167-D: argument of type "signed char *" is incompatible with parameter of type "const char *const"
+        result = xTaskCreate( thread, ( signed 
+ortCHAR * ) name, stacksize, arg, prio, &CreatedTask );
+LWIP\arch\sys_arch.c: 1 warning, 0 errors
 compiling ethernetif.c...
 LWIP\lwip-1.4.1\src\netif\ethernetif.c(184): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
     
@@ -2812,7 +2812,7 @@ compiling malloc.c...
 compiling lan8720.c...
 compiling lwip_comm.c...
 linking...
-Program Size: Code=66416 RO-data=4236 RW-data=692 ZI-data=610668  
+Program Size: Code=66460 RO-data=4236 RW-data=692 ZI-data=617836  
 FromELF: creating hex file...
 ".\Objects\fire watch.axf" - 0 Error(s), 1035 Warning(s).
 

@@ -11,7 +11,7 @@ static void Smoke_ADC_Init(void)
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC2, ENABLE);
     
     // 2. 配置PA1为模拟输入（直接指定PA1）
-    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_1;
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AN;  // 模拟输入模式
     GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL; // 无上下拉
     GPIO_Init(GPIOA, &GPIO_InitStruct);
@@ -26,7 +26,7 @@ static void Smoke_ADC_Init(void)
     ADC_Init(ADC2, &ADC_InitStruct);
     
     // 4. 配置ADC2通道1（对应PA1）
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_1, 1, ADC_SampleTime_480Cycles);
+    ADC_RegularChannelConfig(ADC2, ADC_Channel_5, 1, ADC_SampleTime_480Cycles);
     
     // 5. 使能ADC并校准
     ADC_Cmd(ADC2, ENABLE);
