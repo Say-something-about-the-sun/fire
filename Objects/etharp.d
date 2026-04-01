@@ -18,7 +18,6 @@
 .\objects\etharp.o: .\LWIP\lwip-1.4.1\src\include\lwip/memp_std.h
 .\objects\etharp.o: .\LWIP\lwip-1.4.1\src\include\lwip/snmp.h
 .\objects\etharp.o: .\LWIP\lwip-1.4.1\src\include\lwip/dhcp.h
-.\objects\etharp.o: .\LWIP\lwip-1.4.1\src\include\lwip/udp.h
 .\objects\etharp.o: .\LWIP\lwip-1.4.1\src\include\ipv4\lwip/autoip.h
 .\objects\etharp.o: .\LWIP\lwip-1.4.1\src\include\netif/etharp.h
 .\objects\etharp.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h

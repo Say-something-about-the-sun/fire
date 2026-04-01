@@ -20,7 +20,7 @@
 /* 内存分配相关 (极其重要) */
 #define configSUPPORT_DYNAMIC_ALLOCATION        1           // 支持动态内存分配
 #define configSUPPORT_STATIC_ALLOCATION         0           // 不支持静态内存分配
-#define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( 25 * 1024 ) ) // FreeRTOS堆空间大小: 50KB (留给任务栈和信号量)
+#define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( 30 * 1024 ) ) // FreeRTOS堆空间大小: 50KB (留给任务栈和信号量)
 #define configAPPLICATION_ALLOCATED_HEAP        0           // 0: 编译器自动分配堆
 
 /* 钩子函数配置 */

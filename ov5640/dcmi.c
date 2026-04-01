@@ -8,15 +8,24 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "FreeRTOS.h"
+#include "task.h"
+
+
 u8 ov_frame=0;   						//帧计数
 extern void jpeg_data_process(void);	//JPEG数据处理函数
 extern volatile u8 frame_done;		//帧完成标志
+
+
+// 外部声明你的相机任务句柄
+extern TaskHandle_t CameraTask_Handler;
+
 
 // 帧计数
 volatile u32 g_raw_frame_count = 0;  // 硬件触发次数（中断进入次数）
 
 // JPEG缓冲区大小定义
-#define JPEG_MAX_SIZE       (32*1024)       // 每帧最大32KB
+#define JPEG_MAX_SIZE       (25*1024)       // 每帧最大32KB
 
 DCMI_InitTypeDef DCMI_InitStructure;
 
@@ -40,13 +49,17 @@ void DCMI_IRQHandler(void)
         led_off(led1);
         led1_state = 0;
     }
+	
+	
+	
     
     if(DCMI_GetITStatus(DCMI_IT_FRAME) != RESET)
     {
-        // 增加硬件帧计数
-        g_raw_frame_count++;
         
-        //1. 停止 DMA 並計算長度
+			 // 增加硬件帧计数
+        g_raw_frame_count++;
+			
+			// 1. 停止 DMA 並計算長度
         DMA_Cmd(DMA2_Stream1, DISABLE);
         u32 words_remaining = DMA_GetCurrDataCounter(DMA2_Stream1);
         current_capture_buf->data_len = (JPEG_MAX_SIZE - (words_remaining * 4));
@@ -56,12 +69,9 @@ void DCMI_IRQHandler(void)
         
         // 3. 乒乓切換
         volatile BufferControl* next_buf = (current_capture_buf == &buf_ctrl_a) ? &buf_ctrl_b : &buf_ctrl_a;
-        if(next_buf->state == BUF_IDLE)
-        {
+        if(next_buf->state == BUF_IDLE) {
             current_capture_buf = next_buf;
-        }
-        else
-        {
+        } else {
             dropped_frames++;
         }
         
@@ -92,6 +102,7 @@ void DCMI_IRQHandler(void)
         DCMI_ClearITPendingBit(DCMI_IT_FRAME);
     }
 }
+
 //DCMI DMA配置
 //DMA_Memory0BaseAddr:存储器0地址    即要存储摄像头数据的内存地址(也可以是外设地址)
 //DMA_BufferSize:存储器大小    0~65535
@@ -182,7 +193,7 @@ void My_DCMI_Init(void)
 	DCMI_ITConfig(DCMI_IT_FRAME,ENABLE);//使能帧中断 
 
   NVIC_InitStructure.NVIC_IRQChannel = DCMI_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=7;//抢占优先级2
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=6;//抢占优先级2
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority =0;		//子优先级2
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			//IRQ通道使能
 	NVIC_Init(&NVIC_InitStructure);	//根据指定的参数初始化VIC寄存器

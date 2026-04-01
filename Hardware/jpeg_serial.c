@@ -19,7 +19,7 @@ extern SemaphoreHandle_t Mutex_USART1;
 void Safe_Printf(char *format, ...);
 
 // 内部SRAM JPEG缓冲区配置（双缓冲）
-#define JPEG_MAX_SIZE       (32*1024)       // 每帧最大32KB（320*240分辨率）
+#define JPEG_MAX_SIZE       (30*1024)       // 每帧最大32KB（320*240分辨率）
 
 // 检测缓冲区地址配置（外部SRAM）
 #define DETECT_RGB_BUF_ADDR 0x6804B000      // 检测用RGB缓冲区（HSV缓冲区之后）

@@ -72,8 +72,6 @@
 .\objects\init.o: .\LWIP\lwip-1.4.1\src\include\lwip/raw.h
 .\objects\init.o: .\LWIP\lwip-1.4.1\src\include\lwip/udp.h
 .\objects\init.o: .\LWIP\lwip-1.4.1\src\include\lwip/tcp_impl.h
-.\objects\init.o: .\LWIP\lwip-1.4.1\src\include\lwip/tcp.h
-.\objects\init.o: .\LWIP\lwip-1.4.1\src\include\ipv4\lwip/icmp.h
 .\objects\init.o: .\LWIP\lwip-1.4.1\src\include\lwip/snmp_msg.h
 .\objects\init.o: .\LWIP\lwip-1.4.1\src\include\lwip/snmp.h
 .\objects\init.o: .\LWIP\lwip-1.4.1\src\include\lwip/snmp_structs.h

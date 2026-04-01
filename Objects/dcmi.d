@@ -42,3 +42,13 @@
 .\objects\dcmi.o: .\Hardware\jpeg_serial.h
 .\objects\dcmi.o: .\Hardware\led.h
 .\objects\dcmi.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h
+.\objects\dcmi.o: .\FreeRTOS\include\FreeRTOS.h
+.\objects\dcmi.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stddef.h
+.\objects\dcmi.o: .\FreeRTOS\include\FreeRTOSConfig.h
+.\objects\dcmi.o: .\FreeRTOS\include\projdefs.h
+.\objects\dcmi.o: .\FreeRTOS\include\portable.h
+.\objects\dcmi.o: .\FreeRTOS\include\deprecated_definitions.h
+.\objects\dcmi.o: .\FreeRTOS\ARM_CM4F\portmacro.h
+.\objects\dcmi.o: .\FreeRTOS\include\mpu_wrappers.h
+.\objects\dcmi.o: .\FreeRTOS\include\task.h
+.\objects\dcmi.o: .\FreeRTOS\include\list.h

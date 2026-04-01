@@ -54,7 +54,6 @@
 .\objects\lwip_comm.o: .\LWIP\lwip-1.4.1\src\include\lwip/netif.h
 .\objects\lwip_comm.o: .\LWIP\lwip-1.4.1\src\include\ipv4\lwip/ip.h
 .\objects\lwip_comm.o: .\LWIP\lwip-1.4.1\src\include\lwip/dhcp.h
-.\objects\lwip_comm.o: .\LWIP\lwip-1.4.1\src\include\lwip/udp.h
 .\objects\lwip_comm.o: .\LWIP\lwip-1.4.1\src\include\lwip/mem.h
 .\objects\lwip_comm.o: .\LWIP\lwip-1.4.1\src\include\lwip/memp.h
 .\objects\lwip_comm.o: .\LWIP\lwip-1.4.1\src\include\lwip/memp_std.h
@@ -76,8 +75,6 @@
 .\objects\lwip_comm.o: .\FreeRTOS\include\queue.h
 .\objects\lwip_comm.o: .\FreeRTOS\include\semphr.h
 .\objects\lwip_comm.o: .\LWIP\lwip-1.4.1\src\include\lwip/tcp_impl.h
-.\objects\lwip_comm.o: .\LWIP\lwip-1.4.1\src\include\lwip/tcp.h
-.\objects\lwip_comm.o: .\LWIP\lwip-1.4.1\src\include\ipv4\lwip/icmp.h
 .\objects\lwip_comm.o: .\LWIP\lwip-1.4.1\src\include\ipv4\lwip/ip_frag.h
 .\objects\lwip_comm.o: .\LWIP\lwip-1.4.1\src\include\lwip/tcpip.h
 .\objects\lwip_comm.o: .\LWIP\lwip-1.4.1\src\include\lwip/api_msg.h

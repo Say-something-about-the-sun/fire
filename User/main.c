@@ -343,14 +343,6 @@ extern void button_scan_task(void *pvParameters);
 // 声明按键任务的句柄
 TaskHandle_t ButtonTask_Handler;
 
-
-
-
-
-
-
-
-
 // 【启动任务】：只负责把干活的任务创建出来，然后自杀
 void start_task(void *pvParameters)
 {

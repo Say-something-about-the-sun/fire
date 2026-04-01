@@ -17,9 +17,6 @@
 .\objects\memp.o: .\LWIP\lwip-1.4.1\src\include\ipv4\lwip/ip.h
 .\objects\memp.o: .\LWIP\lwip-1.4.1\src\include\lwip/raw.h
 .\objects\memp.o: .\LWIP\lwip-1.4.1\src\include\lwip/tcp_impl.h
-.\objects\memp.o: .\LWIP\lwip-1.4.1\src\include\lwip/tcp.h
-.\objects\memp.o: .\LWIP\lwip-1.4.1\src\include\lwip/mem.h
-.\objects\memp.o: .\LWIP\lwip-1.4.1\src\include\ipv4\lwip/icmp.h
 .\objects\memp.o: .\LWIP\lwip-1.4.1\src\include\ipv4\lwip/igmp.h
 .\objects\memp.o: .\LWIP\lwip-1.4.1\src\include\lwip/api.h
 .\objects\memp.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stddef.h
@@ -78,6 +75,7 @@
 .\objects\memp.o: .\LWIP\lwip-1.4.1\src\include\lwip/netifapi.h
 .\objects\memp.o: .\LWIP\lwip-1.4.1\src\include\lwip/lwip_timers.h
 .\objects\memp.o: .\LWIP\lwip-1.4.1\src\include\lwip/stats.h
+.\objects\memp.o: .\LWIP\lwip-1.4.1\src\include\lwip/mem.h
 .\objects\memp.o: .\LWIP\lwip-1.4.1\src\include\netif/etharp.h
 .\objects\memp.o: .\LWIP\lwip-1.4.1\src\include\ipv4\lwip/ip_frag.h
 .\objects\memp.o: .\LWIP\lwip-1.4.1\src\include\lwip/snmp_structs.h
