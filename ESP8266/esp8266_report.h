@@ -50,11 +50,14 @@ typedef struct {
 
 // 对外接口声明
 void ESP8266_Report_Init(void);
-void ESP8266_Report_SendSensorData(void);
+u8 ESP8266_Report_SendSensorData(void);
 void ESP8266_Report_UpdateFireDetectionResult(FireDetectionResult* result);
 void button_scan_task(void *pvParameters);
 
 
+
+void ESP8266_Report_PackageJSON(SensorDataPacket* packet, JsonDataPacket* json);
+void ESP8266_Report_CollectSensorData(SensorDataPacket* packet);
 
 extern SensorDataPacket g_sys_data;
 

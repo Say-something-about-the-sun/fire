@@ -174,27 +174,24 @@ extern xSemaphoreHandle s_xSemaphore;
 //u8 xxflag=0;
 void ETH_IRQHandler(void)
 {
-	 
+    uint32_t ulReturn;
+    ulReturn = taskENTER_CRITICAL_FROM_ISR();
+    
+    // 濡傛灉鏈夋暟鎹紝鍞ら啋 LwIP 鎺ユ敹浠诲姟
+    if(ETH_GetRxPktSize(DMARxDescToGet)!=0) 	
+    { 
+        portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+        xSemaphoreGiveFromISR(s_xSemaphore, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    }
+    
+    // 鍙渶瑕佹竻闄よ繖涓や釜甯歌鏍囧織浣嶅嵆鍙紝鍏朵粬鐨勪竴寰嬩笉纰帮紒
+    ETH_DMAClearITPendingBit(ETH_DMA_IT_R); 	
+    ETH_DMAClearITPendingBit(ETH_DMA_IT_NIS);	
+    
+    taskEXIT_CRITICAL_FROM_ISR(ulReturn);
+}
 
-  uint32_t ulReturn;
-  /* 进入临界段，临界段可以嵌套 */
-  ulReturn = taskENTER_CRITICAL_FROM_ISR();
-	if(ETH_GetRxPktSize(DMARxDescToGet)!=0) 	//检测是否收到数据包
-	{ 
-   
-		portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
-    xSemaphoreGiveFromISR(s_xSemaphore, &xHigherPriorityTaskWoken);
-    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-	
-//		lwip_pkt_handle();
-   	
-	}
-	
-	ETH_DMAClearITPendingBit(ETH_DMA_IT_R); 	//清除DMA中断标志位
-	ETH_DMAClearITPendingBit(ETH_DMA_IT_NIS);	
-	  taskEXIT_CRITICAL_FROM_ISR( ulReturn );
-	
-}  
 //接收一个网卡数据包
 //返回值:网络数据包帧结构体
 FrameTypeDef ETH_Rx_Packet(void)

@@ -22,70 +22,80 @@ Dialog DLL:      TCM.DLL V1.14.14.0
  
 <h2>Project:</h2>
 C:\Users\mywife\Desktop\±ÏÒµ²ÄÁÏ\±ÏÉè£¨»ùÓÚstm32µÄ»ğÇé¼à²âÏµÍ³£©\code£¨keil\fire watch.uvprojx
-Project File Date:  04/01/2026
+Project File Date:  04/02/2026
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 3 (build 300)', folder: 'D:\QRS\MDK514\ARM\ARMCC\Bin'
 Rebuild target 'Target 1'
 assembling startup_stm32f40_41xxx.s...
 compiling stm32f4xx_cec.c...
+compiling stm32f4xx_it.c...
+compiling stm32f4xx_adc.c...
 compiling misc.c...
 compiling system_stm32f4xx.c...
-compiling stm32f4xx_can.c...
-compiling stm32f4xx_adc.c...
-compiling stm32f4xx_it.c...
 compiling stm32f4xx_crc.c...
-compiling stm32f4xx_cryp.c...
-compiling stm32f4xx_cryp_aes.c...
+compiling stm32f4xx_can.c...
+compiling stm32f4xx_dbgmcu.c...
+compiling stm32f4xx_cryp_tdes.c...
 compiling stm32f4xx_cryp_des.c...
 compiling stm32f4xx_dcmi.c...
-compiling stm32f4xx_cryp_tdes.c...
 compiling stm32f4xx_dac.c...
-compiling stm32f4xx_dbgmcu.c...
-compiling stm32f4xx_flash_ramfunc.c...
-compiling stm32f4xx_dma.c...
-compiling stm32f4xx_dfsdm.c...
-compiling stm32f4xx_dma2d.c...
-compiling stm32f4xx_exti.c...
+compiling stm32f4xx_cryp.c...
+compiling stm32f4xx_cryp_aes.c...
 compiling stm32f4xx_dsi.c...
+compiling stm32f4xx_exti.c...
+compiling stm32f4xx_dfsdm.c...
+compiling stm32f4xx_flash_ramfunc.c...
+compiling stm32f4xx_dma2d.c...
+compiling stm32f4xx_dma.c...
 compiling stm32f4xx_flash.c...
-compiling stm32f4xx_hash.c...
-compiling stm32f4xx_fmpi2c.c...
-compiling stm32f4xx_gpio.c...
 compiling stm32f4xx_hash_md5.c...
 compiling stm32f4xx_hash_sha1.c...
-compiling stm32f4xx_fsmc.c...
+compiling stm32f4xx_hash.c...
 compiling stm32f4xx_i2c.c...
-compiling stm32f4xx_pwr.c...
-compiling stm32f4xx_lptim.c...
-compiling stm32f4xx_iwdg.c...
+compiling stm32f4xx_gpio.c...
+compiling stm32f4xx_fmpi2c.c...
+compiling stm32f4xx_fsmc.c...
 compiling stm32f4xx_qspi.c...
-compiling stm32f4xx_ltdc.c...
+compiling stm32f4xx_lptim.c...
+compiling stm32f4xx_pwr.c...
 compiling stm32f4xx_rng.c...
+compiling stm32f4xx_iwdg.c...
+compiling stm32f4xx_ltdc.c...
 compiling stm32f4xx_rcc.c...
-compiling stm32f4xx_sai.c...
 compiling stm32f4xx_spdifrx.c...
 compiling stm32f4xx_syscfg.c...
-compiling stm32f4xx_sdio.c...
+compiling stm32f4xx_sai.c...
 compiling stm32f4xx_spi.c...
+compiling stm32f4xx_sdio.c...
 compiling stm32f4xx_tim.c...
 compiling stm32f4xx_rtc.c...
-compiling stm32f4xx_usart.c...
 compiling sys.c...
-compiling delay.c...
 compiling stm32f4xx_wwdg.c...
-compiling usart.c...
 compiling usart3.c...
 System\usart3\usart3.c(44): warning:  #870-D: invalid multibyte character sequence
       printf("[USART3] åˆ?å§?åŒ?å®?æˆ?ï¼?æ³?ç‰?ç?: %lu\r\n", bound);
 System\usart3\usart3.c: 1 warning, 0 errors
+compiling usart.c...
+compiling stm32f4xx_usart.c...
+compiling delay.c...
 compiling usart2.c...
-compiling RTC.c...
 compiling image_preprocess.c...
+compiling fire_detection.c...
 compiling smoke.c...
 Hardware\smoke.c(55): warning:  #223-D: function "printf" declared implicitly
               printf("[Smoke] ADC Timeout Error!\r\n");
 Hardware\smoke.c: 1 warning, 0 errors
+compiling RTC.c...
+compiling jpeg_serial.c...
+Hardware\jpeg_decoder.h(41): warning:  #1-D: last line of file ends without a newline
+  #endif /* __JPEG_DECODER_H */
+Hardware\jpeg_serial.c(22): warning:  #47-D: incompatible redefinition of macro "JPEG_MAX_SIZE" (declared at line 10 of "Hardware\jpeg_decoder.h")
+  #define JPEG_MAX_SIZE       (30*1024)       // æ¯?å¸?æœ€å¤?32KBï¼?320*240åˆ?è¾?ç?ï¼?
+Hardware\jpeg_serial.c(494): warning:  #223-D: function "DCMI_DMA_Init" declared implicitly
+      DCMI_DMA_Init((u32)jpeg_buf_a, JPEG_MAX_SIZE / 4, DMA_MemoryDataSize_Word, DMA_MemoryInc_Enable);
+Hardware\jpeg_serial.c: 3 warnings, 0 errors
+compiling extsram.c...
 compiling jpeg_decoder.c...
 Hardware\jpeg_decoder.c(134): warning:  #223-D: function "printf" declared implicitly
       printf("\r\n--- MEMORY CHECK ---\r\n");
@@ -96,23 +106,13 @@ Hardware\jpeg_decoder.c(130): warning:  #550-D: variable "end_time" was set but 
 Hardware\jpeg_decoder.c(281): warning:  #223-D: function "printf" declared implicitly
           printf("[JPEG Decoder] No decoded image\r\n");
 Hardware\jpeg_decoder.c: 4 warnings, 0 errors
-compiling extsram.c...
-compiling fire_detection.c...
-compiling jpeg_serial.c...
-Hardware\jpeg_decoder.h(41): warning:  #1-D: last line of file ends without a newline
-  #endif /* __JPEG_DECODER_H */
-Hardware\jpeg_serial.c(22): warning:  #47-D: incompatible redefinition of macro "JPEG_MAX_SIZE" (declared at line 10 of "Hardware\jpeg_decoder.h")
-  #define JPEG_MAX_SIZE       (30*1024)       // æ¯?å¸?æœ€å¤?32KBï¼?320*240åˆ?è¾?ç?ï¼?
-Hardware\jpeg_serial.c(494): warning:  #223-D: function "DCMI_DMA_Init" declared implicitly
-      DCMI_DMA_Init((u32)jpeg_buf_a, JPEG_MAX_SIZE / 4, DMA_MemoryDataSize_Word, DMA_MemoryInc_Enable);
-Hardware\jpeg_serial.c: 3 warnings, 0 errors
 compiling syscall.c...
 FatFS\option\syscall.c(13): warning:  #9-D: nested comment is not allowed
   /*------------------------------------------------------------------------*/
 FatFS\option\syscall.c: 1 warning, 0 errors
 compiling cc936.c...
-compiling ff.c...
 compiling tjpgd.c...
+compiling ff.c...
 compiling cJSON.c...
 Cjson\cJSON.c(55): warning:  #1293-D: assignment in condition
         if (!(copy = (char*)cJSON_malloc(len))) return 0;
@@ -128,30 +128,36 @@ Cjson\cJSON.c: 5 warnings, 0 errors
 compiling led.c...
 compiling diskio.c...
 compiling croutine.c...
-compiling event_groups.c...
-compiling list.c...
-compiling main.c...
-User\main.c(261): warning:  #870-D: invalid multibyte character sequence
-  printf("å¼€å§?å”?é†? LwIP...\r\n");
-User\main.c(263): warning:  #223-D: function "lwip_comm_init" declared implicitly
-  while((lwip_state = lwip_comm_init()) != 0) 
-User\main.c(265): warning:  #870-D: invalid multibyte character sequence
-      printf("LwIP åˆ?å§?åŒ?å¤?è´?! é”?è¯?ç ?: %d\r\n", lwip_state);
-User\main.c(265): warning:  #870-D: invalid multibyte character sequence
-      printf("LwIP åˆ?å§?åŒ?å¤?è´?! é”?è¯?ç ?: %d\r\n", lwip_state);
-User\main.c(270): warning:  #870-D: invalid multibyte character sequence
-  printf("LwIP å”?é†?æˆ?åŠ?! ç½?å?å·?å°?ç»?!\r\n");
-User\main.c(280): warning:  #223-D: function "DHT11_Init" declared implicitly
-  		DHT11_Init();
-User\main.c(301): warning:  #223-D: function "My_DCMI_Init" declared implicitly
-      My_DCMI_Init();
-User\main.c: 7 warnings, 0 errors
 compiling heap_4.c...
+compiling main.c...
+User\main.c(284): warning:  #870-D: invalid multibyte character sequence
+  printf("å¼€å§?å”?é†? LwIP...\r\n");
+User\main.c(286): warning:  #223-D: function "lwip_comm_init" declared implicitly
+  while((lwip_state = lwip_comm_init()) != 0) 
+User\main.c(288): warning:  #870-D: invalid multibyte character sequence
+      printf("LwIP åˆ?å§?åŒ?å¤?è´?! é”?è¯?ç ?: %d\r\n", lwip_state);
+User\main.c(288): warning:  #870-D: invalid multibyte character sequence
+      printf("LwIP åˆ?å§?åŒ?å¤?è´?! é”?è¯?ç ?: %d\r\n", lwip_state);
+User\main.c(293): warning:  #870-D: invalid multibyte character sequence
+  printf("LwIP å”?é†?æˆ?åŠ?! ç½?å?å·?å°?ç»?!\r\n");
+User\main.c(302): warning:  #223-D: function "DHT11_Init" declared implicitly
+  		DHT11_Init();
+User\main.c(323): warning:  #223-D: function "My_DCMI_Init" declared implicitly
+      My_DCMI_Init();
+User\main.c(422): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+              if (g_virtual_current > 10.0) 
+User\main.c(478): warning:  #870-D: invalid multibyte character sequence
+              printf("\r\n[WARN] ä¸?é“?è·?(WiFi)æ—?å“?åº?ï¼?è§?å?æ•?éš?è½?ç§?æœ?åˆ?ï¼?\r\n");
+User\main.c(486): warning:  #870-D: invalid multibyte character sequence
+              printf("\r\n[OK] ä¸?é“?è·?(WiFi)ä¸?æŠ?æˆ?åŠ?ã€?\r\n");
+User\main.c: 10 warnings, 0 errors
+compiling list.c...
+compiling event_groups.c...
 compiling queue.c...
 compiling tasks.c...
-compiling port.c...
-compiling SDCard.c...
 compiling timers.c...
+compiling sdcard_jpeg.c...
+compiling port.c...
 compiling sd_data_manager.c...
 SDcard\sd_data_manager.c(928): warning:  #223-D: function "delay_ms" declared implicitly
               delay_ms(WRITE_RETRY_DELAY_MS);
@@ -163,62 +169,34 @@ SDcard\sd_data_manager.c(960): warning:  #223-D: function "delay_ms" declared im
               delay_ms(WRITE_RETRY_DELAY_MS);
 SDcard\sd_data_manager.c: 4 warnings, 0 errors
 compiling ESP8266.c...
-compiling sdcard_jpeg.c...
+compiling SDCard.c...
 compiling sdio_sdcard.c...
+compiling dht11.c...
+compiling water_pump.c...
+compiling esp8266_report.c...
+ESP8266\esp8266_report.c(94): warning:  #870-D: invalid multibyte character sequence
+  								printf("=> å·?æ?å¤? AI è‡?åŠ?æ‰?ç®?ï¼?\r\n");
+ESP8266\esp8266_report.c(135): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          if (packet->virtual_current > 10.0) {
+ESP8266\esp8266_report.c(140): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+      else if (packet->virtual_current > 10.0 || packet->temperature > 60.0)
+ESP8266\esp8266_report.c(140): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+      else if (packet->virtual_current > 10.0 || packet->temperature > 60.0)
+ESP8266\esp8266_report.c(381): warning:  #223-D: function "Safe_Printf" declared implicitly
+          Safe_Printf("[ESP8266 Report] Pushed JSON to Gateway (%d bytes)\r\n", json_packet.json_len);
+ESP8266\esp8266_report.c(388): warning:  #223-D: function "Safe_Printf" declared implicitly
+      Safe_Printf("[ESP8266 Timeout] æœ?æ£€æµ?åˆ? ESP8266 æ¨?å?!\r\n");
+ESP8266\esp8266_report.c: 6 warnings, 0 errors
+compiling key.c...
+compiling sccb.c...
+compiling dcmi.c...
 compiling ov5640.c...
 ov5640\ov5640.c(11): warning:  #47-D: incompatible redefinition of macro "OV5640_ADDR" (declared at line 27 of "ov5640\sccb.h")
   #define OV5640_ADDR     0X78        //OV5640çš?IICåœ?å€
 ov5640\ov5640.c: 1 warning, 0 errors
-compiling water_pump.c...
-compiling sccb.c...
-compiling dht11.c...
-compiling key.c...
-compiling dcmi.c...
-compiling esp8266_report.c...
-ESP8266\esp8266_report.c(94): warning:  #870-D: invalid multibyte character sequence
-  								printf("=> å·?æ?å¤? AI è‡?åŠ?æ‰?ç®?ï¼?\r\n");
-ESP8266\esp8266_report.c(146): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-              if (packet->virtual_current > 10.0) {
-ESP8266\esp8266_report.c(156): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-      else if (packet->virtual_current > 10.0 || packet->temperature > 60.0)
-ESP8266\esp8266_report.c(156): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-      else if (packet->virtual_current > 10.0 || packet->temperature > 60.0)
-ESP8266\esp8266_report.c(365): warning:  #223-D: function "Safe_Printf" declared implicitly
-  Safe_Printf("[ESP8266 Report] Pushed JSON to Gateway (%d bytes)\r\n", json_packet.json_len);
-ESP8266\esp8266_report.c: 5 warnings, 0 errors
 compiling def.c...
 compiling dhcp.c...
 compiling dns.c...
-compiling raw.c...
-LWIP\lwip-1.4.1\src\core\raw.c(210): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(RAW_DEBUG | LWIP_DBG_TRACE, ("raw_sendto\n"));
-LWIP\lwip-1.4.1\src\core\raw.c(218): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-        
-WIP_DEBUGF(RAW_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_LEVEL_SERIOUS, ("raw_sendto: could not allocate header\n"));
-LWIP\lwip-1.4.1\src\core\raw.c(226): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      
-WIP_DEBUGF(RAW_DEBUG, ("raw_sendto: added header pbuf %p before given pbuf %p\n", (void *)q, (void *)p));
-LWIP\lwip-1.4.1\src\core\raw.c(226): warning:  #174-D: expression has no effect
-      
-WIP_DEBUGF(RAW_DEBUG, ("raw_sendto: added header pbuf %p before given pbuf %p\n", (void *)q, (void *)p));
-LWIP\lwip-1.4.1\src\core\raw.c(226): warning:  #174-D: expression has no effect
-      
-WIP_DEBUGF(RAW_DEBUG, ("raw_sendto: added header pbuf %p before given pbuf %p\n", (void *)q, (void *)p));
-LWIP\lwip-1.4.1\src\core\raw.c(237): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      LWIP_DEBUGF(RAW_DEBUG | LWIP_DBG_LEVEL_WARNING, ("raw_sendto: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
-LWIP\lwip-1.4.1\src\core\raw.c(237): warning:  #174-D: expression has no effect
-      LWIP_DEBUGF(RAW_DEBUG | LWIP_DBG_LEVEL_WARNING, ("raw_sendto: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
-LWIP\lwip-1.4.1\src\core\raw.c(237): warning:  #174-D: expression has no effect
-      LWIP_DEBUGF(RAW_DEBUG | LWIP_DBG_LEVEL_WARNING, ("raw_sendto: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
-LWIP\lwip-1.4.1\src\core\raw.c(237): warning:  #174-D: expression has no effect
-      LWIP_DEBUGF(RAW_DEBUG | LWIP_DBG_LEVEL_WARNING, ("raw_sendto: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
-LWIP\lwip-1.4.1\src\core\raw.c(237): warning:  #174-D: expression has no effect
-      LWIP_DEBUGF(RAW_DEBUG | LWIP_DBG_LEVEL_WARNING, ("raw_sendto: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
-LWIP\lwip-1.4.1\src\core\raw.c(335): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(RAW_DEBUG | LWIP_DBG_TRACE, ("raw_new\n"));
-LWIP\lwip-1.4.1\src\core\raw.c: 11 warnings, 0 errors
 compiling netif.c...
 LWIP\lwip-1.4.1\src\core\netif.c(200): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
     LWIP_DEBUGF(NETIF_DEBUG, ("netif: added interface %c%c IP addr ",
@@ -350,20 +328,41 @@ LWIP\lwip-1.4.1\src\core\netif.c(440): warning:  #174-D: expression has no effec
 LWIP\lwip-1.4.1\src\core\netif.c(440): warning:  #174-D: expression has no effect
     LWIP_DEBUGF(NETIF_DEBUG, ("netif: setting default interface %c%c\n",
 LWIP\lwip-1.4.1\src\core\netif.c: 52 warnings, 0 errors
+compiling raw.c...
+LWIP\lwip-1.4.1\src\core\raw.c(210): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(RAW_DEBUG | LWIP_DBG_TRACE, ("raw_sendto\n"));
+LWIP\lwip-1.4.1\src\core\raw.c(218): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+        
+WIP_DEBUGF(RAW_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_LEVEL_SERIOUS, ("raw_sendto: could not allocate header\n"));
+LWIP\lwip-1.4.1\src\core\raw.c(226): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      
+WIP_DEBUGF(RAW_DEBUG, ("raw_sendto: added header pbuf %p before given pbuf %p\n", (void *)q, (void *)p));
+LWIP\lwip-1.4.1\src\core\raw.c(226): warning:  #174-D: expression has no effect
+      
+WIP_DEBUGF(RAW_DEBUG, ("raw_sendto: added header pbuf %p before given pbuf %p\n", (void *)q, (void *)p));
+LWIP\lwip-1.4.1\src\core\raw.c(226): warning:  #174-D: expression has no effect
+      
+WIP_DEBUGF(RAW_DEBUG, ("raw_sendto: added header pbuf %p before given pbuf %p\n", (void *)q, (void *)p));
+LWIP\lwip-1.4.1\src\core\raw.c(237): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      LWIP_DEBUGF(RAW_DEBUG | LWIP_DBG_LEVEL_WARNING, ("raw_sendto: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
+LWIP\lwip-1.4.1\src\core\raw.c(237): warning:  #174-D: expression has no effect
+      LWIP_DEBUGF(RAW_DEBUG | LWIP_DBG_LEVEL_WARNING, ("raw_sendto: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
+LWIP\lwip-1.4.1\src\core\raw.c(237): warning:  #174-D: expression has no effect
+      LWIP_DEBUGF(RAW_DEBUG | LWIP_DBG_LEVEL_WARNING, ("raw_sendto: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
+LWIP\lwip-1.4.1\src\core\raw.c(237): warning:  #174-D: expression has no effect
+      LWIP_DEBUGF(RAW_DEBUG | LWIP_DBG_LEVEL_WARNING, ("raw_sendto: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
+LWIP\lwip-1.4.1\src\core\raw.c(237): warning:  #174-D: expression has no effect
+      LWIP_DEBUGF(RAW_DEBUG | LWIP_DBG_LEVEL_WARNING, ("raw_sendto: No route to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
+LWIP\lwip-1.4.1\src\core\raw.c(335): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(RAW_DEBUG | LWIP_DBG_TRACE, ("raw_new\n"));
+LWIP\lwip-1.4.1\src\core\raw.c: 11 warnings, 0 errors
 compiling stats.c...
 compiling tcp.c...
 compiling tcp_in.c...
 compiling tcp_out.c...
 compiling lwip_sys.c...
-compiling init.c...
-compiling memp.c...
-LWIP\lwip-1.4.1\src\core\memp.c(435): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      
-WIP_DEBUGF(MEMP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("memp_malloc: out of memory in pool %s\n", memp_desc[type]));
-LWIP\lwip-1.4.1\src\core\memp.c(435): warning:  #174-D: expression has no effect
-      
-WIP_DEBUGF(MEMP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("memp_malloc: out of memory in pool %s\n", memp_desc[type]));
-LWIP\lwip-1.4.1\src\core\memp.c: 2 warnings, 0 errors
 compiling mem.c...
 LWIP\lwip-1.4.1\src\core\mem.c(318): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
       
@@ -381,6 +380,14 @@ LWIP\lwip-1.4.1\src\core\mem.c(629): warning:  #174-D: expression has no effect
     
 WIP_DEBUGF(MEM_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("mem_malloc: could not allocate %"S16_F" bytes\n", (s16_t)size));
 LWIP\lwip-1.4.1\src\core\mem.c: 5 warnings, 0 errors
+compiling memp.c...
+LWIP\lwip-1.4.1\src\core\memp.c(435): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      
+WIP_DEBUGF(MEMP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("memp_malloc: out of memory in pool %s\n", memp_desc[type]));
+LWIP\lwip-1.4.1\src\core\memp.c(435): warning:  #174-D: expression has no effect
+      
+WIP_DEBUGF(MEMP_DEBUG | LWIP_DBG_LEVEL_SERIOUS, ("memp_malloc: out of memory in pool %s\n", memp_desc[type]));
+LWIP\lwip-1.4.1\src\core\memp.c: 2 warnings, 0 errors
 compiling pbuf.c...
 LWIP\lwip-1.4.1\src\core\pbuf.c(212): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
     
@@ -485,86 +492,8 @@ LWIP\lwip-1.4.1\src\core\pbuf.c(902): warning:  #223-D: function "LWIP_PLATFORM_
     
 WIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_copy: end of chain reached.\n"));
 LWIP\lwip-1.4.1\src\core\pbuf.c: 39 warnings, 0 errors
+compiling init.c...
 compiling autoip.c...
-compiling icmp.c...
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(94): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      
-WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: short ICMP (%"U16_F" bytes) received\n", p->tot_len));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(94): warning:  #174-D: expression has no effect
-      
-WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: short ICMP (%"U16_F" bytes) received\n", p->tot_len));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(125): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-          
-WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: Not echoing to multicast or broadcast pings\n"));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(132): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      
-WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: ping\n"));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(134): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-        
-WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: bad ICMP echo received\n"));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(138): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-        
-WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: checksum failed for received ICMP echo\n"));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(158): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-          
-WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: allocating new pbuf failed\n"));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(239): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-          
-WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: ip_output_if returned an error: %c.\n", ret));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(239): warning:  #174-D: expression has no effect
-          
-WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: ip_output_if returned an error: %c.\n", ret));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(244): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      LWIP_DEBUGF(ICMP_DEBUG, ("icmp_input: ICMP type %"S16_F" code %"S16_F" not supported.\n", 
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(244): warning:  #174-D: expression has no effect
-      LWIP_DEBUGF(ICMP_DEBUG, ("icmp_input: ICMP type %"S16_F" code %"S16_F" not supported.\n", 
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(244): warning:  #174-D: expression has no effect
-      LWIP_DEBUGF(ICMP_DEBUG, ("icmp_input: ICMP type %"S16_F" code %"S16_F" not supported.\n", 
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(317): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-      
-WIP_DEBUGF(ICMP_DEBUG, ("icmp_time_exceeded: failed to allocate pbuf for ICMP packet.\n"));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(324): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(ICMP_DEBUG, ("icmp_time_exceeded from "));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(325): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-p_addr_debug_print(ICMP_DEBUG, &(iphdr->src));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(325): warning:  #174-D: expression has no effect
-    
-p_addr_debug_print(ICMP_DEBUG, &(iphdr->src));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(325): warning:  #174-D: expression has no effect
-    
-p_addr_debug_print(ICMP_DEBUG, &(iphdr->src));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(325): warning:  #174-D: expression has no effect
-    
-p_addr_debug_print(ICMP_DEBUG, &(iphdr->src));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(325): warning:  #174-D: expression has no effect
-    
-p_addr_debug_print(ICMP_DEBUG, &(iphdr->src));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(326): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(ICMP_DEBUG, (" to "));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(327): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-p_addr_debug_print(ICMP_DEBUG, &(iphdr->dest));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(327): warning:  #174-D: expression has no effect
-    
-p_addr_debug_print(ICMP_DEBUG, &(iphdr->dest));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(327): warning:  #174-D: expression has no effect
-    
-p_addr_debug_print(ICMP_DEBUG, &(iphdr->dest));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(327): warning:  #174-D: expression has no effect
-    
-p_addr_debug_print(ICMP_DEBUG, &(iphdr->dest));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(327): warning:  #174-D: expression has no effect
-    
-p_addr_debug_print(ICMP_DEBUG, &(iphdr->dest));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(328): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
-WIP_DEBUGF(ICMP_DEBUG, ("\n"));
-LWIP\lwip-1.4.1\src\core\ipv4\icmp.c: 26 warnings, 0 errors
-compiling igmp.c...
-compiling inet.c...
 compiling udp.c...
 LWIP\lwip-1.4.1\src\core\udp.c(171): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
       LWIP_DEBUGF(UDP_DEBUG,
@@ -727,6 +656,85 @@ LWIP\lwip-1.4.1\src\core\udp.c(886): warning:  #174-D: expression has no effect
 LWIP\lwip-1.4.1\src\core\udp.c(886): warning:  #174-D: expression has no effect
     LWIP_DEBUGF(UDP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE,
 LWIP\lwip-1.4.1\src\core\udp.c: 67 warnings, 0 errors
+compiling igmp.c...
+compiling icmp.c...
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(94): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      
+WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: short ICMP (%"U16_F" bytes) received\n", p->tot_len));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(94): warning:  #174-D: expression has no effect
+      
+WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: short ICMP (%"U16_F" bytes) received\n", p->tot_len));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(125): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+          
+WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: Not echoing to multicast or broadcast pings\n"));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(132): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      
+WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: ping\n"));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(134): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+        
+WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: bad ICMP echo received\n"));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(138): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+        
+WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: checksum failed for received ICMP echo\n"));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(158): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+          
+WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: allocating new pbuf failed\n"));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(239): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+          
+WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: ip_output_if returned an error: %c.\n", ret));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(239): warning:  #174-D: expression has no effect
+          
+WIP_DEBUGF(ICMP_DEBUG, ("icmp_input: ip_output_if returned an error: %c.\n", ret));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(244): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      LWIP_DEBUGF(ICMP_DEBUG, ("icmp_input: ICMP type %"S16_F" code %"S16_F" not supported.\n", 
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(244): warning:  #174-D: expression has no effect
+      LWIP_DEBUGF(ICMP_DEBUG, ("icmp_input: ICMP type %"S16_F" code %"S16_F" not supported.\n", 
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(244): warning:  #174-D: expression has no effect
+      LWIP_DEBUGF(ICMP_DEBUG, ("icmp_input: ICMP type %"S16_F" code %"S16_F" not supported.\n", 
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(317): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+      
+WIP_DEBUGF(ICMP_DEBUG, ("icmp_time_exceeded: failed to allocate pbuf for ICMP packet.\n"));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(324): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(ICMP_DEBUG, ("icmp_time_exceeded from "));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(325): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+p_addr_debug_print(ICMP_DEBUG, &(iphdr->src));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(325): warning:  #174-D: expression has no effect
+    
+p_addr_debug_print(ICMP_DEBUG, &(iphdr->src));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(325): warning:  #174-D: expression has no effect
+    
+p_addr_debug_print(ICMP_DEBUG, &(iphdr->src));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(325): warning:  #174-D: expression has no effect
+    
+p_addr_debug_print(ICMP_DEBUG, &(iphdr->src));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(325): warning:  #174-D: expression has no effect
+    
+p_addr_debug_print(ICMP_DEBUG, &(iphdr->src));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(326): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(ICMP_DEBUG, (" to "));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(327): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+p_addr_debug_print(ICMP_DEBUG, &(iphdr->dest));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(327): warning:  #174-D: expression has no effect
+    
+p_addr_debug_print(ICMP_DEBUG, &(iphdr->dest));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(327): warning:  #174-D: expression has no effect
+    
+p_addr_debug_print(ICMP_DEBUG, &(iphdr->dest));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(327): warning:  #174-D: expression has no effect
+    
+p_addr_debug_print(ICMP_DEBUG, &(iphdr->dest));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(327): warning:  #174-D: expression has no effect
+    
+p_addr_debug_print(ICMP_DEBUG, &(iphdr->dest));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c(328): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+    
+WIP_DEBUGF(ICMP_DEBUG, ("\n"));
+LWIP\lwip-1.4.1\src\core\ipv4\icmp.c: 26 warnings, 0 errors
+compiling inet.c...
 compiling inet_chksum.c...
 LWIP\lwip-1.4.1\src\core\ipv4\inet_chksum.c(285): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
       LWIP_DEBUGF(INET_DEBUG, ("inet_chksum_pseudo(): checksumming pbuf %p (has next %p) \n",
@@ -900,6 +908,7 @@ LWIP\lwip-1.4.1\src\core\ipv4\ip_frag.c(609): warning:  #223-D: function "LWIP_P
     
 WIP_DEBUGF(IP_REASS_DEBUG,("ip_reass: nullreturn\n"));
 LWIP\lwip-1.4.1\src\core\ipv4\ip_frag.c: 16 warnings, 0 errors
+compiling err.c...
 compiling timers.c...
 LWIP\lwip-1.4.1\src\core\timers.c(122): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
     
@@ -908,7 +917,6 @@ LWIP\lwip-1.4.1\src\core\timers.c(138): warning:  #223-D: function "LWIP_PLATFOR
     
 WIP_DEBUGF(TIMERS_DEBUG, ("tcpip: etharp_tmr()\n"));
 LWIP\lwip-1.4.1\src\core\timers.c: 2 warnings, 0 errors
-compiling err.c...
 compiling netdb.c...
 compiling netbuf.c...
 compiling netifapi.c...
@@ -1122,6 +1130,7 @@ LWIP\lwip-1.4.1\src\netif\etharp.c(1294): warning:  #174-D: expression has no ef
 LWIP\lwip-1.4.1\src\netif\etharp.c(1294): warning:  #174-D: expression has no effect
     LWIP_DEBUGF(ETHARP_DEBUG | LWIP_DBG_TRACE,
 LWIP\lwip-1.4.1\src\netif\etharp.c: 82 warnings, 0 errors
+compiling api_msg.c...
 compiling api_lib.c...
 LWIP\lwip-1.4.1\src\api\api_lib.c(420): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
     
@@ -1139,7 +1148,6 @@ LWIP\lwip-1.4.1\src\api\api_lib.c(574): warning:  #174-D: expression has no effe
     
 WIP_DEBUGF(API_LIB_DEBUG, ("netconn_send: sending %"U16_F" bytes\n", buf->p->tot_len));
 LWIP\lwip-1.4.1\src\api\api_lib.c: 5 warnings, 0 errors
-compiling api_msg.c...
 compiling sys_arch.c...
 LWIP\arch\sys_arch.c(541): warning:  #167-D: argument of type "signed char *" is incompatible with parameter of type "const char *const"
         result = xTaskCreate( thread, ( signed 
@@ -1159,6 +1167,9 @@ LWIP\lwip-1.4.1\src\api\tcpip.c(100): warning:  #174-D: expression has no effect
         
 WIP_DEBUGF(TCPIP_DEBUG, ("tcpip_thread: PACKET %p\n", (void *)msg));
 LWIP\lwip-1.4.1\src\api\tcpip.c(122): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+        
+WIP_DEBUGF(TCPIP_DEBUG, ("tcpip_thread: TIMEOUT %p\n", (void *)msg));
+LWIP\lwip-1.4.1\src\api\tcpip.c(122): warning:  #174-D: expression has no effect
         
 WIP_DEBUGF(TCPIP_DEBUG, ("tcpip_thread: TIMEOUT %p\n", (void *)msg));
 LWIP\lwip-1.4.1\src\api\tcpip.c(127): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
@@ -1187,13 +1198,10 @@ LWIP\lwip-1.4.1\src\api\tcpip.c(145): warning:  #174-D: expression has no effect
 WIP_DEBUGF(TCPIP_DEBUG, ("tcpip_thread: invalid message: %d\n", msg->type));
 LWIP\lwip-1.4.1\src\api\tcpip.c: 14 warnings, 0 errors
 compiling ethernetif.c...
-LWIP\lwip-1.4.1\src\netif\ethernetif.c(184): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-    
+LWIP\lwip-1.4.1\src\netif\ethernetif.c(227): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
+                      
 WIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
-LWIP\lwip-1.4.1\src\netif\ethernetif.c(200): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
-  								
-WIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
-LWIP\lwip-1.4.1\src\netif\ethernetif.c: 2 warnings, 0 errors
+LWIP\lwip-1.4.1\src\netif\ethernetif.c: 1 warning, 0 errors
 compiling sockets.c...
 LWIP\lwip-1.4.1\src\api\sockets.c(200): warning:  #223-D: function "LWIP_PLATFORM_DIAG" declared implicitly
       
@@ -1784,17 +1792,18 @@ tcp_transfer\tcp_transfer.c(32): warning:  #870-D: invalid multibyte character s
 tcp_transfer\tcp_transfer.c(66): warning:  #223-D: function "printf" declared implicitly
       printf("-> [Net] %d å­?èŠ? UDP æ?æµ?å®?ç¾?ç»?æ?ï¼?\r\n", jpeg_len);
 tcp_transfer\tcp_transfer.c: 3 warnings, 0 errors
+compiling ethernet_report.c...
 linking...
-Program Size: Code=53124 RO-data=3992 RW-data=596 ZI-data=618828  
+Program Size: Code=58272 RO-data=4124 RW-data=608 ZI-data=618912  
 FromELF: creating hex file...
-".\Objects\fire watch.axf" - 0 Error(s), 633 Warning(s).
+".\Objects\fire watch.axf" - 0 Error(s), 637 Warning(s).
 
 <h2>Collection of Component include folders:</h2>
   C:\Users\mywife\Desktop\±ÏÒµ²ÄÁÏ\±ÏÉè£¨»ùÓÚstm32µÄ»ğÇé¼à²âÏµÍ³£©\code£¨keil\RTE
   D:\QRS\MDK514\ARM\PACK\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
 
 <h2>Collection of Component Files used:</h2>
-Build Time Elapsed:  00:00:41
+Build Time Elapsed:  00:00:36
 </pre>
 </body>
 </html>

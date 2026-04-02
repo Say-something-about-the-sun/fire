@@ -126,30 +126,14 @@ static void AI_Fire_Decision_Center(SensorDataPacket* packet)
 {
     u8 is_fire_real = packet->image_fire_detected || packet->fire_detected || packet->flame_do == 1;
 
-    // 🚀 [核心修复] 静态火灾锁定计数器
-    // 作用：只要检测到一次火灾，强制系统维持紧急状态 N 帧，无视后续的视觉闪烁！
-    static u8 fire_latch_counter = 0; 
-    
-    if (is_fire_real) {
-        fire_latch_counter = 20; // 只要看到一次火，强制锁定起火状态约 2~3 秒 (假设每秒跑10帧)
-    }
-
-    // 🔴 Level 3: 确认起火 (只要锁定器不为0，就认定大火还在烧！)
-    if (fire_latch_counter > 0) 
+    // 🔴 Level 3: 确认起火
+    if (is_fire_real || WaterPump_GetStatus() == 1) // 只要真起火了，或者水泵正在喷水，就是最高危机
     {
-        fire_latch_counter--;    // 消耗一帧锁定时间
         packet->risk_level = 3; 
         packet->confidence = packet->image_fire_detected ? packet->image_confidence : 85.0f;
         
-        // 只有在自动模式 (0) 下，AI 才允许操作硬件
-        if (g_system_mode == 0) {
-            if (packet->virtual_current > 10.0) {
-                g_main_power_status = 0; // 虚拟跳闸
-                WaterPump_Off();         // 禁水防触电
-            } else {
-                g_main_power_status = 0; // 虚拟跳闸
-                WaterPump_On();          // 💦 稳定输出：这回继电器绝对能稳稳吸合！
-            }
+        if (packet->virtual_current > 10.0) {
+            g_main_power_status = 0; // 虚拟跳闸
         }
     } 
     // 🟠 Level 2: 高危预警 (过载或高温)
@@ -157,25 +141,17 @@ static void AI_Fire_Decision_Center(SensorDataPacket* packet)
     {
         packet->risk_level = 2;
         packet->confidence = 90.0f; 
-        
-        if (g_system_mode == 0) {
-            g_main_power_status = 0; // 预防性跳闸
-            WaterPump_Off();       
-        }
+        g_main_power_status = 0; // 预防性跳闸
     }
     // 🟢 Level 1/0: 正常或仅烟雾
     else 
     {
         packet->risk_level = (packet->smoke_detected) ? 1 : 0;
         packet->confidence = (packet->smoke_detected) ? 60.0f : 100.0f;
-        
-        if (g_system_mode == 0) { 
-            g_main_power_status = 1; 
-            WaterPump_Off();       
-        }
+        g_main_power_status = 1; 
     }
 
-    // 将最终的状态打包给发往云端的 packet
+    // 将硬件的真实状态打包发给云端
     packet->pump_status = WaterPump_GetStatus(); 
     packet->system_mode = g_system_mode;
     packet->main_power_status = g_main_power_status;
@@ -189,7 +165,7 @@ void ESP8266_Report_Init(void)
 }
 
 // 2. 采集传感器数据 
-static void ESP8266_Report_CollectSensorData(SensorDataPacket* packet)
+void ESP8266_Report_CollectSensorData(SensorDataPacket* packet)
 {
     // ================= 1. 获取时间 =================
     // 因为 RTC 已经被 USART2 中断实时校准过了，所以直接读取 RTC 即可获得完美同步的走动时间！
@@ -253,7 +229,7 @@ static void ESP8266_Report_CollectSensorData(SensorDataPacket* packet)
 
 // 3. 将数据打包成 JSON 字符串 (防死机纯整数版)
 // [esp8266_report.c 中替换]
-static void ESP8266_Report_PackageJSON(SensorDataPacket* packet, JsonDataPacket* json)
+void ESP8266_Report_PackageJSON(SensorDataPacket* packet, JsonDataPacket* json)
 {
     // 【防 FPU 死机】：手动拆分所有浮点数！
     int smoke_int = (int)packet->smoke_ppm;
@@ -347,8 +323,10 @@ static void ESP8266_Report_PackageJSON(SensorDataPacket* packet, JsonDataPacket*
     json->json_len = (len > 0) ? (u16)len : 0;
 }
 
+
+/*
 // 4. 统一发送接口 (提供给 FreeRTOS 任务调用)
-void ESP8266_Report_SendSensorData(void)
+u8 ESP8266_Report_SendSensorData(void)
 {
     // 【防栈溢出】：必须使用 static
     static SensorDataPacket sensor_packet;
@@ -361,10 +339,60 @@ void ESP8266_Report_SendSensorData(void)
     // 2. 直接扔给 USART3 透传给 ESP8266
     if (json_packet.json_len > 0)
     {
+        esp8266_ack_flag = 0; // 发送前清空标志
         USART3_Send_Data((u8*)json_packet.json_str, json_packet.json_len);
-Safe_Printf("[ESP8266 Report] Pushed JSON to Gateway (%d bytes)\r\n", json_packet.json_len);
+        
+        // 3. 等待反馈 (最多等 200 圈，也就是 2 秒)
+        int wait_timeout = 200;
+        while(wait_timeout > 0)
+        {
+            if(esp8266_ack_flag == 1) {
+                Safe_Printf("[ESP8266 Report] Pushed JSON to Gateway (%d bytes)\r\n", json_packet.json_len);
+ 
+                return 1; // 链路畅通！
+            }
+            vTaskDelay(10); // 每次等 10ms
+            wait_timeout--;
+        }
+        
+        // 如果等了2秒都没收到回复，说明 WiFi 挂了！
+        Safe_Printf("-> [Error] WiFi Link Timeout!\r\n");
+        return 0; 
     }
+    return 1; // 没数据发也算正常
+    
 }
+*/
+
+// 1. 把头文件里的声明和这里的 void 改成 u8
+u8 ESP8266_Report_SendSensorData(void)
+{
+    static SensorDataPacket sensor_packet;
+    static JsonDataPacket json_packet; 
+    
+    // 采集并打包
+    ESP8266_Report_CollectSensorData(&sensor_packet);
+    ESP8266_Report_PackageJSON(&sensor_packet, &json_packet);
+    
+    // 扔给 USART3 透传给 ESP8266
+    if (json_packet.json_len > 0)
+    {
+        USART3_Send_Data((u8*)json_packet.json_str, json_packet.json_len);
+        Safe_Printf("[ESP8266 Report] Pushed JSON to Gateway (%d bytes)\r\n", json_packet.json_len);
+    }
+    
+    // ==========================================
+    // 🚨 测试专用代码：因为 ESP8266 拔了电源，
+    // 我们直接欺骗系统，告诉它 WiFi 发送失败 (返回 0)！
+    // ==========================================
+    Safe_Printf("[ESP8266 Timeout] 未检测到 ESP8266 模块!\r\n");
+    return 0; // 强制触发备用以太网链路！
+    
+    // (未来你接上 ESP8266 后，这里要改成判断串口反馈，成功则 return 1)
+}
+
+
+
 
 // 接收来自 jpeg_serial.c 的图像处理结果
 void ESP8266_Report_UpdateFireDetectionResult(FireDetectionResult* result)

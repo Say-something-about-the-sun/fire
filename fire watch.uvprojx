@@ -335,7 +335,7 @@
               <MiscControls>--diag_suppress=177 --cpu Cortex-M4.fp </MiscControls>
               <Define>STM32F40_41xxx,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\CMSIS;.\Hardware;.\Library\inc;.\Library\src;.\Start;.\System;.\User;.\System\delay;.\System\sys;.\System\usart;.\System\usart2;.\System\usart3;.\FatFS;.\FatFS\option;.\Cjson;.\TJpgDec;.\FreeRTOS\ARM_CM4F;.\FreeRTOS\include;.\FreeRTOS\src;.\ov5640;.\SDcard;.\ESP8266;.\water_pump;.\dht11;.\key;.\LWIP\arch;.\LWIP\ETHERNET;.\LWIP\lwip-1.4.1\src\core;.\LWIP\lwip_app\lwip_comm;.\LWIP\lwip-1.4.1\src\netif;.\LWIP\lwip-1.4.1\src\api;.\LWIP\STM32F4x7_ETH_Driver\src;.\LWIP\STM32F4x7_ETH_Driver\inc;.\LWIP\lwip-1.4.1\src\core\ipv4;.\LWIP\MALLOC;.\LWIP\lwip-1.4.1\src\include\ipv4;.\LWIP\lwip-1.4.1\src\include;.\LWIP;.\tcp_transfer</IncludePath>
+              <IncludePath>.\CMSIS;.\Hardware;.\Library\inc;.\Library\src;.\Start;.\System;.\User;.\System\delay;.\System\sys;.\System\usart;.\System\usart2;.\System\usart3;.\FatFS;.\FatFS\option;.\Cjson;.\TJpgDec;.\FreeRTOS\ARM_CM4F;.\FreeRTOS\include;.\FreeRTOS\src;.\ov5640;.\SDcard;.\ESP8266;.\water_pump;.\dht11;.\key;.\LWIP\arch;.\LWIP\ETHERNET;.\LWIP\lwip-1.4.1\src\core;.\LWIP\lwip_app\lwip_comm;.\LWIP\lwip-1.4.1\src\netif;.\LWIP\lwip-1.4.1\src\api;.\LWIP\STM32F4x7_ETH_Driver\src;.\LWIP\STM32F4x7_ETH_Driver\inc;.\LWIP\lwip-1.4.1\src\core\ipv4;.\LWIP\MALLOC;.\LWIP\lwip-1.4.1\src\include\ipv4;.\LWIP\lwip-1.4.1\src\include;.\LWIP;.\tcp_transfer;.\ethernet_report</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1503,6 +1503,16 @@
               <FileName>tcp_transfer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\tcp_transfer\tcp_transfer.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ethernet_report</GroupName>
+          <Files>
+            <File>
+              <FileName>ethernet_report.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ethernet_report\ethernet_report.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -124,6 +124,7 @@
 ".\objects\lwip_comm.o"
 ".\objects\malloc.o"
 ".\objects\tcp_transfer.o"
+".\objects\ethernet_report.o"
 --library_type=microlib --strict --scatter ".\Objects\fire watch.sct"
 --summary_stderr --info summarysizes --map --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

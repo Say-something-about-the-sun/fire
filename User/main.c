@@ -20,6 +20,9 @@
 #include <stdlib.h>
 #include  "water_pump.h"
 #include "key.h"
+#include "ethernet_report.h"  // 引入网口备用链路
+
+
 
 #include <stdarg.h>
 // 引入 FreeRTOS 头文件
@@ -31,6 +34,22 @@
 
 //lwip
 #include "malloc.h"
+
+
+
+
+// 1. AI 检测结果结构体 (⚠️ 注意：如果你的结构体不叫 FireResult_t，请换成你真实的类型名)
+extern FireDetectionResult g_latest_fire_result; 
+
+// 2. 系统状态标志位
+extern u8 g_system_mode;
+extern u8 g_main_power_status;
+
+// 3. 虚拟电流 (通常是 float 类型，如果是别的类型请自行修改)
+extern float g_virtual_current;
+
+
+
 
 // 1. 定义一把全局串口互斥锁
 SemaphoreHandle_t Mutex_USART1;
@@ -253,6 +272,10 @@ int main(void)
     // 色调设置
     OV5640_Hue_Set(0);
 		
+		//水泵初始化
+		WaterPump_Init();
+		
+		
 		// 唤醒 LwIP 协议栈
 my_mem_init(SRAMIN);  
 
@@ -273,8 +296,7 @@ printf("LwIP 唤醒成功! 网卡已就绪!\r\n");
     // 4. 初始化烟雾传感器
     Smoke_Sensor_Init();
     
-		//水泵初始化
-		WaterPump_Init();
+		
 		
 		//温湿度初始化
 		DHT11_Init();
@@ -352,7 +374,7 @@ void start_task(void *pvParameters)
     xTaskCreate(camera_task, "CameraTask", 1024, NULL, 2, &CameraTask_Handler);
     
     // 创建上报任务：给足 4KB 栈(1024*4)，最高优先级 3（保证准时发送，不被图像卡住）
-    xTaskCreate(report_task, "ReportTask", 1024, NULL, 3, &ReportTask_Handler);
+    xTaskCreate(report_task, "ReportTask", 512, NULL, 3, &ReportTask_Handler);
 
 		// 3. 创建极速按键扫描任务：最高优先级 4
     // 扫按键只需要几微秒，极少占用CPU。给它最高优先级，保证它每 20ms 绝对能打断摄像头，
@@ -367,31 +389,63 @@ void start_task(void *pvParameters)
 void camera_task(void *pvParameters)
 {
     static u32 frame_counter = 0;
+    static u8 fire_latch_counter = 0; // 🚀 搬到这里！水泵防抖锁定器
     
     while(1)
     {
-			// ==================== 每次循环都检查并解析 ESP32 数据 ====================
+        // 1. 获取 ESP32 数据 (包含了烟雾、红外火焰等状态)
         USART2_Process_ESP32_Data();
-        // 1. 处理图像帧
+        
+        // 2. 图像识别
         frame_counter++;
-        
-        // 判断是否需要进行火焰检测 (如果你想开启，传入1)
-        
-			u8 do_fire_detection = 0;
-        if(frame_counter >= 5) 
-        {
-            do_fire_detection = 1;
-            frame_counter = 0; // 计数器清零
-        }
-			
-        
-        // 🚨 【核心修复】：把原来的 process_jpeg_frame(0) 替换掉！
-        // 传入 do_fire_detection，让它根据计划开启扫描
+        u8 do_fire_detection = (frame_counter >= 5) ? 1 : 0;
+        if(frame_counter >= 5) frame_counter = 0; 
         process_jpeg_frame(do_fire_detection);
-      
-      
         
-        // 2. 检查 USART DMA 发送是否完成
+        // ==============================================================
+        // 💦 核心硬件条件反射中枢 (每 100ms 极速响应！)
+        // ==============================================================
+        // 只要本地AI看到火，或者ESP32传来火警信号，就拉满锁定器
+        // (注：g_latest_fire_result 是 AI 结果，你需要补充上 ESP32 的火焰变量)
+       u8 is_fire_real = (g_latest_fire_result.fire_detected == 1) /* || (ESP32_Flame_Status == 1) */;
+        
+        if (is_fire_real) {
+            fire_latch_counter = 20; // 只要有火，强制拉满 20 帧 (2秒喷水延时)
+        }
+
+        // ⚠️ 请将这里的 g_virtual_current 替换为你代码里实际存储电流的全局变量
+        // 比如 esp32_sensor_data.virtual_current 等
+        
+        if (g_system_mode == 0) // 自动模式下才允许控制硬件
+        {
+            // 🚨 【最高优先级】：全局过流保护红线！(独立于火灾状态)
+            if (g_virtual_current > 10.0) 
+            {
+                g_main_power_status = 0;   // 虚拟跳闸，切断主电！
+                WaterPump_Off();           // 禁水防触电！
+                
+                // 即使过载停水，火灾计时器也应当继续流逝
+                if (fire_latch_counter > 0) {
+                    fire_latch_counter--; 
+                }
+            }
+            // ✅ 【第二优先级】：供电安全的情况下的消防联动
+            else 
+            {
+                if (fire_latch_counter > 0) 
+                {
+                    fire_latch_counter--;  // 每 100ms 消耗 1
+                    WaterPump_On();        // 💦 安全状态，允许持续喷水！
+                } 
+                else 
+                {
+                    WaterPump_Off();       // 🛑 锁定器归零，彻底停水
+                }
+            }
+        }
+        // ==============================================================
+        
+        // 3. 检查 USART DMA 发送是否完成
         if(usart1_dma_complete)
         {
             if(current_send_buf != NULL) {
@@ -401,22 +455,38 @@ void camera_task(void *pvParameters)
             }
         }
         
-        // 3. OS 延时 100 毫秒（挂起当前任务，把 CPU 让给别的任务！）
+        // OS 延时 100 毫秒
         vTaskDelay(100);
     }
 }
 
+
 // 【传感器上报任务】：取代了原来的 5 秒计时器
 void report_task(void *pvParameters)
 {
+    u8 link_status = 1; 
+
     while(1)
     {
-        // 1. 采集并发送传感器数据
-        // printf("[Report Task] Wake up to send data!\r\n");
-        ESP8266_Report_SendSensorData();
+        // 1. 尝试使用主链路 (WiFi) 上报数据
+        // 注意：我们需要让这个函数具备返回值 (1=成功，0=失败)
+        link_status = ESP8266_Report_SendSensorData();
         
-        // 2. 发送完毕后，任务进入休眠 5000 毫秒！
-        // 这 5 秒内，这个任务绝对不会占用哪怕 0.001% 的 CPU！
+        // 2. 故障转移机制 (Failover)
+        if(link_status == 0)
+        {
+            printf("\r\n[WARN] 主链路(WiFi)无响应，触发故障转移机制！\r\n");
+            
+            // 3. 瞬间激活备用网口链路，数据绝不丢失！
+            Ethernet_Report_SendSensorData();
+        }
+        else
+        {
+            // 如果 WiFi 是通的，正常打印
+            printf("\r\n[OK] 主链路(WiFi)上报成功。\r\n");
+        }
+        
+        // 4. 休眠 5 秒，等待下一次采集
         vTaskDelay(5000);
     }
 }
