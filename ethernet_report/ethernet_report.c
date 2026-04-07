@@ -9,117 +9,229 @@
 // 如果你的工程使用的是 Safe_Printf，可以保留；这里用标准 printf 演示
 #include <stdio.h> 
 
+// --- 请替换为你实际的 OneNet 设备信息 ---
+#define ONENET_MQTT_IP      "183.230.40.39"   // OneNet MQTT 服务器 IP (请 ping 你平台对应的域名)
+#define ONENET_MQTT_PORT    1883              // OneNet 端口 (旧版通常是 6002，Studio版是 1883)
 
-/*
+#define MQTT_CLIENT_ID      "stm32f407zgt6"      // 例如："123456789"
+#define MQTT_USERNAME       "PGs73D47Zf"       // 例如："654321"
+#define MQTT_PASSWORD       "version=2018-10-31&res=products%2FPGs73D47Zf%2Fdevices%2Fstm32f407zgt6&et=1805469231&method=sha1&sign=snpTD9lxQKVsom7omCk5XnSUCG8%3D"     // APIKey 或者 Token
+
+// 你 ESP8266 发往 OneNet 用的 Topic 是什么，这里就填什么！
+// 例如旧版："dp", 新版 Studio 可能是："$sys/产品ID/设备名称/dp/post/json"
+#define MQTT_TOPIC          "$sys/PGs73D47Zf/stm32f407zgt6/thing/property/post"
+
+
+
+static void Ethernet_Build_Studio_JSON(SensorDataPacket* packet, JsonDataPacket* json);
+
+
+
+
+// =========================================================================
+// 🚀 微型 MQTT 组装引擎 (Micro-MQTT) - 专为单次上报设计，零内存泄漏
+// =========================================================================
+
+// 辅助函数：将字符串写入缓冲区，并带上 2 字节的长度前缀
+static int write_mqtt_string(u8 *buf, const char *str) {
+    int len = strlen(str);
+    buf[0] = (len >> 8) & 0xFF; // 长度高位
+    buf[1] = len & 0xFF;        // 长度低位
+    memcpy(&buf[2], str, len);  // 拷贝内容
+    return len + 2;
+}
+
+// 辅助函数：计算并写入 MQTT 的“剩余长度 (Remaining Length)”
+static int encode_remaining_length(u8 *buf, int len) {
+    int pos = 0;
+    do {
+        u8 d = len % 128;
+        len /= 128;
+        if (len > 0) d |= 128;
+        buf[pos++] = d;
+    } while (len > 0);
+    return pos; // 返回长度字节所占的空间 (1~4字节)
+}
+
+// 🎯 功能 1：组装 CONNECT (登录) 报文
+// 返回值：组装后的报文总长度
+int MicroMQTT_BuildConnect(const char *client_id, const char *username, const char *password, u8 *out_buf) {
+    u8 payload[256];
+    int p_len = 0;
+    
+    // 1. 组装 Payload (ClientID, Username, Password)
+    p_len += write_mqtt_string(&payload[p_len], client_id);
+    p_len += write_mqtt_string(&payload[p_len], username);
+    p_len += write_mqtt_string(&payload[p_len], password);
+    
+    // 2. 组装可变报头 (Variable Header) - 固定为 MQTT 3.1.1 标准
+    u8 var_header[] = {
+        0x00, 0x04, 'M', 'Q', 'T', 'T', // 协议名
+        0x04,                           // 协议级别
+        0xC2,                           // 标志位 (Clean Session=1, User=1, Pass=1)
+        0x00, 0x3C                      // KeepAlive (60秒，反正我们发完就断，无所谓)
+    };
+    
+    // 3. 拼接完整的 CONNECT 报文
+    int total_len = 0;
+    out_buf[total_len++] = 0x10; // 固定报头：0x10 表示 CONNECT
+    total_len += encode_remaining_length(&out_buf[total_len], sizeof(var_header) + p_len);
+    memcpy(&out_buf[total_len], var_header, sizeof(var_header)); total_len += sizeof(var_header);
+    memcpy(&out_buf[total_len], payload, p_len); total_len += p_len;
+    
+    return total_len;
+}
+
+// 🎯 功能 2：组装 PUBLISH (发布) 报文
+// 返回值：组装后的报文总长度
+int MicroMQTT_BuildPublish(const char *topic, const char *json_str, int json_len, u8 *out_buf) {
+    int total_len = 0;
+    int topic_len = strlen(topic);
+    
+    // 剩余长度 = 2字节(Topic长度) + Topic字符串长度 + JSON长度
+    int remain_len = 2 + topic_len + json_len;
+    
+    out_buf[total_len++] = 0x30; // 固定报头：0x30 表示 PUBLISH, QoS=0
+    total_len += encode_remaining_length(&out_buf[total_len], remain_len);
+    
+    // 写入 Topic
+    out_buf[total_len++] = (topic_len >> 8) & 0xFF;
+    out_buf[total_len++] = topic_len & 0xFF;
+    memcpy(&out_buf[total_len], topic, topic_len); total_len += topic_len;
+    
+    // 写入 JSON 实体
+    memcpy(&out_buf[total_len], json_str, json_len); total_len += json_len;
+    
+    return total_len;
+}
+
+
 void Ethernet_Report_SendSensorData(void)
 {
-    // 1. 静态分配，防止爆掉 FreeRTOS 任务栈
     static SensorDataPacket sensor_packet;
     static JsonDataPacket json_packet; 
     
-    int sock = -1;
-    struct sockaddr_in server_addr;
-    int send_bytes = 0;
+    // 分配用来装 MQTT 报文的缓存区
+    u8 mqtt_buffer[512]; 
+    int packet_len;
 
-    printf("-> [Ethernet] 激活备用以太网链路，准备上报数据...\r\n");
+    printf("-> [Ethernet] 正在激活备用以太网链路(MQTT透传模式)...\r\n");
     
-    // 2. 数据采集与打包 (完全白嫖 WiFi 链路的底层函数！)
+    // 1. 采集并打包真实的 JSON 数据！
     ESP8266_Report_CollectSensorData(&sensor_packet);
-    ESP8266_Report_PackageJSON(&sensor_packet, &json_packet);
+	
+    Ethernet_Build_Studio_JSON(&sensor_packet, &json_packet);
     
-    // 如果打包失败或没有数据，直接退出
-    if (json_packet.json_len == 0) {
-        printf("-> [Ethernet] 无有效 JSON 数据，取消发送。\r\n");
-        return;
-    }
+    if (json_packet.json_len == 0) return;
 
-    // ==========================================
-    // 3. LwIP 网络发送核心逻辑 (UDP 客户端模式)
-    // ==========================================
+    // 2. 建立 TCP 连接直连 OneNet
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) return;
     
-    // 3.1 申请一个 UDP Socket
-    // AF_INET: IPv4, SOCK_DGRAM: UDP协议
-    sock = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sock < 0) 
-    {
-        printf("-> [Ethernet Error] 申请 Socket 失败！LwIP 资源可能不足。\r\n");
+    struct timeval timeout;
+    timeout.tv_sec = 1; timeout.tv_usec = 0; // 设置 1 秒超时
+    setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+
+    struct sockaddr_in server_addr;
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(ONENET_MQTT_PORT);
+    server_addr.sin_addr.s_addr = inet_addr(ONENET_MQTT_IP);
+
+    if (connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+        printf("-> [Ethernet Error] 无法连接到 OneNet 云端！\r\n");
+        close(sock);
         return; 
     }
 
-    // 3.2 配置目标服务器（电脑）的 IP 和端口
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(BACKUP_SERVER_PORT);
-    server_addr.sin_addr.s_addr = inet_addr(BACKUP_SERVER_IP);
-
-		
-		struct timeval timeout;
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 500000; // 500ms
-    setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
-		
-		
-		
-		
-		
-    // 3.3 执行发送
-    // 参数：socket句柄, 数据指针, 数据长度, 标志位, 目标地址结构体, 结构体大小
-    send_bytes = sendto(sock, 
-                        json_packet.json_str, 
-                        json_packet.json_len, 
-                        0, 
-                        (struct sockaddr *)&server_addr, 
-                        sizeof(server_addr));
-
-    // 3.4 检查发送结果
-    if (send_bytes > 0) 
-    {
-        printf("-> [Ethernet] 备用链路 JSON 发送成功！(%d 字节)\r\n", send_bytes);
-        // 可选：你甚至可以把发出去的 JSON 内容打印出来看看
-        // printf("%s\r\n", json_packet.json_str); 
-    } 
-    else 
-    {
-        printf("-> [Ethernet Error] UDP 数据包发送失败！\r\n");
+    // ==========================================================
+    // 💥 绝招释放：连续发送 CONNECT 和 PUBLISH 报文！
+    // ==========================================================
+    
+    // 动作 1：组装并发送登录报文 (CONNECT)
+    packet_len = MicroMQTT_BuildConnect(MQTT_CLIENT_ID, MQTT_USERNAME, MQTT_PASSWORD, mqtt_buffer);
+    send(sock, mqtt_buffer, packet_len, 0);
+    
+    // 稍微延时 50ms，给 OneNet 服务器验证密码的时间
+    vTaskDelay(50 / portTICK_PERIOD_MS); 
+    
+    // 动作 2：组装并发送真实的数据报文 (PUBLISH)
+    packet_len = MicroMQTT_BuildPublish(MQTT_TOPIC, json_packet.json_str, json_packet.json_len, mqtt_buffer);
+    int send_bytes = send(sock, mqtt_buffer, packet_len, 0);
+    
+    if(send_bytes > 0) {
+        printf("-> [Ethernet] 备用链路 MQTT 数据已送达云端！(%d 字节)\r\n", json_packet.json_len);
     }
-
-    // 3.5 极其重要：发送完毕后，必须关闭 Socket，释放 LwIP 内核资源！
-    // 否则发几次之后系统就因为 Socket 耗尽而死锁了。
+    
+    // 动作 3：绝不拖泥带水，发送完毕直接暴力断开 TCP！
     close(sock); 
 }
 
-*/
-
-
-void Ethernet_Report_SendSensorData(void)
+// =========================================================================
+// 🚀 OneNet Studio 专属 JSON 打包器 (仅限以太网直连云端使用)
+// =========================================================================
+static void Ethernet_Build_Studio_JSON(SensorDataPacket* packet, JsonDataPacket* json)
 {
-    int sock = -1;
-    struct sockaddr_in server_addr;
+    // 1. 【防 FPU 死机】：复用你极其优秀的手动拆分浮点数逻辑
+    int smoke_int = (int)packet->smoke_ppm;
+    int smoke_dec = (int)((packet->smoke_ppm - smoke_int) * 100);
+    if(smoke_dec < 0) smoke_dec = -smoke_dec;
+
+    int temp_int = (int)packet->temperature;
+    int temp_dec = (int)((packet->temperature - temp_int) * 10);
+    if(temp_dec < 0) temp_dec = -temp_dec;
     
-    // 🚨 1. 把这两行真实的采集和打包代码【注释掉】！
-    // ESP8266_Report_CollectSensorData(&sensor_packet);
-    // ESP8266_Report_PackageJSON(&sensor_packet, &json_packet);
+    int hum_int = (int)packet->humidity;
+    int hum_dec = (int)((packet->humidity - hum_int) * 10);
+    if(hum_dec < 0) hum_dec = -hum_dec;
     
-    // 🚨 2. 直接伪造一个死数据包
-    char* test_str = "{\"Status\":\"Alive\"}";
-    int test_len = 18;
+    int cur_int = (int)packet->virtual_current;
+    int cur_dec = (int)((packet->virtual_current - cur_int) * 100);
+    if(cur_dec < 0) cur_dec = -cur_dec;
 
-    sock = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sock < 0) return;
+    memset(json->json_str, 0, sizeof(json->json_str));
 
-    struct timeval timeout;
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 500000;
-    setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
-
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(8080);
-    server_addr.sin_addr.s_addr = inet_addr("192.168.0.101");
-
-    // 🚨 3. 发送假数据
-    int send_bytes = sendto(sock, test_str, test_len, 0, (struct sockaddr *)&server_addr, sizeof(server_addr));
+    // 2. 🚨 核心差异：按照 OneNet Studio 物模型要求的 "params": {"key": {"value": data}} 格式组装
+    // ⚠️ 注意：这里的键名 (如 temperature, smoke_ppm) 必须与你在 OneNet 平台上定义的【属性标识符】一字不差！
+    int len = snprintf(json->json_str, sizeof(json->json_str),
+        "{"
+        "\"id\":\"123\","           // 消息ID，随意填
+        "\"version\":\"1.0\","      // 协议版本，固定1.0
+        "\"params\":{"
+        
+        "\"temperature\":{\"value\":%d.%01d},"
+        "\"humidity\":{\"value\":%d.%01d},"
+        "\"smoke_ppm\":{\"value\":%d.%02d},"
+        "\"virtual_current\":{\"value\":%d.%02d},"
+        
+        "\"flame_adc\":{\"value\":%d},"
+        "\"flame_do\":{\"value\":%d},"
+        "\"smoke_adc\":{\"value\":%d},"
+        "\"temp_detected\":{\"value\":%d},"
+        
+        "\"risk_level\":{\"value\":%d},"
+        "\"pump_status\":{\"value\":%d},"
+        "\"system_mode\":{\"value\":%d},"
+        "\"main_power_status\":{\"value\":%d}"
+        
+        "}" // params 结束
+        "}",// 最外层结束 (注意：纯 MQTT 透传不需要加 \n)
+        
+        temp_int, temp_dec,
+        hum_int, hum_dec,
+        smoke_int, smoke_dec,
+        cur_int, cur_dec,
+        
+        packet->flame_adc,
+        packet->flame_do,
+        packet->smoke_adc,
+        packet->temp_detected,
+        
+        packet->risk_level,
+        packet->pump_status,
+        packet->system_mode,
+        packet->main_power_status
+    );
     
-    if(send_bytes > 0) printf("-> UDP OK!\r\n");
-
-    close(sock);
+    json->json_len = (len > 0) ? (u16)len : 0;
 }
 

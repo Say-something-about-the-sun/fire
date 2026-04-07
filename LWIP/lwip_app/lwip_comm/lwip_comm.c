@@ -107,7 +107,7 @@ void lwip_comm_default_ip_set(__lwip_dev *lwipx)
 {
 	u32 sn0;
 	sn0=*(vu32*)(0x1FFF7A10);//获取STM32的唯一ID的前24位作为MAC地址后三字节
-	//默认远端IP为:192.168.1.100
+	//默认远端IP为:192.168.1.105
 	lwipx->remoteip[0]=192;	
 	lwipx->remoteip[1]=168;
 	lwipx->remoteip[2]=1;
