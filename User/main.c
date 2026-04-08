@@ -405,16 +405,15 @@ void camera_task(void *pvParameters)
         // ==============================================================
         // 💦 核心硬件条件反射中枢 (每 100ms 极速响应！)
         // ==============================================================
-        // 只要本地AI看到火，或者ESP32传来火警信号，就拉满锁定器
-        // (注：g_latest_fire_result 是 AI 结果，你需要补充上 ESP32 的火焰变量)
+        // 只要本地AI看到火，就拉满锁定器
+        
        u8 is_fire_real = (g_latest_fire_result.fire_detected == 1) /* || (ESP32_Flame_Status == 1) */;
         
         if (is_fire_real) {
             fire_latch_counter = 20; // 只要有火，强制拉满 20 帧 (2秒喷水延时)
         }
 
-        // ⚠️ 请将这里的 g_virtual_current 替换为你代码里实际存储电流的全局变量
-        // 比如 esp32_sensor_data.virtual_current 等
+        
         
         if (g_system_mode == 0) // 自动模式下才允许控制硬件
         {
@@ -468,25 +467,25 @@ void report_task(void *pvParameters)
 
     while(1)
     {
-        // 1. 尝试使用主链路 (WiFi) 上报数据
-        // 注意：我们需要让这个函数具备返回值 (1=成功，0=失败)
+        // 1. 尝试使用主链路 (WiFi) 上报数据，并阻塞等待回执 (最多等3秒)
         link_status = ESP8266_Report_SendSensorData();
         
         // 2. 故障转移机制 (Failover)
         if(link_status == 0)
         {
-            printf("\r\n[WARN] 主链路(WiFi)无响应，触发故障转移机制！\r\n");
+            printf("\r\n[WARN] 主链路(WiFi)失效，触发故障转移机制！\r\n");
             
             // 3. 瞬间激活备用网口链路，数据绝不丢失！
-            Ethernet_Report_SendSensorData();
+            // 这里执行完大约会耗时 0.2 ~ 0.5 秒
+            Ethernet_Report_SendSensorData(); 
         }
         else
         {
-            // 如果 WiFi 是通的，正常打印
-            printf("\r\n[OK] 主链路(WiFi)上报成功。\r\n");
+            printf("\r\n[OK] 系统主备链路状态良好。\r\n");
         }
         
         // 4. 休眠 5 秒，等待下一次采集
-        vTaskDelay(5000);
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
 }
+

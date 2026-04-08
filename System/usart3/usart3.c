@@ -1,9 +1,25 @@
 #include "usart3.h"
 #include "delay.h"
+#include <string.h>
+
+
+// ===================================================
+// 定义一个全局变量，给外面的 ReportTask 看的
+// 0: 等待/闲置, 1: 上报成功, 2: 链路断开或上报失败
+// ===================================================
+volatile u8 g_esp8266_upload_status = 0;
+
+
+
+
 
 // 接收缓冲区
 u8 USART3_RX_BUF[USART3_RX_BUF_SIZE];
 u16 USART3_RX_STA = 0; // 接收状态标记
+
+
+
+
 
 // 初始化USART3
 void USART3_Init(u32 bound)
@@ -109,6 +125,34 @@ void USART3_IRQHandler(void)
                     USART3_RX_STA = 0; // 接收错误,不是 \n，重新开始
                 } else {
                     USART3_RX_STA |= 0x8000; // 完美接收到 \n，最高位置 1，触发大脑解析！
+										
+										
+									
+										// 【本次新增核心】：利用刚收到的这一整帧，进行极速关键字扫描！
+                    // ==============================================================
+                    // 1. 先在末尾补上字符串结束符 '\0'，防止 strstr 越界跑飞
+                    USART3_RX_BUF[USART3_RX_STA & 0X3FFF] = '\0'; 
+                    
+                    // 2. 扫描 ESP8266 发来的状态回执
+                    if (strstr((const char*)USART3_RX_BUF, "UPLOAD_OK") != NULL) 
+                    {
+                        g_esp8266_upload_status = 1; // 标记为：上报成功！
+                    }
+                    else if (strstr((const char*)USART3_RX_BUF, "UPLOAD_ERR") != NULL || 
+                             strstr((const char*)USART3_RX_BUF, "WIFI_ERR") != NULL) 
+                    {
+                        g_esp8266_upload_status = 2; // 标记为：上报失败或网断了！
+                    }
+                    // ==============================================================
+                    
+                    // 注意：这里不要清零 USART3_RX_STA，因为你的主循环里可能还要
+                    // 根据 0x8000 去解析 "CMD:PUMP:1" 这种云端下发的控制指令！
+									
+									
+									
+									
+									
+									
                 }
             }
             else // 还没收到 \r

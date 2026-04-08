@@ -10,7 +10,7 @@
 #include <stdio.h> 
 
 // --- 请替换为你实际的 OneNet 设备信息 ---
-#define ONENET_MQTT_IP      "183.230.40.39"   // OneNet MQTT 服务器 IP (请 ping 你平台对应的域名)
+#define ONENET_MQTT_IP      "183.230.40.96"   // OneNet MQTT 服务器 IP (请 ping 你平台对应的域名)
 #define ONENET_MQTT_PORT    1883              // OneNet 端口 (旧版通常是 6002，Studio版是 1883)
 
 #define MQTT_CLIENT_ID      "stm32f407zgt6"      // 例如："123456789"
@@ -129,7 +129,7 @@ void Ethernet_Report_SendSensorData(void)
     if (sock < 0) return;
     
     struct timeval timeout;
-    timeout.tv_sec = 1; timeout.tv_usec = 0; // 设置 1 秒超时
+    timeout.tv_sec = 5; timeout.tv_usec = 0; // 设置 1 秒超时
     setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
 
     struct sockaddr_in server_addr;
@@ -162,16 +162,29 @@ void Ethernet_Report_SendSensorData(void)
         printf("-> [Ethernet] 备用链路 MQTT 数据已送达云端！(%d 字节)\r\n", json_packet.json_len);
     }
     
+		
+		u8 rx_buf[64];
+    // 等待云端的 CONNACK 回复（最多等 5 秒，收到会立刻往下走）
+    int rx_len = recv(sock, rx_buf, sizeof(rx_buf) - 1, 0);
+    if(rx_len > 0) {
+        printf("-> [Ethernet] 收到云端确认信号！完美闭环！\r\n");
+    }
+		
+		
+		
     // 动作 3：绝不拖泥带水，发送完毕直接暴力断开 TCP！
     close(sock); 
 }
 
+
+
+
 // =========================================================================
-// 🚀 OneNet Studio 专属 JSON 打包器 (仅限以太网直连云端使用)
+// 🚀 OneNet Studio 专属 JSON 打包器 (终极完美对账版)
 // =========================================================================
 static void Ethernet_Build_Studio_JSON(SensorDataPacket* packet, JsonDataPacket* json)
 {
-    // 1. 【防 FPU 死机】：复用你极其优秀的手动拆分浮点数逻辑
+    // 1. 【防 FPU 死机】：手动拆分所有浮点数
     int smoke_int = (int)packet->smoke_ppm;
     int smoke_dec = (int)((packet->smoke_ppm - smoke_int) * 100);
     if(smoke_dec < 0) smoke_dec = -smoke_dec;
@@ -184,54 +197,78 @@ static void Ethernet_Build_Studio_JSON(SensorDataPacket* packet, JsonDataPacket*
     int hum_dec = (int)((packet->humidity - hum_int) * 10);
     if(hum_dec < 0) hum_dec = -hum_dec;
     
+    // 🚨 修正 1：获取虚拟电流值，准备填入 "current"
     int cur_int = (int)packet->virtual_current;
     int cur_dec = (int)((packet->virtual_current - cur_int) * 100);
     if(cur_dec < 0) cur_dec = -cur_dec;
 
     memset(json->json_str, 0, sizeof(json->json_str));
 
-    // 2. 🚨 核心差异：按照 OneNet Studio 物模型要求的 "params": {"key": {"value": data}} 格式组装
-    // ⚠️ 注意：这里的键名 (如 temperature, smoke_ppm) 必须与你在 OneNet 平台上定义的【属性标识符】一字不差！
+    // 2. 🚨 修正 2：严格遵守 bool 类型发 %s (true/false) 的铁律！
     int len = snprintf(json->json_str, sizeof(json->json_str),
         "{"
-        "\"id\":\"123\","           // 消息ID，随意填
-        "\"version\":\"1.0\","      // 协议版本，固定1.0
+        "\"id\":\"123\","
+        "\"version\":\"1.0\","
         "\"params\":{"
         
+        // --- Float 单精度浮点型 ---
         "\"temperature\":{\"value\":%d.%01d},"
         "\"humidity\":{\"value\":%d.%01d},"
         "\"smoke_ppm\":{\"value\":%d.%02d},"
-        "\"virtual_current\":{\"value\":%d.%02d},"
+        "\"current\":{\"value\":%d.%02d},"  // 名字已改为 current
         
+        // --- Int32 和 Enum 整数型 ---
         "\"flame_adc\":{\"value\":%d},"
-        "\"flame_do\":{\"value\":%d},"
-        "\"smoke_adc\":{\"value\":%d},"
         "\"temp_detected\":{\"value\":%d},"
-        
         "\"risk_level\":{\"value\":%d},"
-        "\"pump_status\":{\"value\":%d},"
         "\"system_mode\":{\"value\":%d},"
-        "\"main_power_status\":{\"value\":%d}"
+        
+        // --- Bool 布尔型 (极其严格，必须用 %s 填入 true/false) ---
+        "\"pump_status\":{\"value\":%s},"
+        "\"main_power_status\":{\"value\":%s}"
         
         "}" // params 结束
-        "}",// 最外层结束 (注意：纯 MQTT 透传不需要加 \n)
+        "}",// 最外层结束
         
+        // 对应 Float 值
         temp_int, temp_dec,
         hum_int, hum_dec,
         smoke_int, smoke_dec,
         cur_int, cur_dec,
         
+        // 对应 Int32 / Enum 值
         packet->flame_adc,
-        packet->flame_do,
-        packet->smoke_adc,
         packet->temp_detected,
-        
         packet->risk_level,
-        packet->pump_status,
         packet->system_mode,
-        packet->main_power_status
+        
+        // 对应 Bool 值 (动态转换为字符串)
+        packet->pump_status ? "true" : "false",
+        packet->main_power_status ? "true" : "false"
     );
     
     json->json_len = (len > 0) ? (u16)len : 0;
 }
 
+
+
+/*
+static void Ethernet_Build_Studio_JSON(SensorDataPacket* packet, JsonDataPacket* json)
+{
+    memset(json->json_str, 0, sizeof(json->json_str));
+
+    // 🚀 极简测试法：只发一个绝对不会错的假温度！
+    // ⚠️ 前提：请确保你的 OneNet 物模型里，确实有一个叫 "temperature" 的属性，且类型是 float 或 double！
+    int len = snprintf(json->json_str, sizeof(json->json_str),
+        "{"
+        "\"id\":\"123\","
+        "\"version\":\"1.0\","
+        "\"params\":{"
+        "\"temperature\":{\"value\":25.5}" // 强制写死一个小数
+        "}"
+        "}"
+    );
+    
+    json->json_len = (len > 0) ? (u16)len : 0;
+}
+*/

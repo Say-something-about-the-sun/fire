@@ -38,3 +38,4 @@
 .\objects\usart3.o: .\Library\inc\stm32f4xx_fsmc.h
 .\objects\usart3.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\usart3.o: .\System\delay\delay.h
+.\objects\usart3.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h

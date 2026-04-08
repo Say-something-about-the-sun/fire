@@ -68,6 +68,8 @@
 .\objects\api_msg.o: .\LWIP\lwip-1.4.1\src\include\ipv4\lwip/ip.h
 .\objects\api_msg.o: .\LWIP\lwip-1.4.1\src\include\lwip/udp.h
 .\objects\api_msg.o: .\LWIP\lwip-1.4.1\src\include\lwip/tcp.h
+.\objects\api_msg.o: .\LWIP\lwip-1.4.1\src\include\lwip/mem.h
+.\objects\api_msg.o: .\LWIP\lwip-1.4.1\src\include\ipv4\lwip/icmp.h
 .\objects\api_msg.o: .\LWIP\lwip-1.4.1\src\include\lwip/raw.h
 .\objects\api_msg.o: .\LWIP\lwip-1.4.1\src\include\lwip/memp.h
 .\objects\api_msg.o: .\LWIP\lwip-1.4.1\src\include\lwip/memp_std.h

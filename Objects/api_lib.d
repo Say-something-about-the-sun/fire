@@ -74,4 +74,6 @@
 .\objects\api_lib.o: .\LWIP\lwip-1.4.1\src\include\lwip/raw.h
 .\objects\api_lib.o: .\LWIP\lwip-1.4.1\src\include\lwip/udp.h
 .\objects\api_lib.o: .\LWIP\lwip-1.4.1\src\include\lwip/tcp.h
+.\objects\api_lib.o: .\LWIP\lwip-1.4.1\src\include\lwip/mem.h
+.\objects\api_lib.o: .\LWIP\lwip-1.4.1\src\include\ipv4\lwip/icmp.h
 .\objects\api_lib.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h

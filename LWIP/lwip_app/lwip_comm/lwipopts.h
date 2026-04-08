@@ -22,10 +22,10 @@
 #define MEMP_NUM_UDP_PCB        6
 
 //MEMP_NUM_TCP_PCB:同时建立激活的TCP数量
-#define MEMP_NUM_TCP_PCB        2
+#define MEMP_NUM_TCP_PCB        5
 
 //MEMP_NUM_TCP_PCB_LISTEN:能够监听的TCP连接数量
-#define MEMP_NUM_TCP_PCB_LISTEN 1
+#define MEMP_NUM_TCP_PCB_LISTEN 2
 
 //MEMP_NUM_TCP_SEG:最多同时在队列中的TCP段数量
 #define MEMP_NUM_TCP_SEG        15
@@ -45,7 +45,7 @@
 
 
 /* ---------- TCP选项---------- */
-#define LWIP_TCP                0  //为1是使用TCP
+#define LWIP_TCP                1  //为1是使用TCP
 #define TCP_TTL                 255//生存时间
 
 /*当TCP的数据段超出队列时的控制位,当设备的内存过小的时候此项应为0*/

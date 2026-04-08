@@ -150,6 +150,15 @@ void connectMQTT() {
 
 // ==================== 处理JSON并发送到OneNET（物模型格式）====================
 void processJsonAndSend(String jsonStr) {
+
+  // 在干活之前，先看看自己是不是断网了。如果断网，立刻向 STM32 喊救命！
+    if (WiFi.status() != WL_CONNECTED || !mqttClient.connected()) {
+        Serial.println("Network disconnected! Cannot send.");
+        stm32Serial.println("WIFI_ERR"); // 👉 告诉 STM32：我网断了，快切备用链路！
+        return; 
+    }
+
+
     // 1. 解析STM32发来的完整JSON
    DynamicJsonDocument doc(1536);
     DeserializationError error = deserializeJson(doc, jsonStr);
@@ -322,11 +331,15 @@ void processJsonAndSend(String jsonStr) {
     
     Serial.print("Publishing (ThingModel): ");
     Serial.println(mqttPayload);
+
+
     
     if (mqttClient.publish(topic.c_str(), mqttPayload.c_str())) {
         Serial.println("Published successfully!");
+        stm32Serial.println("UPLOAD_OK");  // 👉 告诉 STM32：完美送达，不用担心！
     } else {
         Serial.println("Publish failed!");
+        stm32Serial.println("UPLOAD_ERR"); // 👉 告诉 STM32：发送失败，可能被 OneNET 限流或拒收！
     }
 }
 // ==================== 接收 OneNET 报错回执 ====================

@@ -21,7 +21,7 @@ FireDetectionResult g_latest_fire_result;
 
 extern u8 USART3_RX_BUF[];
 extern u16 USART3_RX_STA;
-
+extern volatile u8 g_esp8266_upload_status;//usart3中定义的状态标志
 
 // ==========================================
 // 🌐 定义跨任务共享的全局状态变量
@@ -370,27 +370,51 @@ u8 ESP8266_Report_SendSensorData(void)
     static SensorDataPacket sensor_packet;
     static JsonDataPacket json_packet; 
     
-    // 采集并打包
+    // 1. 采集并打包
     ESP8266_Report_CollectSensorData(&sensor_packet);
     ESP8266_Report_PackageJSON(&sensor_packet, &json_packet);
     
-    // 扔给 USART3 透传给 ESP8266
-    if (json_packet.json_len > 0)
+    if (json_packet.json_len == 0) return 1; // 没数据就不发，视为正常
+    
+    // 2. 🚨 核心动作：发送前，必须清零上次的标志位！
+    g_esp8266_upload_status = 0; 
+    
+    // 3. 扔给 USART3 透传给 ESP8266
+    USART3_Send_Data((u8*)json_packet.json_str, json_packet.json_len);
+    Safe_Printf("[ESP8266 Report] Pushed JSON to Gateway (%d bytes)\r\n", json_packet.json_len);
+    
+    // ==========================================
+    // ⏱️ 开启死神倒计时 (最多等待 3 秒)
+    // ==========================================
+    u16 timeout = 300; // 300次 * 10ms = 3000ms = 3秒
+    
+    // 只要状态还是 0 (等待中)，并且时间没用完，就一直等
+    while (g_esp8266_upload_status == 0 && timeout > 0)
     {
-        USART3_Send_Data((u8*)json_packet.json_str, json_packet.json_len);
-        Safe_Printf("[ESP8266 Report] Pushed JSON to Gateway (%d bytes)\r\n", json_packet.json_len);
+        vTaskDelay(10 / portTICK_PERIOD_MS); // 每次休眠 10ms，让出 CPU 给其他任务
+        timeout--;
     }
     
     // ==========================================
-    // 🚨 测试专用代码：因为 ESP8266 拔了电源，
-    // 我们直接欺骗系统，告诉它 WiFi 发送失败 (返回 0)！
+    // ⚖️ 判决时刻
     // ==========================================
-    Safe_Printf("[ESP8266 Timeout] 未检测到 ESP8266 模块!\r\n");
-    return 0; // 强制触发备用以太网链路！
-    
-    // (未来你接上 ESP8266 后，这里要改成判断串口反馈，成功则 return 1)
+    if (g_esp8266_upload_status == 1)
+    {
+        // 收到 UPLOAD_OK，提前结束倒计时！
+        Safe_Printf("-> [ESP8266 ACK] 成功收到云端确认回执！耗时: %d ms\r\n", (300 - timeout) * 10);
+        return 1; // 正常返回 1
+    }
+    else
+    {
+        // 走到这里，要么是 timeout 归零了，要么是收到了 ERR
+        if (timeout == 0) {
+            Safe_Printf("-> [ESP8266 Timeout] 3秒超时，未收到回执 (可能死机或断网)！\r\n");
+        } else if (g_esp8266_upload_status == 2) {
+            Safe_Printf("-> [ESP8266 Error] 模块明确回复发送失败或断网！\r\n");
+        }
+        return 0; // 强制触发备用以太网链路！
+    }
 }
-
 
 
 

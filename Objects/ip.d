@@ -20,6 +20,7 @@
 .\objects\ip.o: .\LWIP\lwip-1.4.1\src\include\lwip/raw.h
 .\objects\ip.o: .\LWIP\lwip-1.4.1\src\include\lwip/udp.h
 .\objects\ip.o: .\LWIP\lwip-1.4.1\src\include\lwip/tcp_impl.h
+.\objects\ip.o: .\LWIP\lwip-1.4.1\src\include\lwip/tcp.h
 .\objects\ip.o: .\LWIP\lwip-1.4.1\src\include\lwip/snmp.h
 .\objects\ip.o: .\LWIP\lwip-1.4.1\src\include\lwip/dhcp.h
 .\objects\ip.o: .\LWIP\lwip-1.4.1\src\include\ipv4\lwip/autoip.h
