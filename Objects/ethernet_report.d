@@ -49,6 +49,7 @@
 .\objects\ethernet_report.o: .\ESP8266\esp8266_report.h
 .\objects\ethernet_report.o: .\Hardware\fire_detection.h
 .\objects\ethernet_report.o: .\Hardware\image_preprocess.h
+.\objects\ethernet_report.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h
 .\objects\ethernet_report.o: .\LWIP\lwip-1.4.1\src\include\lwip/sockets.h
 .\objects\ethernet_report.o: .\LWIP\lwip-1.4.1\src\include\lwip/opt.h
 .\objects\ethernet_report.o: .\LWIP\lwip_app\lwip_comm\lwipopts.h

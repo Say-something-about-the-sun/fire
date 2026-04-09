@@ -1,6 +1,6 @@
 #include "ethernet_report.h"
 #include "esp8266_report.h" // 借用你的传感器采集和 JSON 打包结构体与函数
-
+#include <string.h>
 // LwIP Socket 核心头文件
 #include "lwip/sockets.h"
 #include "lwip/opt.h"      // 引入 LwIP 配置
@@ -24,8 +24,8 @@
 
 
 static void Ethernet_Build_Studio_JSON(SensorDataPacket* packet, JsonDataPacket* json);
-
-
+static void USART3_Hardware_Sleep(void);
+static void USART3_Hardware_Wakeup(void);
 
 
 // =========================================================================
@@ -108,53 +108,66 @@ int MicroMQTT_BuildPublish(const char *topic, const char *json_str, int json_len
 
 void Ethernet_Report_SendSensorData(void)
 {
+    // 🚀 修复1：加上 static，把大内存储存移到全局区，拯救 FreeRTOS 任务栈！
     static SensorDataPacket sensor_packet;
     static JsonDataPacket json_packet; 
-    
-    // 分配用来装 MQTT 报文的缓存区
-    u8 mqtt_buffer[512]; 
+    static u8 mqtt_buffer[512]; 
     int packet_len;
 
+	
+
+		
     printf("-> [Ethernet] 正在激活备用以太网链路(MQTT透传模式)...\r\n");
     
-    // 1. 采集并打包真实的 JSON 数据！
+    // 1. 采集并打包专属的 JSON 格式
     ESP8266_Report_CollectSensorData(&sensor_packet);
-	
     Ethernet_Build_Studio_JSON(&sensor_packet, &json_packet);
     
-    if (json_packet.json_len == 0) return;
+    if (json_packet.json_len == 0) {
+        printf("-> [Ethernet Error] JSON 数据为空，中止发送！\r\n");
+        return;
+    }
 
-    // 2. 建立 TCP 连接直连 OneNet
+    // 2. 申请 Socket
+    printf("-> [Ethernet] 准备申请 TCP Socket...\r\n");
     int sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock < 0) return;
+    if (sock < 0) {
+        // 🚀 修复2：打破静默，如果死在这里，说明 LwIP 资源被锁死了！
+        printf("-> [Ethernet Error] Socket 申请失败！(LwIP 资源耗尽)\r\n");
+        return; 
+    }
     
+    // 强制设置 5 秒超时防死锁
     struct timeval timeout;
-    timeout.tv_sec = 5; timeout.tv_usec = 0; // 设置 1 秒超时
+    timeout.tv_sec = 5; timeout.tv_usec = 0; 
     setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(ONENET_MQTT_PORT);
-    server_addr.sin_addr.s_addr = inet_addr(ONENET_MQTT_IP);
+    server_addr.sin_port = htons(1883); // OneNet 端口
+    // ⚠️ 请确保这里填的是你昨天 ping 通的纯数字明文 IP！
+    server_addr.sin_addr.s_addr = inet_addr("183.230.40.96"); 
 
+    // 3. 建立连接
+    printf("-> [Ethernet] 正在拨号连接云端...\r\n");
     if (connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
-        printf("-> [Ethernet Error] 无法连接到 OneNet 云端！\r\n");
+        printf("-> [Ethernet Error] TCP 拨号失败！(请检查网线是否插紧，或路由器是否拦截)\r\n");
         close(sock);
         return; 
     }
 
+    printf("-> [Ethernet] TCP 拨号成功！开始发送鉴权报文...\r\n");
+
     // ==========================================================
-    // 💥 绝招释放：连续发送 CONNECT 和 PUBLISH 报文！
+    // 发送 CONNECT 和 PUBLISH 报文
     // ==========================================================
-    
-    // 动作 1：组装并发送登录报文 (CONNECT)
     packet_len = MicroMQTT_BuildConnect(MQTT_CLIENT_ID, MQTT_USERNAME, MQTT_PASSWORD, mqtt_buffer);
     send(sock, mqtt_buffer, packet_len, 0);
     
     // 稍微延时 50ms，给 OneNet 服务器验证密码的时间
     vTaskDelay(50 / portTICK_PERIOD_MS); 
     
-    // 动作 2：组装并发送真实的数据报文 (PUBLISH)
     packet_len = MicroMQTT_BuildPublish(MQTT_TOPIC, json_packet.json_str, json_packet.json_len, mqtt_buffer);
     int send_bytes = send(sock, mqtt_buffer, packet_len, 0);
     
@@ -162,19 +175,26 @@ void Ethernet_Report_SendSensorData(void)
         printf("-> [Ethernet] 备用链路 MQTT 数据已送达云端！(%d 字节)\r\n", json_packet.json_len);
     }
     
-		
-		u8 rx_buf[64];
-    // 等待云端的 CONNACK 回复（最多等 5 秒，收到会立刻往下走）
+    // 智能等待云端的 CONNACK 回复
+    u8 rx_buf[64];
     int rx_len = recv(sock, rx_buf, sizeof(rx_buf) - 1, 0);
     if(rx_len > 0) {
         printf("-> [Ethernet] 收到云端确认信号！完美闭环！\r\n");
+    } else {
+        printf("-> [Ethernet Warn] 数据已发，但未收到云端确认(不影响上传)\r\n");
     }
-		
-		
-		
-    // 动作 3：绝不拖泥带水，发送完毕直接暴力断开 TCP！
+    
+    // 安全断开
     close(sock); 
+    printf("-> [Ethernet] 会话结束，管线安全切断。\r\n");
+		
+		
+
 }
+		
+		
+		
+  
 
 
 
@@ -250,6 +270,35 @@ static void Ethernet_Build_Studio_JSON(SensorDataPacket* packet, JsonDataPacket*
     json->json_len = (len > 0) ? (u16)len : 0;
 }
 
+
+
+// =======================================================
+// 🚀 工业级防线：彻底屏蔽故障模块的电磁干扰
+// =======================================================
+static void USART3_Hardware_Sleep(void)
+{
+    // 1. 核心级屏蔽中断！直接在 ARM 内核层面把 USART3 的中断线剪断！
+    NVIC_DisableIRQ(USART3_IRQn);
+    
+    // 2. 关闭串口硬件状态机
+    USART_Cmd(USART3, DISABLE);
+}
+
+static void USART3_Hardware_Wakeup(void)
+{
+    // 1. 疯狂读取数据寄存器，把断网期间积压在里面的物理电磁乱码全部倒进垃圾桶
+    USART_ReceiveData(USART3);
+    USART_ReceiveData(USART3);
+    
+    // 2. 暴力清除所有错误标志位 (特别是 ORE 溢出错误)
+    USART_ClearFlag(USART3, USART_FLAG_ORE | USART_FLAG_RXNE | USART_FLAG_PE | USART_FLAG_FE);
+    
+    // 3. 重启串口硬件
+    USART_Cmd(USART3, ENABLE);
+    
+    // 4. 清理干净后，重新接通 ARM 内核的中断线
+    NVIC_EnableIRQ(USART3_IRQn);
+}
 
 
 /*

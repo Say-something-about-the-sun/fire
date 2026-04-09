@@ -23,6 +23,9 @@ extern u8 USART3_RX_BUF[];
 extern u16 USART3_RX_STA;
 extern volatile u8 g_esp8266_upload_status;//usart3中定义的状态标志
 
+extern volatile int32_t g_demo_fault_countdown;
+
+
 // ==========================================
 // 🌐 定义跨任务共享的全局状态变量
 // ==========================================
@@ -35,6 +38,11 @@ volatile float g_virtual_current = 1.2f; // 全局虚拟电流
 // ==========================================
 void button_scan_task(void *pvParameters)
 {
+	
+	
+			// 用于 20ms 累积到 1 秒的计数器 (50 * 20ms = 1000ms)
+    static u8 second_tick_counter = 0;
+	
     while(1)
     {
         // 1. 获取按键单次触发信号 (带消抖)
@@ -62,7 +70,29 @@ void button_scan_task(void *pvParameters)
             g_virtual_current = 1.2f;   
         }
 
+				// 🚀 【本次新增】动作 D: [KEY2 按键] 注入 30 秒演示故障
+        if (key_val == KEY2_PRES) {
+            g_demo_fault_countdown = 30; // 设置倒计时
+            printf("\r\n>>> 🔴 [演示开始] 已触发 30 秒人为故障，主链路已切断！ <<<\r\n");
+        }
 				
+				
+				
+				// 🚀 【本次新增】秒级倒计时逻辑
+        // 因为本任务每 20ms 循环一次，所以累加 50 次就是 1 秒
+        if (++second_tick_counter >= 50) 
+        {
+            second_tick_counter = 0; // 重置小计数器
+            
+            if (g_demo_fault_countdown > 0) 
+            {
+                g_demo_fault_countdown--;
+                if (g_demo_fault_countdown == 0)
+                {
+                    printf("\r\n>>> 🟢 [演示结束] 故障时间到，系统已自动愈合！ <<<\r\n");
+                }
+            }
+        }
 				
 				// =========================================================
         // ☁️ 监听云端下发的超级指令 (非阻塞式查询)
@@ -376,9 +406,21 @@ u8 ESP8266_Report_SendSensorData(void)
     
     if (json_packet.json_len == 0) return 1; // 没数据就不发，视为正常
     
+	if (g_demo_fault_countdown > 0) 
+    {
+        // 打印剩余时间，方便你在演示时向评委解说
+        printf("\r\n[Demo Mode] 模拟 WiFi 硬件故障中... 剩余自动愈合时间: %d 秒\r\n", g_demo_fault_countdown);
+        return 0; // 核心逻辑：直接返回 0，强制触发以太网补救
+    }
+	
+	
+	
     // 2. 🚨 核心动作：发送前，必须清零上次的标志位！
     g_esp8266_upload_status = 0; 
-    
+    USART3_RX_STA = 0; // 🎯 必须清零！否则只能成功一次！
+    memset(USART3_RX_BUF, 0, sizeof(USART3_RX_BUF)); // 清空旧字符串
+	
+	
     // 3. 扔给 USART3 透传给 ESP8266
     USART3_Send_Data((u8*)json_packet.json_str, json_packet.json_len);
     Safe_Printf("[ESP8266 Report] Pushed JSON to Gateway (%d bytes)\r\n", json_packet.json_len);

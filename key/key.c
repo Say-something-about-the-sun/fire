@@ -4,24 +4,30 @@
 /**
  * @brief  初始化按键
  */
+/**
+ * @brief  初始化按键
+ */
 void KEY_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    // 使能 GPIOE 和 GPIOA 时钟
-    RCC_AHB1PeriphClockCmd(KEY0_RCC | WKUP_RCC, ENABLE);
+    // 1. 使能所有按键对应的 GPIO 时钟
+    // 把所有的 RCC 宏用按位或 (|) 连起来，一行搞定！
+    RCC_AHB1PeriphClockCmd(KEY0_RCC | KEY1_RCC | KEY2_RCC | WKUP_RCC, ENABLE);
 
-    // 初始化 KEY0(PE4) 和 KEY1(PE3) 为上拉输入
-    GPIO_InitStructure.GPIO_Pin = KEY0_PIN | KEY1_PIN;
+    // 2. 初始化 KEY0, KEY1, KEY2
+    // 因为这三个按键都在 GPIOE 上，而且都是低电平有效，所以可以合并在一起初始化
+    GPIO_InitStructure.GPIO_Pin = KEY0_PIN | KEY1_PIN | KEY2_PIN; 
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP; // 🚨 探索者的按键另一端接地，所以必须上拉
-    GPIO_Init(GPIOE, &GPIO_InitStructure);
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP; // 另一端接地，必须配置为内部上拉
+    GPIO_Init(KEY0_PORT, &GPIO_InitStructure);   // 既然端口一样，传 KEY0_PORT 代表即可
 
-    // 初始化 WK_UP(PA0) 为下拉输入
+    // 3. 单独初始化 WK_UP
+    // 因为它在 GPIOA 上，且是高电平有效，必须单独配置为下拉
     GPIO_InitStructure.GPIO_Pin = WKUP_PIN;
-    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN; // 🚨 WK_UP 另一端接 3.3V，必须下拉
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN; // 另一端接 3.3V，必须配置为内部下拉
+    GPIO_Init(WKUP_PORT, &GPIO_InitStructure);
 }
 
 /**

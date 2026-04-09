@@ -35,7 +35,7 @@
 //lwip
 #include "malloc.h"
 
-
+volatile int32_t g_demo_fault_countdown = 0;
 
 
 // 1. AI 检测结果结构体 (⚠️ 注意：如果你的结构体不叫 FireResult_t，请换成你真实的类型名)

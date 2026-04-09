@@ -15,16 +15,20 @@
 #define WKUP_PIN        GPIO_Pin_0
 #define WKUP_RCC        RCC_AHB1Periph_GPIOA
 
+#define KEY2_PORT       GPIOE
+#define KEY2_PIN        GPIO_Pin_2
+#define KEY2_RCC        RCC_AHB1Periph_GPIOE
+
 // 直接读取引脚电平的宏
 #define KEY0_VAL        GPIO_ReadInputDataBit(KEY0_PORT, KEY0_PIN) // 按下为 0
 #define KEY1_VAL        GPIO_ReadInputDataBit(KEY1_PORT, KEY1_PIN) // 按下为 0
 #define WKUP_VAL        GPIO_ReadInputDataBit(WKUP_PORT, WKUP_PIN) // 按下为 1
-
+#define KEY2_VAL        GPIO_ReadInputDataBit(KEY2_PORT, KEY2_PIN)
 // 按键扫描返回值定义
 #define KEY0_PRES       1
 #define KEY1_PRES       2
 #define WKUP_PRES       3
-
+#define KEY2_PRES       4
 void KEY_Init(void);
 u8 KEY_Scan(u8 mode);
 
