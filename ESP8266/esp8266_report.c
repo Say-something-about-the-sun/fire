@@ -70,29 +70,27 @@ void button_scan_task(void *pvParameters)
             g_virtual_current = 1.2f;   
         }
 
-				// 🚀 【本次新增】动作 D: [KEY2 按键] 注入 30 秒演示故障
-        if (key_val == KEY2_PRES) {
-            g_demo_fault_countdown = 30; // 设置倒计时
-            printf("\r\n>>> 🔴 [演示开始] 已触发 30 秒人为故障，主链路已切断！ <<<\r\n");
-        }
-				
-				
-				
-				// 🚀 【本次新增】秒级倒计时逻辑
-        // 因为本任务每 20ms 循环一次，所以累加 50 次就是 1 秒
-        if (++second_tick_counter >= 50) 
+				// 🚀 [KEY2 按键] 注入 30 秒演示故障 (英文版)
+if (key_val == KEY2_PRES) {
+    g_demo_fault_countdown = 30; 
+    printf("\r\n>>> [DEMO START] 30s manual fault triggered. Main link CUT! <<<\r\n");
+}
+
+// 🚀 秒级倒计时逻辑 (英文版)
+if (++second_tick_counter >= 50) 
+{
+    second_tick_counter = 0; 
+    if (g_demo_fault_countdown > 0) 
+    {
+        g_demo_fault_countdown--;
+        if (g_demo_fault_countdown == 0)
         {
-            second_tick_counter = 0; // 重置小计数器
-            
-            if (g_demo_fault_countdown > 0) 
-            {
-                g_demo_fault_countdown--;
-                if (g_demo_fault_countdown == 0)
-                {
-                    printf("\r\n>>> 🟢 [演示结束] 故障时间到，系统已自动愈合！ <<<\r\n");
-                }
-            }
+            printf("\r\n>>> [DEMO END] Fault timeout. System auto-healed! <<<\r\n");
         }
+    }
+}
+
+
 				
 				// =========================================================
         // ☁️ 监听云端下发的超级指令 (非阻塞式查询)
@@ -407,11 +405,10 @@ u8 ESP8266_Report_SendSensorData(void)
     if (json_packet.json_len == 0) return 1; // 没数据就不发，视为正常
     
 	if (g_demo_fault_countdown > 0) 
-    {
-        // 打印剩余时间，方便你在演示时向评委解说
-        printf("\r\n[Demo Mode] 模拟 WiFi 硬件故障中... 剩余自动愈合时间: %d 秒\r\n", g_demo_fault_countdown);
-        return 0; // 核心逻辑：直接返回 0，强制触发以太网补救
-    }
+{
+    printf("\r\n[Demo Mode] Intercepted! Simulating WiFi fault... Healing in: %d s\r\n", g_demo_fault_countdown);
+    return 0; 
+}
 	
 	
 	

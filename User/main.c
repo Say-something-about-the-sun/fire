@@ -261,11 +261,12 @@ int main(void)
 	
 	  Extsram_Init();
     // 3. 初始化摄像头
-    // printf("[3] Initializing OV5640...\r\n");
+   /*
     if( OV5640_Init() != 0) {
         printf("[ERROR] OV5640 initialization failed!\r\n");
         while(1);
     }
+		*/
     
     // printf("[3.5] Setting output size to %dx%d...\r\n", CAMERA_WIDTH, CAMERA_HEIGHT);
     OV5640_OutSize_Set(4, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
@@ -320,12 +321,12 @@ printf("LwIP 唤醒成功! 网卡已就绪!\r\n");
     
     // 8. 初始化DCMI（后初始化DCMI）
     
-    My_DCMI_Init();
+    //My_DCMI_Init();
     
     // 9. 启动捕获
     
     // 启动第一帧
-    DCMI_StartOneFrame();
+    //DCMI_StartOneFrame();
     
     // printf("\r\n[OK] System initialized! Monitoring...\r\n");
     // printf("========================================\r\n\r\n");
@@ -374,7 +375,7 @@ void start_task(void *pvParameters)
     xTaskCreate(camera_task, "CameraTask", 1024, NULL, 2, &CameraTask_Handler);
     
     // 创建上报任务：给足 4KB 栈(1024*4)，最高优先级 3（保证准时发送，不被图像卡住）
-    xTaskCreate(report_task, "ReportTask", 512, NULL, 3, &ReportTask_Handler);
+    xTaskCreate(report_task, "ReportTask", 1024, NULL, 3, &ReportTask_Handler);
 
 		// 3. 创建极速按键扫描任务：最高优先级 4
     // 扫按键只需要几微秒，极少占用CPU。给它最高优先级，保证它每 20ms 绝对能打断摄像头，
@@ -471,13 +472,19 @@ void report_task(void *pvParameters)
         link_status = ESP8266_Report_SendSensorData();
         
         // 2. 故障转移机制 (Failover)
-        if(link_status == 0)
+        if(link_status == 0 || g_demo_fault_countdown > 0)
         {
             printf("\r\n[WARN] 主链路(WiFi)失效，触发故障转移机制！\r\n");
             
+					DCMI_Stop();
+					// 🚀 关键：给系统 200ms 缓冲，让之前的串口操作彻底结束，电荷重新充盈
+    vTaskDelay(200 / portTICK_PERIOD_MS);
+					
             // 3. 瞬间激活备用网口链路，数据绝不丢失！
             // 这里执行完大约会耗时 0.2 ~ 0.5 秒
             Ethernet_Report_SendSensorData(); 
+					
+						DCMI_Start();
         }
         else
         {

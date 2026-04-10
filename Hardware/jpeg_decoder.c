@@ -130,6 +130,7 @@ u8 jpeg_decoder_decode(const uint8_t* jpeg_data, uint32_t jpeg_size)
     uint32_t start_time, end_time;
     jpeg_stream_t stream;
 
+	/*
 	// 🚨 终极探针：检查是否发生了恐怖的“DMA内存踩踏”！
     printf("\r\n--- MEMORY CHECK ---\r\n");
     printf("JPEG Data Addr (DMA) : 0x%08X\r\n", (uint32_t)jpeg_data);
@@ -140,12 +141,15 @@ u8 jpeg_decoder_decode(const uint8_t* jpeg_data, uint32_t jpeg_size)
     if(diff < 0) diff = -diff;
     printf("Distance             : %d bytes\r\n", diff);
     
-    // 如果工作区和DMA缓冲区的距离小于32KB，说明互相重叠了！
+   
+
+
+	// 如果工作区和DMA缓冲区的距离小于32KB，说明互相重叠了！
     if(diff < 32768) {
         printf("🚨 DANGER: Memory Overlap Detected! DMA is crushing the workspace!\r\n");
     }
     printf("--------------------\r\n");
-		
+		*/
      // 初始化stream
     stream.data = jpeg_data;      // 直接使用传入的jpeg_data
     stream.size = jpeg_size;

@@ -62,3 +62,7 @@
 .\objects\ethernet_report.o: .\LWIP\lwip-1.4.1\src\include\lwip/def.h
 .\objects\ethernet_report.o: .\LWIP\lwip-1.4.1\src\include\ipv4\lwip/inet.h
 .\objects\ethernet_report.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\ethernet_report.o: .\LWIP\lwip_app\lwip_comm\lwip_comm.h
+.\objects\ethernet_report.o: .\LWIP\ETHERNET\lan8720.h
+.\objects\ethernet_report.o: .\LWIP\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth.h
+.\objects\ethernet_report.o: .\LWIP\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth_conf.h

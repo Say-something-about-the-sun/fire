@@ -416,13 +416,13 @@ u8 process_jpeg_frame(u8 do_fire_detection)
                 // 🚨 修复一：暂时注释掉内部限流，只要外部让测，我们就测！
                 // if(fire_detection_frame_count % FIRE_DETECTION_INTERVAL == 0) {
                     
-                    printf("\r\n[Vision] 1. Start decoding JPEG...\r\n");
+                    //printf("\r\n[Vision] 1. Start decoding JPEG...\r\n");
                     
                     // 1. 解码JPEG
                     int decode_res = jpeg_decoder_process(&p[jpeg_start], jpeg_size);
                     
                     if(decode_res == 0) {
-                        printf("[Vision] 2. Decode SUCCESS! Processing pixels...\r\n");
+                       // printf("[Vision] 2. Decode SUCCESS! Processing pixels...\r\n");
                         
                         JpegDecodeState* dec = jpeg_decoder_get_state();
                         
@@ -445,8 +445,8 @@ u8 process_jpeg_frame(u8 do_fire_detection)
                         // 5. 更新火焰检测结果到报告模块
                         ESP8266_Report_UpdateFireDetectionResult(&fire_result);
                         
-                        printf("[Vision] 3. Algorithm done! Fire: %d, Area: %d\r\n", 
-                               fire_result.fire_detected, fire_result.fire_area);
+                       // printf("[Vision] 3. Algorithm done! Fire: %d, Area: %d\r\n", 
+                        //       fire_result.fire_detected, fire_result.fire_area);
                     } 
                     else {
                         // 🚨 修复二：如果解码失败，大声喊出来错在哪！

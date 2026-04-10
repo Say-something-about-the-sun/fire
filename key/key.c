@@ -33,7 +33,7 @@ void KEY_Init(void)
 /**
  * @brief  按键扫描函数
  * @param  mode: 0=不支持连续按, 1=支持连续按
- * @retval 0=无按键, 1=KEY0, 2=KEY1, 3=WK_UP
+ * @retval 0=无按键, 1=KEY0, 2=KEY1, 3=WK_UP, 4=KEY2
  */
 u8 KEY_Scan(u8 mode)
 {
@@ -41,19 +41,23 @@ u8 KEY_Scan(u8 mode)
     
     if (mode == 1) key_up = 1; // 支持连按
     
-    if (key_up && (KEY0_VAL == 0 || KEY1_VAL == 0 || WKUP_VAL == 1))
+    // 🚀 修复 1：把 KEY2_VAL == 0 加入触发条件
+    if (key_up && (KEY0_VAL == 0 || KEY1_VAL == 0 || KEY2_VAL == 0 || WKUP_VAL == 1))
     {
         delay_ms(10); // 去抖动
         key_up = 0;
         
         if (KEY0_VAL == 0) return KEY0_PRES;
         else if (KEY1_VAL == 0) return KEY1_PRES;
+        else if (KEY2_VAL == 0) return KEY2_PRES; // 🚀 修复 2：返回 KEY2 的标志位
         else if (WKUP_VAL == 1) return WKUP_PRES;
     }
-    else if (KEY0_VAL == 1 && KEY1_VAL == 1 && WKUP_VAL == 0)
+    // 🚀 修复 3：把 KEY2_VAL == 1 加入松手检测条件
+    else if (KEY0_VAL == 1 && KEY1_VAL == 1 && KEY2_VAL == 1 && WKUP_VAL == 0)
     {
         key_up = 1;
     }
     
     return 0; // 无按键按下
 }
+

@@ -9,9 +9,14 @@
 // 如果你的工程使用的是 Safe_Printf，可以保留；这里用标准 printf 演示
 #include <stdio.h> 
 
+
+#include "lwip_comm.h"
+
+
+
 // --- 请替换为你实际的 OneNet 设备信息 ---
 #define ONENET_MQTT_IP      "183.230.40.96"   // OneNet MQTT 服务器 IP (请 ping 你平台对应的域名)
-#define ONENET_MQTT_PORT    1883              // OneNet 端口 (旧版通常是 6002，Studio版是 1883)
+#define ONENET_MQTT_PORT    1883             // OneNet 端口 (旧版通常是 6002，Studio版是 1883)
 
 #define MQTT_CLIENT_ID      "stm32f407zgt6"      // 例如："123456789"
 #define MQTT_USERNAME       "PGs73D47Zf"       // 例如："654321"
@@ -108,56 +113,57 @@ int MicroMQTT_BuildPublish(const char *topic, const char *json_str, int json_len
 
 void Ethernet_Report_SendSensorData(void)
 {
-    // 🚀 修复1：加上 static，把大内存储存移到全局区，拯救 FreeRTOS 任务栈！
+    // 🚀 大内存储存移到全局区，拯救 FreeRTOS 任务栈！
     static SensorDataPacket sensor_packet;
     static JsonDataPacket json_packet; 
     static u8 mqtt_buffer[512]; 
     int packet_len;
+    int sock;
+    struct sockaddr_in server_addr;
 
-	
-
-		
-    printf("-> [Ethernet] 正在激活备用以太网链路(MQTT透传模式)...\r\n");
+    printf("\r\n[WARN] Main link failed! Triggering Ethernet failover...\r\n");
+    
+    // 打印本机 IP
+    printf("-> [Ethernet] IP: %d.%d.%d.%d, Gateway: %d.%d.%d.%d\r\n", 
+           lwipdev.ip[0], lwipdev.ip[1], lwipdev.ip[2], lwipdev.ip[3],
+           lwipdev.gateway[0], lwipdev.gateway[1], lwipdev.gateway[2], lwipdev.gateway[3]);
+           
+    printf("-> [Ethernet] Activating backup link (MQTT Passthrough)...\r\n");
     
     // 1. 采集并打包专属的 JSON 格式
     ESP8266_Report_CollectSensorData(&sensor_packet);
     Ethernet_Build_Studio_JSON(&sensor_packet, &json_packet);
     
-    if (json_packet.json_len == 0) {
-        printf("-> [Ethernet Error] JSON 数据为空，中止发送！\r\n");
+    // 2. 创建 Socket
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) {
+        printf("-> [Ethernet Error] Socket creation failed!\r\n");
+        return;
+    }
+	
+			// 告诉 recv 函数：最多等 1000 毫秒（1秒）。如果对方不回话，就放弃等待，强行往下走！
+    int timeout = 1000; 
+    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+		
+		
+		
+    // 3. 配置服务器地址 (🚀 使用你定义的宏！)
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(ONENET_MQTT_PORT); 
+    server_addr.sin_addr.s_addr = inet_addr(ONENET_MQTT_IP); 
+
+    printf("-> [Ethernet] Connecting to Server IP: %s, Port: %d...\r\n", ONENET_MQTT_IP, ONENET_MQTT_PORT);
+
+    // 4. 拨号连接 (这次绝对秒连！)
+    int res = connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr));
+    if (res < 0) {
+        printf("-> [Ethernet Error] Connect failed, error code: %d\r\n", res);
+        close(sock);
         return;
     }
 
-    // 2. 申请 Socket
-    printf("-> [Ethernet] 准备申请 TCP Socket...\r\n");
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock < 0) {
-        // 🚀 修复2：打破静默，如果死在这里，说明 LwIP 资源被锁死了！
-        printf("-> [Ethernet Error] Socket 申请失败！(LwIP 资源耗尽)\r\n");
-        return; 
-    }
-    
-    // 强制设置 5 秒超时防死锁
-    struct timeval timeout;
-    timeout.tv_sec = 5; timeout.tv_usec = 0; 
-    setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
-    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
-
-    struct sockaddr_in server_addr;
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(1883); // OneNet 端口
-    // ⚠️ 请确保这里填的是你昨天 ping 通的纯数字明文 IP！
-    server_addr.sin_addr.s_addr = inet_addr("183.230.40.96"); 
-
-    // 3. 建立连接
-    printf("-> [Ethernet] 正在拨号连接云端...\r\n");
-    if (connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
-        printf("-> [Ethernet Error] TCP 拨号失败！(请检查网线是否插紧，或路由器是否拦截)\r\n");
-        close(sock);
-        return; 
-    }
-
-    printf("-> [Ethernet] TCP 拨号成功！开始发送鉴权报文...\r\n");
+    printf("-> [Ethernet] TCP Connected Successfully!\r\n");
 
     // ==========================================================
     // 发送 CONNECT 和 PUBLISH 报文
@@ -172,26 +178,23 @@ void Ethernet_Report_SendSensorData(void)
     int send_bytes = send(sock, mqtt_buffer, packet_len, 0);
     
     if(send_bytes > 0) {
-        printf("-> [Ethernet] 备用链路 MQTT 数据已送达云端！(%d 字节)\r\n", json_packet.json_len);
+        printf("-> [Ethernet] MQTT payload delivered to Cloud! (%d bytes)\r\n", json_packet.json_len);
     }
     
     // 智能等待云端的 CONNACK 回复
     u8 rx_buf[64];
     int rx_len = recv(sock, rx_buf, sizeof(rx_buf) - 1, 0);
     if(rx_len > 0) {
-        printf("-> [Ethernet] 收到云端确认信号！完美闭环！\r\n");
+        printf("-> [Ethernet] Cloud ACK received! Perfect loop!\r\n");
     } else {
-        printf("-> [Ethernet Warn] 数据已发，但未收到云端确认(不影响上传)\r\n");
+        printf("-> [Ethernet Warn] Data sent, but no Cloud ACK received.\r\n");
     }
     
     // 安全断开
     close(sock); 
-    printf("-> [Ethernet] 会话结束，管线安全切断。\r\n");
-		
-		
-
+    printf("-> [Ethernet] Session closed. Pipeline secured.\r\n");
 }
-		
+
 		
 		
   
