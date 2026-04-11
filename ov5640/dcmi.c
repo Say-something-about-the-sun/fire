@@ -200,18 +200,35 @@ void My_DCMI_Init(void)
 } 
 
 //DCMI,开启捕获
-void DCMI_Start(void)
-{  
-	DMA_Cmd(DMA2_Stream1, ENABLE);//使能DMA2,Stream1 
-	DCMI_CaptureCmd(ENABLE);//DCMI捕获使能  
-}
-
-//DCMI,关闭捕获
+// ===============================================
+// 🛑 绝对停车：关闭中断，瞬间释放总线
+// ===============================================
 void DCMI_Stop(void)
 { 
-  DCMI_CaptureCmd(DISABLE);//DCMI捕获使能关闭	
-	
-	while(DCMI->CR&0X01);		//等待捕获结束 
-	 	
-	DMA_Cmd(DMA2_Stream1,DISABLE);//关闭DMA2,Stream1
+    // 1. 关掉摄像头和 DMA 的中断，防止报错引发“中断风暴”绞杀 CPU
+    NVIC_DisableIRQ(DCMI_IRQn);
+    NVIC_DisableIRQ(DMA2_Stream1_IRQn);
+
+    // 2. 强行关闭外设
+    DCMI_CaptureCmd(DISABLE);
+    DCMI_Cmd(DISABLE);
+    DMA_Cmd(DMA2_Stream1, DISABLE);
+}
+
+// ===============================================
+// 🟢 安全重启：清理残骸，恢复中断
+// ===============================================
+void DCMI_Start(void)
+{  
+    // 1. 清理强行停车导致的 DMA 报错标志位
+    DMA_ClearFlag(DMA2_Stream1, DMA_FLAG_TCIF1 | DMA_FLAG_TEIF1 | DMA_FLAG_HTIF1 | DMA_FLAG_FEIF1 | DMA_FLAG_DMEIF1);
+    
+    // 2. 重新开启外设
+    DMA_Cmd(DMA2_Stream1, ENABLE);
+    DCMI_Cmd(ENABLE);
+    DCMI_CaptureCmd(ENABLE);
+
+    // 3. 恢复中断
+    NVIC_EnableIRQ(DCMI_IRQn);
+    NVIC_EnableIRQ(DMA2_Stream1_IRQn);
 }

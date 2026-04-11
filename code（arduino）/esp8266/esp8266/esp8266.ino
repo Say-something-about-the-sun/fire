@@ -5,6 +5,9 @@
 
 #define MQTT_VERSION MQTT_VERSION_3_1_1
 
+
+
+
 // ==================== WiFi 配置 ====================
 /**热点
 const char* ssid = "vivoS15e";
@@ -61,25 +64,28 @@ void setup() {
 
 // ==================== loop() ====================
 void loop() {
+  // 1. 无脑死守 WiFi 链路
   if (WiFi.status() != WL_CONNECTED) {
     connectWiFi();
   }
   
+  // 2. 无脑死守 MQTT 链路 (🚨 移除了原先的心跳判断，只要断了就无限重连)
   if (!mqttClient.connected()) {
     connectMQTT();
   }
   
   mqttClient.loop();
   
-  // 接收STM32发来的JSON数据
-  while (stm32Serial.available()) {
+  // 3. 极速转发 STM32 数据
+  while (stm32Serial.available()) 
+  {
     char c = stm32Serial.read();
     
     if (c == '\n') {
       if (receivedJson.length() > 0) {
         Serial.print("Received JSON: ");
         Serial.println(receivedJson);
-        processJsonAndSend(receivedJson);
+        processJsonAndSend(receivedJson); // 你的发送函数
         receivedJson = "";
       }
     } else {
@@ -89,12 +95,9 @@ void loop() {
     if (!stm32Serial.available()) {
         delay(2); 
     }
-
-
-
   }
-  
-  // 从电脑串口转发数据到STM32（调试用）
+
+  // 4. 从电脑串口转发数据到STM32（调试用）
   if (Serial.available()) {
     char c = Serial.read();
     stm32Serial.write(c);
@@ -103,6 +106,7 @@ void loop() {
 
 // ==================== 连接WiFi ====================
 void connectWiFi() {
+  Serial.print("Connecting to WiFi");
   WiFi.begin(ssid, password);
   
   int attempts = 0;
@@ -113,12 +117,9 @@ void connectWiFi() {
   }
   
   if (WiFi.status() == WL_CONNECTED) {
-    Serial.println();
-    Serial.print("WiFi connected! IP address: ");
-    Serial.println(WiFi.localIP());
+    Serial.println("\r\nWiFi connected! IP: " + WiFi.localIP().toString());
   } else {
-    Serial.println();
-    Serial.println("WiFi connection failed! Check credentials.");
+    Serial.println("\r\nWiFi connection failed!");
   }
 }
 
@@ -129,13 +130,7 @@ void connectMQTT() {
   if (mqttClient.connect(clientId, mqttUser, mqttPass)) {
     Serial.println(" connected!");
     
-    // 1. 订阅原来的通道：接收你上传数据后的“成功回执”
-    String replyTopic = "$sys/" + String(productId) + "/" + String(deviceId) + "/thing/property/post/reply";
-    mqttClient.subscribe(replyTopic.c_str());
-    Serial.println("Subscribed to reply topic!");
-
-    // 2. 👇 本次极其关键的新增：订阅“指令下发”通道！
-    // 只有订阅了这个，HBuilderX 按下的按钮指令才能砸到单片机头上！
+    // 订阅云端指令通道 (保持不变)
     String setTopic = "$sys/" + String(productId) + "/" + String(deviceId) + "/thing/property/set";
     mqttClient.subscribe(setTopic.c_str());
     Serial.println("Subscribed to SET command topic!");

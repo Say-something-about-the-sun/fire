@@ -1,6 +1,7 @@
 #include "ethernet_report.h"
 #include "esp8266_report.h" // 借用你的传感器采集和 JSON 打包结构体与函数
 #include <string.h>
+
 // LwIP Socket 核心头文件
 #include "lwip/sockets.h"
 #include "lwip/opt.h"      // 引入 LwIP 配置
@@ -18,13 +19,23 @@
 #define ONENET_MQTT_IP      "183.230.40.96"   // OneNet MQTT 服务器 IP (请 ping 你平台对应的域名)
 #define ONENET_MQTT_PORT    1883             // OneNet 端口 (旧版通常是 6002，Studio版是 1883)
 
-#define MQTT_CLIENT_ID      "stm32f407zgt6"      // 例如："123456789"
+
+#define MQTT_CLIENT_ID      "stm32f407zgt6-networkport"      // 例如："123456789"
 #define MQTT_USERNAME       "PGs73D47Zf"       // 例如："654321"
-#define MQTT_PASSWORD       "version=2018-10-31&res=products%2FPGs73D47Zf%2Fdevices%2Fstm32f407zgt6&et=1805469231&method=sha1&sign=snpTD9lxQKVsom7omCk5XnSUCG8%3D"     // APIKey 或者 Token
+#define MQTT_PASSWORD       "version=2018-10-31&res=products%2FPGs73D47Zf%2Fdevices%2Fstm32f407zgt6-networkport&et=1805469231&method=sha1&sign=cUmFRKmVGbMg1dCPDIML4co%2FPYs%3D"     // APIKey 或者 Token
+
+#define MQTT_TOPIC          "$sys/PGs73D47Zf/stm32f407zgt6-networkport/thing/property/post"
+
+/*
+#define MQTT_USERNAME  "PGs73D47Zf"
+#define MQTT_CLIENT_ID   "stm32f407zgt6"
+#define MQTT_PASSWORD  "version=2018-10-31&res=products%2FPGs73D47Zf%2Fdevices%2Fstm32f407zgt6&et=1805469231&method=sha1&sign=snpTD9lxQKVsom7omCk5XnSUCG8%3D"
+
+#define MQTT_TOPIC          "$sys/PGs73D47Zf/stm32f407zgt6/thing/property/post"
+*/
 
 // 你 ESP8266 发往 OneNet 用的 Topic 是什么，这里就填什么！
 // 例如旧版："dp", 新版 Studio 可能是："$sys/产品ID/设备名称/dp/post/json"
-#define MQTT_TOPIC          "$sys/PGs73D47Zf/stm32f407zgt6/thing/property/post"
 
 
 
@@ -113,7 +124,6 @@ int MicroMQTT_BuildPublish(const char *topic, const char *json_str, int json_len
 
 void Ethernet_Report_SendSensorData(void)
 {
-    // 🚀 大内存储存移到全局区，拯救 FreeRTOS 任务栈！
     static SensorDataPacket sensor_packet;
     static JsonDataPacket json_packet; 
     static u8 mqtt_buffer[512]; 
@@ -123,55 +133,64 @@ void Ethernet_Report_SendSensorData(void)
 
     printf("\r\n[WARN] Main link failed! Triggering Ethernet failover...\r\n");
     
-    // 打印本机 IP
+    // ==========================================================
+    // 🚀 终极护航：全员静默，释放总线与电源极限！
+    // ==========================================================
+    // 1. 关停 ESP32(USART2) 和 ESP8266(USART3) 的中断
+    // 绝对防止在网卡处理 TCP 握手时，被外来的串口乱码打断产生 ORE 溢出死锁！
+    NVIC_DisableIRQ(USART2_IRQn); 
+    NVIC_DisableIRQ(USART3_IRQn); 
+    
+    // 2. 停掉 DCMI 外设和 DMA，把 AHB 总线的带宽 100% 让给以太网
+    DCMI_Stop(); 
+    
+    // 3. 🚨 强行让 OV5640 摄像头进入深度休眠！(极其关键)
+    // 寄存器 0x3008 的 bit 6 设置为 1 (0x42) 会让传感器进入待机模式，功耗骤降，拯救 3.3V 稳压芯片！
+    OV5640_WR_Reg(0x3008, 0x42); 
+    
+    // 4. 屏息等待 300ms：让车祸残骸排空，让主板的 3.3V 电压彻底回血升满！
+    vTaskDelay(300 / portTICK_PERIOD_MS); 
+
+
+    // ==========================================================
+    // 🌐 网卡纯净拨号时间
+    // ==========================================================
     printf("-> [Ethernet] IP: %d.%d.%d.%d, Gateway: %d.%d.%d.%d\r\n", 
            lwipdev.ip[0], lwipdev.ip[1], lwipdev.ip[2], lwipdev.ip[3],
            lwipdev.gateway[0], lwipdev.gateway[1], lwipdev.gateway[2], lwipdev.gateway[3]);
            
     printf("-> [Ethernet] Activating backup link (MQTT Passthrough)...\r\n");
     
-    // 1. 采集并打包专属的 JSON 格式
     ESP8266_Report_CollectSensorData(&sensor_packet);
     Ethernet_Build_Studio_JSON(&sensor_packet, &json_packet);
     
-    // 2. 创建 Socket
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
         printf("-> [Ethernet Error] Socket creation failed!\r\n");
-        return;
+        goto RESTORE_SYSTEM; // 失败也必须跳到末尾恢复摄像头！
     }
-	
-			// 告诉 recv 函数：最多等 1000 毫秒（1秒）。如果对方不回话，就放弃等待，强行往下走！
+    
     int timeout = 1000; 
     setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
-		
-		
-		
-    // 3. 配置服务器地址 (🚀 使用你定义的宏！)
+        
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(ONENET_MQTT_PORT); 
     server_addr.sin_addr.s_addr = inet_addr(ONENET_MQTT_IP); 
 
-    printf("-> [Ethernet] Connecting to Server IP: %s, Port: %d...\r\n", ONENET_MQTT_IP, ONENET_MQTT_PORT);
-
-    // 4. 拨号连接 (这次绝对秒连！)
     int res = connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr));
     if (res < 0) {
         printf("-> [Ethernet Error] Connect failed, error code: %d\r\n", res);
         close(sock);
-        return;
+        goto RESTORE_SYSTEM; // 失败也必须跳到末尾恢复摄像头！
     }
 
     printf("-> [Ethernet] TCP Connected Successfully!\r\n");
 
-    // ==========================================================
-    // 发送 CONNECT 和 PUBLISH 报文
-    // ==========================================================
+    // 打包并发送 MQTT 数据
     packet_len = MicroMQTT_BuildConnect(MQTT_CLIENT_ID, MQTT_USERNAME, MQTT_PASSWORD, mqtt_buffer);
     send(sock, mqtt_buffer, packet_len, 0);
     
-    // 稍微延时 50ms，给 OneNet 服务器验证密码的时间
     vTaskDelay(50 / portTICK_PERIOD_MS); 
     
     packet_len = MicroMQTT_BuildPublish(MQTT_TOPIC, json_packet.json_str, json_packet.json_len, mqtt_buffer);
@@ -181,7 +200,7 @@ void Ethernet_Report_SendSensorData(void)
         printf("-> [Ethernet] MQTT payload delivered to Cloud! (%d bytes)\r\n", json_packet.json_len);
     }
     
-    // 智能等待云端的 CONNACK 回复
+    // 等待云端回执
     u8 rx_buf[64];
     int rx_len = recv(sock, rx_buf, sizeof(rx_buf) - 1, 0);
     if(rx_len > 0) {
@@ -190,12 +209,35 @@ void Ethernet_Report_SendSensorData(void)
         printf("-> [Ethernet Warn] Data sent, but no Cloud ACK received.\r\n");
     }
     
-    // 安全断开
     close(sock); 
     printf("-> [Ethernet] Session closed. Pipeline secured.\r\n");
+
+
+    // ==========================================================
+    // 🚀 拨号完成：系统状态重置，满血复活！
+    // ==========================================================
+RESTORE_SYSTEM:
+    // 1. 唤醒 OV5640：写入 0x02 恢复正常工作输出
+    OV5640_WR_Reg(0x3008, 0x02); 
+    
+    // 2. 必须给摄像头内部 ISP 和时钟留出启动重启的时间
+    vTaskDelay(100 / portTICK_PERIOD_MS); 
+    
+    // 3. 重新开启 DCMI 总线捕获，恢复画面
+    DCMI_Start(); 
+    
+    // 4. 清理在静默期间，两个串口积攒在接收寄存器里的垃圾错乱数据
+    // 这一步能彻底拔掉 ORE 溢出死锁的隐患！
+    USART_ReceiveData(USART2); 
+    USART_ClearFlag(USART2, USART_FLAG_ORE);
+    USART_ReceiveData(USART3); 
+    USART_ClearFlag(USART3, USART_FLAG_ORE);
+    
+    // 5. 重新开放串口中断，恢复 ESP32 与 ESP8266 的通信
+    NVIC_EnableIRQ(USART2_IRQn); 
+    NVIC_EnableIRQ(USART3_IRQn); 
 }
 
-		
 		
   
 

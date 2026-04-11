@@ -112,7 +112,12 @@ void USART3_Send_Data(u8* data, u16 len)
 void USART3_IRQHandler(void)
 {
     u8 Res;
-    
+  if(USART_GetFlagStatus(USART3, USART_FLAG_ORE) != RESET)
+    {
+        USART_ReceiveData(USART3); // 读一次数据寄存器，硬件会自动清除 ORE 标志
+    }  
+	
+	
     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET) // 接收到数据
     {
         Res = USART_ReceiveData(USART3); // 读取接收到的1个字节数据
