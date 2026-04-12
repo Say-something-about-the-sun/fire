@@ -3,6 +3,7 @@
 #define __JPEG_SERIAL_H
 
 #include "sys.h"
+#include "fire_detection.h"
 
 // 火焰检测配置参数
 #define FIRE_DETECT_INTERVAL 3   // 每3帧进行一次火焰检测
@@ -38,7 +39,11 @@ void serial_send_jpeg_data(u8* jpeg_data, u32 jpeg_len);
 void jpeg_data_process(void);
 void DCMI_StartOneFrame(void);
 u32 DCMI_GetFrameLength(void);
-u8 process_jpeg_frame(u8 do_fire_detection);  // 添加参数：是否进行火焰检测
+
+
+u8 process_jpeg_frame(u8 do_fire_detection, FireDetectionResult *out_result);
+
+
 u8 jpeg_serial_init(void);
 u32 jpeg_serial_get_frame_count(void);
 void jpeg_serial_inc_frame_count(void);

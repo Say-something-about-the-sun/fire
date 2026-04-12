@@ -40,6 +40,8 @@
 .\objects\dcmi.o: .\System\usart\usart.h
 .\objects\dcmi.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\dcmi.o: .\Hardware\jpeg_serial.h
+.\objects\dcmi.o: .\Hardware\fire_detection.h
+.\objects\dcmi.o: .\Hardware\image_preprocess.h
 .\objects\dcmi.o: .\Hardware\led.h
 .\objects\dcmi.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h
 .\objects\dcmi.o: .\FreeRTOS\include\FreeRTOS.h
@@ -52,3 +54,4 @@
 .\objects\dcmi.o: .\FreeRTOS\include\mpu_wrappers.h
 .\objects\dcmi.o: .\FreeRTOS\include\task.h
 .\objects\dcmi.o: .\FreeRTOS\include\list.h
+.\objects\dcmi.o: .\task\task_vision.h

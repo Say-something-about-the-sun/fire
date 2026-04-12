@@ -1,225 +1,47 @@
 #include "esp8266_report.h"
+#include "ai_decision.h"   // 引入 AI 大脑
 #include "usart3.h"
+#include "usart2.h"
 #include "smoke.h"
 #include "RTC.h"
 #include "jpeg_serial.h"
-#include <stdio.h>
-#include "usart2.h"
-#include <string.h>
 #include "dht11.h"
-#include "water_pump.h"
-#include "FreeRTOS.h"
-#include "key.h"
-#include "task.h"
+#include <stdio.h>
 #include <string.h>
-
-
-
-
-FireDetectionResult g_latest_fire_result;
-
 
 extern u8 USART3_RX_BUF[];
 extern u16 USART3_RX_STA;
-extern volatile u8 g_esp8266_upload_status;//usart3中定义的状态标志
 
 
+extern void Safe_Printf(char *format, ...);
 
-
-// ==========================================
-// 🌐 定义跨任务共享的全局状态变量
-// ==========================================
-volatile u8 g_system_mode = 0;       // 0:自动模式, 1:手动模式
-volatile u8 g_main_power_status = 1; // 1:通电正常, 0:跳闸断电
-volatile float g_virtual_current = 1.2f; // 全局虚拟电流
-
-// ==========================================
-// 🚀 极速按键扫描任务 (每 20ms 执行一次，绝对丝滑)
-// ==========================================
-void button_scan_task(void *pvParameters)
-{
-	
-	
-			// 用于 20ms 累积到 1 秒的计数器 (50 * 20ms = 1000ms)
-    static u8 second_tick_counter = 0;
-	
-    while(1)
-    {
-        // 1. 获取按键单次触发信号 (带消抖)
-        u8 key_val = KEY_Scan(0);
-
-        // 👉 动作 A: [WK_UP 按键] 切换 自动/手动 模式
-        if (key_val == WKUP_PRES) {
-            g_system_mode = !g_system_mode; 
-        }
-
-        // 👉 动作 B: [KEY1 按键] 手动开关水泵
-        if (g_system_mode == 1 && key_val == KEY1_PRES) {
-            if (WaterPump_GetStatus() == 1) {
-                WaterPump_Off(); 
-            } else {
-                WaterPump_On();  
-            }
-        }
-
-        // 👉 动作 C: [KEY0 按键] 实时电平监测，模拟电流短路
-        // 只要按住不松，电流就一直保持 58.5A
-        if (KEY0_VAL == 0) { 
-            g_virtual_current = 58.5f;  
-        } else {
-            g_virtual_current = 1.2f;   
-        }
-
-				if (key_val == KEY2_PRES) {
-            g_system_mode = 1;         // 强制切入人工接管模式（防 AI 误判关水）
-            WaterPump_On();            // 强制启动消防水泵
-            g_virtual_current = 15.0f; // 模拟电流突增，触发过载报警或关联动作
-            
-            printf("\r\n>>> [EMERGENCY] Manual Override Activated! Pump ON! <<<\r\n");
-        }
-
-
-				
-				// =========================================================
-        // ☁️ 监听云端下发的超级指令 (非阻塞式查询)
-        // =========================================================
-        if (USART3_RX_STA & 0x8000) // 如果标志位最高位为1，表示接收到了以回车换行结尾的一帧数据
-        {
-            // 给接收到的数据末尾加个 '\0'，把它变成标准 C 语言字符串
-            USART3_RX_BUF[USART3_RX_STA & 0x3FFF] = '\0'; 
-            
-            // 🔎 查找字符串中是否包含魔法口诀
-            if (strstr((const char*)USART3_RX_BUF, "CMD:PUMP:1") != NULL)
-            {
-                // 🚨 极其关键的安全逻辑：
-                // 必须强行把系统切入“手动模式”，否则你刚打开水泵，
-                // 下一微秒 AI 大脑发现没火灾，又会自动把它关掉！
-                g_system_mode = 1; 
-                WaterPump_On();
-                // printf("\r\n[Cloud CMD] 远程强制开启水泵！\r\n");
-            }
-            else if (strstr((const char*)USART3_RX_BUF, "CMD:PUMP:0") != NULL)
-            {
-                g_system_mode = 1; // 强行切入“手动模式”
-                WaterPump_Off();
-                // printf("\r\n[Cloud CMD] 远程强制关闭水泵！\r\n");
-            }
-						else if (strstr((const char*)USART3_RX_BUF, "CMD:MODE:0") != NULL)
-						{
-								g_system_mode = 0; // 恢复自动模式
-								printf("=> 已恢复 AI 自动托管！\r\n");
-						}
-						else if (strstr((const char*)USART3_RX_BUF, "CMD:MODE:1") != NULL)
-						{
-								g_system_mode = 1; // 强行切入手动模式
-								printf("=> 已切入人工接管模式！\r\n");
-						}
-            
-            // 🧹 清空接收标志位，准备接收云端的下一条指令
-            memset(USART3_RX_BUF, 0, sizeof(USART3_RX_BUF));
-						USART3_RX_STA = 0; 
-        }
-				
-				
-				
-				
-				
-        // 🚨 极其关键：任务休眠 20 毫秒，让出 CPU 给摄像头和网络！
-        vTaskDelay(pdMS_TO_TICKS(20)); 
-    }
-}
-
-
-/**
- * @brief  AI 核心决策中枢 (纯逻辑封装)
- * @param  packet: 已经采集好全部数据的结构体指针
- */
-/**
- * @brief  AI 核心决策中枢 (加入继电器防抖与火力锁定)
- * @param  packet: 已经采集好全部数据的结构体指针
- */
-static void AI_Fire_Decision_Center(SensorDataPacket* packet)
-{
-    u8 is_fire_real = packet->image_fire_detected || packet->fire_detected || packet->flame_do == 1;
-
-    // 🔴 Level 3: 确认起火
-    if (is_fire_real || WaterPump_GetStatus() == 1) // 只要真起火了，或者水泵正在喷水，就是最高危机
-    {
-        packet->risk_level = 3; 
-        packet->confidence = packet->image_fire_detected ? packet->image_confidence : 85.0f;
-        
-        if (packet->virtual_current > 10.0) {
-            g_main_power_status = 0; // 虚拟跳闸
-        }
-    } 
-    // 🟠 Level 2: 高危预警 (过载或高温)
-    else if (packet->virtual_current > 10.0 || packet->temperature > 60.0)
-    {
-        packet->risk_level = 2;
-        packet->confidence = 90.0f; 
-        g_main_power_status = 0; // 预防性跳闸
-    }
-    // 🟢 Level 1/0: 正常或仅烟雾
-    else 
-    {
-        packet->risk_level = (packet->smoke_detected) ? 1 : 0;
-        packet->confidence = (packet->smoke_detected) ? 60.0f : 100.0f;
-        g_main_power_status = 1; 
-    }
-
-    // 将硬件的真实状态打包发给云端
-    packet->pump_status = WaterPump_GetStatus(); 
-    packet->system_mode = g_system_mode;
-    packet->main_power_status = g_main_power_status;
-}
-
-
-// 1. 初始化模块 (现在只需打印提示即可，真实的硬件初始化在 main 里的 USART3_Init)
 void ESP8266_Report_Init(void)
 {
     printf("[ESP8266 Report] Smart MQTT Gateway Mode Initialized.\r\n");
 }
 
-// 2. 采集传感器数据 
+// 纯粹的数据搬运工
 void ESP8266_Report_CollectSensorData(SensorDataPacket* packet)
 {
-    // ================= 1. 获取时间 =================
-    // 因为 RTC 已经被 USART2 中断实时校准过了，所以直接读取 RTC 即可获得完美同步的走动时间！
     RTC_Get_Time(packet->timestamp);
     
-    // ================= 2. STM32 本地传感器 =================
-    // 烟雾传感器 (直连在 STM32)
+    // 传感器
     packet->smoke_ppm = Smoke_Get_Concentration();
     packet->smoke_adc = Smoke_Get_ADC_Value();
     packet->smoke_detected = (packet->smoke_ppm > 50.0f) ? 1 : 0;
     
-    
-    // ================= 3. 图像处理结果 (OV5640) =================
-    packet->image_fire_detected = g_latest_fire_result.fire_detected;
-    packet->image_confidence = g_latest_fire_result.confidence;
-    packet->fire_area = g_latest_fire_result.fire_area;
-    packet->fire_center_x = g_latest_fire_result.fire_center_x;
-    packet->fire_center_y = g_latest_fire_result.fire_center_y;
-    packet->flicker_detected = g_latest_fire_result.flicker_detected;
-    
-    // 帧统计
+   
     packet->frame_count = jpeg_serial_get_frame_count();
     packet->dropped_frames = jpeg_serial_get_dropped_frames();
 
-    // ================= 4. 来自 ESP32 的协处理器数据 =================
-    // 直接读取 USART2 中断解析后存入的全局变量
+    // ESP32 数据
     packet->flame_adc = g_esp32_data.flame_adc;
     packet->flame_do = g_esp32_data.flame_do;
     packet->fire_detected = g_esp32_data.fire_detected;
-// ==========================================
-		// ==========================================
-// ==========================================
-		// ==========================================
-// 5. 采集温湿度 (带缓存机制)（dht11）
-    static u8 last_good_temp = 25; 
-    static u8 last_good_humi = 50; 
+
+    // 温湿度
+    static u8 last_good_temp = 25, last_good_humi = 50; 
     u8 temp_val = 0, humi_val = 0;
-    
     if(DHT11_Read_Data(&temp_val, &humi_val) == 0) {
         if(humi_val <= 100 && temp_val <= 80) {
             last_good_temp = temp_val;
@@ -229,17 +51,23 @@ void ESP8266_Report_CollectSensorData(SensorDataPacket* packet)
     packet->temperature = (float)last_good_temp;
     packet->humidity = (float)last_good_humi;
 
-    
-    // =========================================================
-    //  3. 实体按键交互逻辑 (状态机核心)
-    // =========================================================
-    
-   packet->virtual_current = g_virtual_current;
-		
-		// =========================================================
-    //  4. 数据全部就绪，呼叫 AI 大脑进行决策！
-    // =========================================================
+    // 数据收集完毕，呼叫 AI 大脑进行决策和填装最终状态
     AI_Fire_Decision_Center(packet);
+}
+
+// 解析网络指令的轻量化处理
+static void Process_Cloud_Commands(void)
+{
+    if (USART3_RX_STA & 0x8000) 
+    {
+        USART3_RX_BUF[USART3_RX_STA & 0x3FFF] = '\0'; 
+        
+        // 直接将字符串扔给 AI 大脑处理，网络层不直接操作硬件！
+        AI_Execute_Cloud_Command((const char*)USART3_RX_BUF);
+        
+        memset(USART3_RX_BUF, 0, sizeof(USART3_RX_BUF));
+        USART3_RX_STA = 0; 
+    }
 }
 
 
@@ -340,88 +168,27 @@ void ESP8266_Report_PackageJSON(SensorDataPacket* packet, JsonDataPacket* json)
 }
 
 
-/*
-// 4. 统一发送接口 (提供给 FreeRTOS 任务调用)
-u8 ESP8266_Report_SendSensorData(void)
-{
-    // 【防栈溢出】：必须使用 static
-    static SensorDataPacket sensor_packet;
-    static JsonDataPacket json_packet; 
-    
-    // 1. 采集并打包
-    ESP8266_Report_CollectSensorData(&sensor_packet);
-    ESP8266_Report_PackageJSON(&sensor_packet, &json_packet);
-    
-    // 2. 直接扔给 USART3 透传给 ESP8266
-    if (json_packet.json_len > 0)
-    {
-        esp8266_ack_flag = 0; // 发送前清空标志
-        USART3_Send_Data((u8*)json_packet.json_str, json_packet.json_len);
-        
-        // 3. 等待反馈 (最多等 200 圈，也就是 2 秒)
-        int wait_timeout = 200;
-        while(wait_timeout > 0)
-        {
-            if(esp8266_ack_flag == 1) {
-                Safe_Printf("[ESP8266 Report] Pushed JSON to Gateway (%d bytes)\r\n", json_packet.json_len);
- 
-                return 1; // 链路畅通！
-            }
-            vTaskDelay(10); // 每次等 10ms
-            wait_timeout--;
-        }
-        
-        // 如果等了2秒都没收到回复，说明 WiFi 挂了！
-        Safe_Printf("-> [Error] WiFi Link Timeout!\r\n");
-        return 0; 
-    }
-    return 1; // 没数据发也算正常
-    
-}
-*/
 
-// 1. 把头文件里的声明和这里的 void 改成 u8
+
+
+
 u8 ESP8266_Report_SendSensorData(void)
 {
     static SensorDataPacket sensor_packet;
     static JsonDataPacket json_packet; 
     
-    // 1. 采集并打包
+    // 1. 处理积压的云端指令
+    Process_Cloud_Commands();
+
+    // 2. 采集并打包
     ESP8266_Report_CollectSensorData(&sensor_packet);
-    ESP8266_Report_PackageJSON(&sensor_packet, &json_packet);
+    ESP8266_Report_PackageJSON(&sensor_packet, &json_packet); // 调用你的原函数
     
     if (json_packet.json_len == 0) return 1; 
     
-    // 2. 清理串口接收状态，准备下一次接收云端指令
-    USART3_RX_STA = 0; 
-    memset(USART3_RX_BUF, 0, sizeof(USART3_RX_BUF)); 
-    
-    // 3. 极速扔给 USART3 透传给 ESP8266
     USART3_Send_Data((u8*)json_packet.json_str, json_packet.json_len);
     Safe_Printf("[ESP8266 Report] Pushed JSON to Gateway (%d bytes)\r\n", json_packet.json_len);
     
-    // 🚨 核心切除：砍掉原来的 while 循环死等 3 秒
-    // 既然没有备胎链路了，推给 ESP8266 就算任务完成，立刻把 CPU 还给摄像头！
-    
-    return 1; // 永远返回成功，让主状态机无脑循环
+    return 1; 
 }
-
-
-
-
-// 接收来自 jpeg_serial.c 的图像处理结果
-void ESP8266_Report_UpdateFireDetectionResult(FireDetectionResult* result)
-{
-    if(result != NULL)
-    {
-        // 将最新的图像检测结果保存到全局变量中
-        g_latest_fire_result.fire_detected = result->fire_detected;
-        g_latest_fire_result.confidence = result->confidence;
-        g_latest_fire_result.fire_area = result->fire_area;
-        g_latest_fire_result.fire_center_x = result->fire_center_x;
-        g_latest_fire_result.fire_center_y = result->fire_center_y;
-        g_latest_fire_result.flicker_detected = result->flicker_detected;
-    }
-}
-
 

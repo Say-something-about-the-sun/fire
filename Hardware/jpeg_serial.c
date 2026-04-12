@@ -7,7 +7,8 @@
 #include "jpeg_serial.h"
 #include "image_preprocess.h"
 #include "fire_detection.h"
-#include "esp8266_report.h"
+
+
 #include "led.h"
 #include <stdio.h>
 #include <string.h>
@@ -18,8 +19,8 @@
 extern SemaphoreHandle_t Mutex_USART1;
 void Safe_Printf(char *format, ...);
 
-// 内部SRAM JPEG缓冲区配置（双缓冲）
-#define JPEG_MAX_SIZE       (30*1024)       // 每帧最大32KB（320*240分辨率）
+
+
 
 // 检测缓冲区地址配置（外部SRAM）
 #define DETECT_RGB_BUF_ADDR 0x6804B000      // 检测用RGB缓冲区（HSV缓冲区之后）
@@ -324,7 +325,7 @@ u32 DCMI_GetFrameLength(void)
  * @retval 处理结果：0-成功，非0-失败
  * @note   方案二+三组合：每N帧进行一次火焰检测，使用低分辨率检测
  */
-u8 process_jpeg_frame(u8 do_fire_detection)
+u8 process_jpeg_frame(u8 do_fire_detection, FireDetectionResult* out_result)
 {
     // 增加帧计数
     frame_count++;
@@ -437,13 +438,14 @@ u8 process_jpeg_frame(u8 do_fire_detection)
                                                     dec->width, dec->height, 
                                                     &fire_result);
                         
-											
-											
-											extern FireDetectionResult g_latest_fire_result; // 声明引用外部全局变量
-											g_latest_fire_result = fire_result;              // 将结果塞进全局抽屉！
-											
-                        // 5. 更新火焰检测结果到报告模块
-                        ESP8266_Report_UpdateFireDetectionResult(&fire_result);
+											// 如果调用者需要结果，我们就把算好的 fire_result 拷贝给他
+											if (out_result != NULL) 
+											{
+												
+													*out_result = fire_result;
+												
+											}
+										
                         
                        // printf("[Vision] 3. Algorithm done! Fire: %d, Area: %d\r\n", 
                         //       fire_result.fire_detected, fire_result.fire_area);

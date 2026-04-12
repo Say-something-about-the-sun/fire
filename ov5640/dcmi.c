@@ -12,13 +12,16 @@
 #include "task.h"
 
 
+#include "task_vision.h" 
+
+
 u8 ov_frame=0;   						//帧计数
 extern void jpeg_data_process(void);	//JPEG数据处理函数
 extern volatile u8 frame_done;		//帧完成标志
 
+extern TaskHandle_t VisionTask_Handler;
 
-// 外部声明你的相机任务句柄
-extern TaskHandle_t CameraTask_Handler;
+
 
 
 // 帧计数
@@ -49,57 +52,52 @@ void DCMI_IRQHandler(void)
         led_off(led1);
         led1_state = 0;
     }
-	
-	
-	
     
     if(DCMI_GetITStatus(DCMI_IT_FRAME) != RESET)
     {
-        
-			 // 增加硬件帧计数
         g_raw_frame_count++;
-			
-			// 1. 停止 DMA 並計算長度
+        
+        // 🚨 架构级修复 1：采到一帧后，立刻关闭摄像头捕获！切断源头！
+        DCMI_CaptureCmd(DISABLE); 
+        
+        // 1. 停止 DMA (搬砖)
         DMA_Cmd(DMA2_Stream1, DISABLE);
+        while((DMA2_Stream1->CR & DMA_SxCR_EN) != RESET); // 死等彻底关闭
+        
         u32 words_remaining = DMA_GetCurrDataCounter(DMA2_Stream1);
         current_capture_buf->data_len = (JPEG_MAX_SIZE - (words_remaining * 4));
         
-        // 2. 標記當前緩衝區已完成
+        // 2. 标记就绪
         current_capture_buf->state = BUF_READY;
         
-        // 3. 乒乓切換
+        // 3. 乒乓切换
         volatile BufferControl* next_buf = (current_capture_buf == &buf_ctrl_a) ? &buf_ctrl_b : &buf_ctrl_a;
         if(next_buf->state == BUF_IDLE) {
             current_capture_buf = next_buf;
         } else {
-            dropped_frames++;
+            dropped_frames++; 
         }
         
-        // 4. 直接处理当前帧数据
-        // 每5帧进行一次火焰检测
-        static u8 fire_detect_cnt = 0;
-        fire_detect_cnt++;
-        process_jpeg_frame(fire_detect_cnt >= 5 ? 1 : 0);  // 1=进行火焰检测，0=只发送图像
-        if(fire_detect_cnt >= 5) fire_detect_cnt = 0;
+        // 4. 通知 RTOS 任务
+        dma_transfer_complete = 1; 
         
-        // 5. 設置通知標誌並立即重啟 DMA，準備捕獲下一幀
-        dma_transfer_complete = 1;
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        if(VisionTask_Handler != NULL) {
+            vTaskNotifyGiveFromISR(VisionTask_Handler, &xHigherPriorityTaskWoken);
+        }
         
-        // 配置DMA到新的缓冲区
+        // 5. 准备下一次 DMA 地址
         DMA2_Stream1->M0AR = (u32)current_capture_buf->buffer;
         DMA2_Stream1->NDTR = JPEG_MAX_SIZE / 4;
         
-        // 清除DMA标志
         DMA_ClearFlag(DMA2_Stream1, DMA_FLAG_TCIF1 | DMA_FLAG_HTIF1 | DMA_FLAG_TEIF1 | DMA_FLAG_DMEIF1 | DMA_FLAG_FEIF1);
+        DCMI->ICR = 0x1F; 
         
-        // 强制清除所有DCMI标志位，确保状态机彻底复位
-        DCMI->ICR = 0x1F; // 强制清除所有5个中断标志位（帧、行、溢出、同步错误等）
-        
-        // 先开启DMA，再保持DCMI捕获
+        // 只开启 DMA，🚨 绝对不要在这里开启 DCMI_CaptureCmd！
         DMA_Cmd(DMA2_Stream1, ENABLE);
-        // 不关闭DCMI，保持连续捕获模式，避免数据流断裂
         
         DCMI_ClearITPendingBit(DCMI_IT_FRAME);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
 }
 

@@ -41,9 +41,8 @@
 .\objects\jpeg_serial.o: .\ov5640\dcmi.h
 .\objects\jpeg_serial.o: Hardware\jpeg_decoder.h
 .\objects\jpeg_serial.o: Hardware\jpeg_serial.h
-.\objects\jpeg_serial.o: Hardware\image_preprocess.h
 .\objects\jpeg_serial.o: Hardware\fire_detection.h
-.\objects\jpeg_serial.o: .\ESP8266\esp8266_report.h
+.\objects\jpeg_serial.o: Hardware\image_preprocess.h
 .\objects\jpeg_serial.o: Hardware\led.h
 .\objects\jpeg_serial.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h
 .\objects\jpeg_serial.o: .\FreeRTOS\include\FreeRTOS.h
