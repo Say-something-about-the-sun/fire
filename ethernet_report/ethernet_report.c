@@ -131,7 +131,7 @@ void Ethernet_Report_SendSensorData(void)
     int sock;
     struct sockaddr_in server_addr;
 
-    printf("\r\n[WARN] Main link failed! Triggering Ethernet failover...\r\n");
+    Safe_Printf("\r\n[WARN] Main link failed! Triggering Ethernet failover...\r\n");
     
     // ==========================================================
     // 🚀 终极护航：全员静默，释放总线与电源极限！
@@ -155,18 +155,18 @@ void Ethernet_Report_SendSensorData(void)
     // ==========================================================
     // 🌐 网卡纯净拨号时间
     // ==========================================================
-    printf("-> [Ethernet] IP: %d.%d.%d.%d, Gateway: %d.%d.%d.%d\r\n", 
+    Safe_Printf("-> [Ethernet] IP: %d.%d.%d.%d, Gateway: %d.%d.%d.%d\r\n", 
            lwipdev.ip[0], lwipdev.ip[1], lwipdev.ip[2], lwipdev.ip[3],
            lwipdev.gateway[0], lwipdev.gateway[1], lwipdev.gateway[2], lwipdev.gateway[3]);
            
-    printf("-> [Ethernet] Activating backup link (MQTT Passthrough)...\r\n");
+    Safe_Printf("-> [Ethernet] Activating backup link (MQTT Passthrough)...\r\n");
     
     ESP8266_Report_CollectSensorData(&sensor_packet);
     Ethernet_Build_Studio_JSON(&sensor_packet, &json_packet);
     
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
-        printf("-> [Ethernet Error] Socket creation failed!\r\n");
+        Safe_Printf("-> [Ethernet Error] Socket creation failed!\r\n");
         goto RESTORE_SYSTEM; // 失败也必须跳到末尾恢复摄像头！
     }
     
@@ -180,12 +180,12 @@ void Ethernet_Report_SendSensorData(void)
 
     int res = connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr));
     if (res < 0) {
-        printf("-> [Ethernet Error] Connect failed, error code: %d\r\n", res);
+        Safe_Printf("-> [Ethernet Error] Connect failed, error code: %d\r\n", res);
         close(sock);
         goto RESTORE_SYSTEM; // 失败也必须跳到末尾恢复摄像头！
     }
 
-    printf("-> [Ethernet] TCP Connected Successfully!\r\n");
+    Safe_Printf("-> [Ethernet] TCP Connected Successfully!\r\n");
 
     // 打包并发送 MQTT 数据
     packet_len = MicroMQTT_BuildConnect(MQTT_CLIENT_ID, MQTT_USERNAME, MQTT_PASSWORD, mqtt_buffer);
@@ -197,20 +197,20 @@ void Ethernet_Report_SendSensorData(void)
     int send_bytes = send(sock, mqtt_buffer, packet_len, 0);
     
     if(send_bytes > 0) {
-        printf("-> [Ethernet] MQTT payload delivered to Cloud! (%d bytes)\r\n", json_packet.json_len);
+        Safe_Printf("-> [Ethernet] MQTT payload delivered to Cloud! (%d bytes)\r\n", json_packet.json_len);
     }
     
     // 等待云端回执
     u8 rx_buf[64];
     int rx_len = recv(sock, rx_buf, sizeof(rx_buf) - 1, 0);
     if(rx_len > 0) {
-        printf("-> [Ethernet] Cloud ACK received! Perfect loop!\r\n");
+        Safe_Printf("-> [Ethernet] Cloud ACK received! Perfect loop!\r\n");
     } else {
-        printf("-> [Ethernet Warn] Data sent, but no Cloud ACK received.\r\n");
+        Safe_Printf("-> [Ethernet Warn] Data sent, but no Cloud ACK received.\r\n");
     }
     
     close(sock); 
-    printf("-> [Ethernet] Session closed. Pipeline secured.\r\n");
+    Safe_Printf("-> [Ethernet] Session closed. Pipeline secured.\r\n");
 
 
     // ==========================================================

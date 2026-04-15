@@ -57,9 +57,9 @@ void USART3_Init(u32 bound)
     // 使能USART3
     USART_Cmd(USART3, ENABLE);
 
-    printf("[USART3] 初始化完成，波特率: %lu\r\n", bound);
-    printf("[USART3] 连接: STM32 PB10 (TX) -> ESP8266 RX\r\n");
-    printf("[USART3] 连接: STM32 PB11 (RX) -> ESP8266 TX\r\n");
+    Safe_Printf("[USART3] 初始化完成，波特率: %lu\r\n", bound);
+    Safe_Printf("[USART3] 连接: STM32 PB10 (TX) -> ESP8266 RX\r\n");
+    Safe_Printf("[USART3] 连接: STM32 PB11 (RX) -> ESP8266 TX\r\n");
 }
 
 // 配置USART3中断
@@ -77,7 +77,7 @@ void USART3_ConfigInterrupt(void)
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
-    printf("[USART3] 中断配置完成\r\n");
+    Safe_Printf("[USART3] 中断配置完成\r\n");
 }
 
 // 发送字符串

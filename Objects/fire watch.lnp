@@ -84,10 +84,10 @@
 ".\objects\water_pump.o"
 ".\objects\dht11.o"
 ".\objects\key.o"
-".\objects\ai_decision.o"
 ".\objects\task_hmi.o"
-".\objects\task_vision.o"
 ".\objects\task_network.o"
+".\objects\task_vision.o"
+".\objects\ai_decision.o"
 --library_type=microlib --strict --scatter ".\Objects\fire watch.sct"
 --summary_stderr --info summarysizes --map --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

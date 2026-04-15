@@ -29,7 +29,7 @@ void udp_client_send_fire_alarm(u8 *jpeg_data, u32 jpeg_len)
         server_addr.sin_port = htons(8080);
         server_addr.sin_addr.s_addr = inet_addr("192.168.0.101");
 
-        printf("-> [Net] Socket 建立，正在预热 ARP...\r\n");
+        Safe_Printf("-> [Net] Socket 建立，正在预热 ARP...\r\n");
 
         // 🌟 核心绝杀 1：发送一个 1 字节的空包，提前触发 ARP 解析！
         // 这相当于提前“敲门”，防止后面的连发引发 ARP 广播风暴死锁！
@@ -63,7 +63,7 @@ void udp_client_send_fire_alarm(u8 *jpeg_data, u32 jpeg_len)
     
     // 🚀 注意：发完之后绝对不要调用 close(sock)！
     // 保持全局存活，下次直接用，绕开所有内核级资源分配！
-    printf("-> [Net] %d 字节 UDP 推流完美结束！\r\n", jpeg_len);
+    Safe_Printf("-> [Net] %d 字节 UDP 推流完美结束！\r\n", jpeg_len);
 }
 
 

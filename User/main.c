@@ -85,7 +85,63 @@ void Safe_Printf(char *format, ...)
 #define CLEANUP_INTERVAL   86400000  // 清理数据间隔（24小时）
 
 
-  
+ void OV5640_Hue_Set(u8 hue)
+{
+    switch(hue)
+    {
+        case 0:  // 0度
+            OV5640_WR_Reg(0x5001, 0xFF);
+            OV5640_WR_Reg(0x5580, 0x01);
+            OV5640_WR_Reg(0x5581, 0x80);
+            OV5640_WR_Reg(0x5582, 0x00);
+            OV5640_WR_Reg(0x5588, 0x01);
+            break;
+        case 1:  // +30度
+            OV5640_WR_Reg(0x5001, 0xFF);
+            OV5640_WR_Reg(0x5580, 0x01);
+            OV5640_WR_Reg(0x5581, 0x6F);
+            OV5640_WR_Reg(0x5582, 0x40);
+            OV5640_WR_Reg(0x5588, 0x01);
+            break;
+        case 2:  // +60度
+            OV5640_WR_Reg(0x5001, 0xFF);
+            OV5640_WR_Reg(0x5580, 0x01);
+            OV5640_WR_Reg(0x5581, 0x40);
+            OV5640_WR_Reg(0x5582, 0x6F);
+            OV5640_WR_Reg(0x5588, 0x01);
+            break;
+        case 3:  // +90度
+            OV5640_WR_Reg(0x5001, 0xFF);
+            OV5640_WR_Reg(0x5580, 0x01);
+            OV5640_WR_Reg(0x5581, 0x00);
+            OV5640_WR_Reg(0x5582, 0x80);
+            OV5640_WR_Reg(0x5588, 0x01);
+            break;
+        case 4:  // -30度
+            OV5640_WR_Reg(0x5001, 0xFF);
+            OV5640_WR_Reg(0x5580, 0x01);
+            OV5640_WR_Reg(0x5581, 0x6F);
+            OV5640_WR_Reg(0x5582, 0x40);
+            OV5640_WR_Reg(0x5588, 0x02);
+            break;
+        case 5:  // -60度
+            OV5640_WR_Reg(0x5001, 0xFF);
+            OV5640_WR_Reg(0x5580, 0x01);
+            OV5640_WR_Reg(0x5581, 0x40);
+            OV5640_WR_Reg(0x5582, 0x6F);
+            OV5640_WR_Reg(0x5588, 0x02);
+            break;
+        case 6:  // -90度
+            OV5640_WR_Reg(0x5001, 0xFF);
+            OV5640_WR_Reg(0x5580, 0x01);
+            OV5640_WR_Reg(0x5581, 0x00);
+            OV5640_WR_Reg(0x5582, 0x80);
+            OV5640_WR_Reg(0x5588, 0x02);
+            break;
+        default:
+            break;
+    }
+} 
 
        
 
@@ -113,14 +169,16 @@ int main(void)
     // 2. 初始化JPEG和串口系统
     jpeg_serial_init();
     
+	
+	
     Extsram_Init();
     // 3. 初始化摄像头
     if( OV5640_Init() != 0) {
-        printf("[ERROR] OV5640 initialization failed!\r\n");
+        Safe_Printf("[ERROR] OV5640 initialization failed!\r\n");
     }
     
     OV5640_OutSize_Set(4, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-   
+    OV5640_Hue_Set(0);
         
     //水泵初始化
     WaterPump_Init();
@@ -150,7 +208,7 @@ int main(void)
     
 		
     
-    printf("[OK] Hardware initialized! Starting FreeRTOS Scheduler...\r\n");
+    Safe_Printf("[OK] Hardware initialized! Starting FreeRTOS Scheduler...\r\n");
         
     // 创建这把互斥锁
     Mutex_USART1 = xSemaphoreCreateMutex();
@@ -167,7 +225,7 @@ int main(void)
     vTaskStartScheduler();
     
     while(1) {
-        printf("[ERROR] FreeRTOS Scheduler failed to start! Check Memory.\r\n");
+        Safe_Printf("[ERROR] FreeRTOS Scheduler failed to start! Check Memory.\r\n");
         delay_ms(1000);
     }
 }

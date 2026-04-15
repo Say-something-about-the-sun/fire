@@ -57,8 +57,7 @@ void DCMI_IRQHandler(void)
     {
         g_raw_frame_count++;
         
-        // 🚨 架构级修复 1：采到一帧后，立刻关闭摄像头捕获！切断源头！
-        DCMI_CaptureCmd(DISABLE); 
+       
         
         // 1. 停止 DMA (搬砖)
         DMA_Cmd(DMA2_Stream1, DISABLE);
@@ -67,37 +66,45 @@ void DCMI_IRQHandler(void)
         u32 words_remaining = DMA_GetCurrDataCounter(DMA2_Stream1);
         current_capture_buf->data_len = (JPEG_MAX_SIZE - (words_remaining * 4));
         
-        // 2. 标记就绪
-        current_capture_buf->state = BUF_READY;
         
-        // 3. 乒乓切换
+        
+        // 2. 智能乒乓切换
         volatile BufferControl* next_buf = (current_capture_buf == &buf_ctrl_a) ? &buf_ctrl_b : &buf_ctrl_a;
-        if(next_buf->state == BUF_IDLE) {
-            current_capture_buf = next_buf;
-        } else {
-            dropped_frames++; 
-        }
-        
-        // 4. 通知 RTOS 任务
-        dma_transfer_complete = 1; 
         
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        if(VisionTask_Handler != NULL) {
-            vTaskNotifyGiveFromISR(VisionTask_Handler, &xHigherPriorityTaskWoken);
+
+        if(next_buf->state == BUF_IDLE) {
+            // ✅ 下一个盒子是空的（说明串口发完了），正常交接！
+            current_capture_buf->state = BUF_READY; // 标记当前满载
+            current_capture_buf = next_buf;         // 切换指针
+            
+            // 只有成功装满一个新盒子，才通知任务来取货！
+            dma_transfer_complete = 1; 
+            if(VisionTask_Handler != NULL) {
+                vTaskNotifyGiveFromISR(VisionTask_Handler, &xHigherPriorityTaskWoken);
+            }
+        } else {
+            // ❌ 严重警告：下一个盒子还没发完 (BUF_READY)！
+            // 为了防止花屏，我们绝对不能切过去！只能委屈自己，把当前刚拍的帧当成废片，待会儿重新覆盖它。
+            dropped_frames++; 
+            // 注意：不修改 state，不切换指针，不通知任务！默默承受丢帧。
         }
         
-        // 5. 准备下一次 DMA 地址
+        // 3. 准备下一次 DMA（永远指向 current_capture_buf，无论是否切换）
         DMA2_Stream1->M0AR = (u32)current_capture_buf->buffer;
         DMA2_Stream1->NDTR = JPEG_MAX_SIZE / 4;
         
         DMA_ClearFlag(DMA2_Stream1, DMA_FLAG_TCIF1 | DMA_FLAG_HTIF1 | DMA_FLAG_TEIF1 | DMA_FLAG_DMEIF1 | DMA_FLAG_FEIF1);
         DCMI->ICR = 0x1F; 
         
-        // 只开启 DMA，🚨 绝对不要在这里开启 DCMI_CaptureCmd！
+        // 重新开启 DMA，等待下一帧到来
         DMA_Cmd(DMA2_Stream1, ENABLE);
         
         DCMI_ClearITPendingBit(DCMI_IT_FRAME);
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        
+        if (xHigherPriorityTaskWoken) {
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        }
     }
 }
 

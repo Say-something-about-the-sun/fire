@@ -17,7 +17,7 @@ extern void Safe_Printf(char *format, ...);
 
 void ESP8266_Report_Init(void)
 {
-    printf("[ESP8266 Report] Smart MQTT Gateway Mode Initialized.\r\n");
+    Safe_Printf("[ESP8266 Report] Smart MQTT Gateway Mode Initialized.\r\n");
 }
 
 // 纯粹的数据搬运工

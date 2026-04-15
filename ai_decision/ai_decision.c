@@ -116,6 +116,14 @@ void AI_Fire_Decision_Center(SensorDataPacket* packet)
     if(Mutex_CoreState != NULL) xSemaphoreTake(Mutex_CoreState, portMAX_DELAY);
 
     // 1. 同步输入数据
+		packet->image_fire_detected = s_latest_vision_result.fire_detected;
+    packet->image_confidence = s_latest_vision_result.confidence;
+    packet->fire_area = s_latest_vision_result.fire_area;
+    packet->fire_center_x = s_latest_vision_result.fire_center_x;
+    packet->fire_center_y = s_latest_vision_result.fire_center_y;
+    packet->flicker_detected = s_latest_vision_result.flicker_detected;
+	
+	
     packet->virtual_current = g_core_state.virtual_current;
     u8 is_fire_real = packet->image_fire_detected || packet->fire_detected || packet->flame_do == 1;
 

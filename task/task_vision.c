@@ -63,9 +63,7 @@ static void camera_task(void *pvParameters)
             usart1_dma_complete = 0; 
         }
 
-        // 🚨 架构级修复 3：一切处理干净了，主动请求拍下一张！
-        // 这样一来，不管你处理多慢，都不会有任何内存被强行覆盖！
-        DCMI_CaptureCmd(ENABLE);
+        
     }
 }
 
