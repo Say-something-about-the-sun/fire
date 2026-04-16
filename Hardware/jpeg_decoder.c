@@ -15,7 +15,7 @@
 #define ROW_BUFFER_HEIGHT  8                      // 缓存8行
 #define ROW_BUFFER_WIDTH   320                    // 每行320像素
 #define ROW_BUFFER_SIZE    (ROW_BUFFER_WIDTH * ROW_BUFFER_HEIGHT * 2)  // 8×320×2=5120字节
-#define JPEG_MAX_SIZE       (32*1024)
+#define JPEG_MAX_SIZE       (35*1024)
 
 
 

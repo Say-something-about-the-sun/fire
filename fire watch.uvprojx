@@ -982,51 +982,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>FatFS</GroupName>
-          <Files>
-            <File>
-              <FileName>diskio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\FatFS\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\FatFS\diskio.h</FilePath>
-            </File>
-            <File>
-              <FileName>ff.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\FatFS\ff.c</FilePath>
-            </File>
-            <File>
-              <FileName>ff.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\FatFS\ff.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffconf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\FatFS\ffconf.h</FilePath>
-            </File>
-            <File>
-              <FileName>integer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\FatFS\integer.h</FilePath>
-            </File>
-            <File>
-              <FileName>cc936.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\FatFS\option\cc936.c</FilePath>
-            </File>
-            <File>
-              <FileName>syscall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\FatFS\option\syscall.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>Cjson</GroupName>
           <Files>
             <File>
@@ -1118,51 +1073,6 @@
               <FileName>FreeRTOSConfig.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\FreeRTOS\include\FreeRTOSConfig.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>SDcard</GroupName>
-          <Files>
-            <File>
-              <FileName>sd_data_manager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\SDcard\sd_data_manager.c</FilePath>
-            </File>
-            <File>
-              <FileName>sd_data_manager.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SDcard\sd_data_manager.h</FilePath>
-            </File>
-            <File>
-              <FileName>SDCard.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\SDcard\SDCard.c</FilePath>
-            </File>
-            <File>
-              <FileName>SDCard.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SDcard\SDCard.h</FilePath>
-            </File>
-            <File>
-              <FileName>sdcard_jpeg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\SDcard\sdcard_jpeg.c</FilePath>
-            </File>
-            <File>
-              <FileName>sdcard_jpeg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SDcard\sdcard_jpeg.h</FilePath>
-            </File>
-            <File>
-              <FileName>sdio_sdcard.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\SDcard\sdio_sdcard.c</FilePath>
-            </File>
-            <File>
-              <FileName>sdio_sdcard.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SDcard\sdio_sdcard.h</FilePath>
             </File>
           </Files>
         </Group>

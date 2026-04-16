@@ -28,7 +28,7 @@ extern TaskHandle_t VisionTask_Handler;
 volatile u32 g_raw_frame_count = 0;  // 硬件触发次数（中断进入次数）
 
 // JPEG缓冲区大小定义
-#define JPEG_MAX_SIZE       (25*1024)       // 每帧最大32KB
+#define JPEG_MAX_SIZE       (35*1024)       // 每帧最大32KB
 
 DCMI_InitTypeDef DCMI_InitStructure;
 
@@ -40,73 +40,46 @@ extern volatile BufferControl buf_ctrl_a;
 extern volatile BufferControl buf_ctrl_b;
 extern volatile u32 dropped_frames;
 
-//DCMI中断服务函数 - 使用帧中断切换缓冲区（不关闭DCMI）
+//DCMI中断服务函数 - 
 void DCMI_IRQHandler(void)
 {
-    // 验证中断是否触发，直接翻转LED1
     static u8 led1_state = 0;
-    if(led1_state == 0) {
-        led_on(led1);
-        led1_state = 1;
-    } else {
-        led_off(led1);
-        led1_state = 0;
-    }
+    if(led1_state == 0) { led_on(led1); led1_state = 1; } 
+    else { led_off(led1); led1_state = 0; }
     
     if(DCMI_GetITStatus(DCMI_IT_FRAME) != RESET)
     {
         g_raw_frame_count++;
         
-       
-        
-        // 1. 停止 DMA (搬砖)
         DMA_Cmd(DMA2_Stream1, DISABLE);
-        while((DMA2_Stream1->CR & DMA_SxCR_EN) != RESET); // 死等彻底关闭
+        while((DMA2_Stream1->CR & DMA_SxCR_EN) != RESET); 
         
         u32 words_remaining = DMA_GetCurrDataCounter(DMA2_Stream1);
         current_capture_buf->data_len = (JPEG_MAX_SIZE - (words_remaining * 4));
         
-        
-        
-        // 2. 智能乒乓切换
         volatile BufferControl* next_buf = (current_capture_buf == &buf_ctrl_a) ? &buf_ctrl_b : &buf_ctrl_a;
-        
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-        if(next_buf->state == BUF_IDLE) {
-            // ✅ 下一个盒子是空的（说明串口发完了），正常交接！
-            current_capture_buf->state = BUF_READY; // 标记当前满载
-            current_capture_buf = next_buf;         // 切换指针
-            
-            // 只有成功装满一个新盒子，才通知任务来取货！
-            dma_transfer_complete = 1; 
-            if(VisionTask_Handler != NULL) {
-                vTaskNotifyGiveFromISR(VisionTask_Handler, &xHigherPriorityTaskWoken);
-            }
-        } else {
-            // ❌ 严重警告：下一个盒子还没发完 (BUF_READY)！
-            // 为了防止花屏，我们绝对不能切过去！只能委屈自己，把当前刚拍的帧当成废片，待会儿重新覆盖它。
-            dropped_frames++; 
-            // 注意：不修改 state，不切换指针，不通知任务！默默承受丢帧。
+        // 正常交接乒乓缓存
+        current_capture_buf->state = BUF_READY;
+        current_capture_buf = next_buf; 
+        
+        if(VisionTask_Handler != NULL) {
+            vTaskNotifyGiveFromISR(VisionTask_Handler, &xHigherPriorityTaskWoken);
         }
         
-        // 3. 准备下一次 DMA（永远指向 current_capture_buf，无论是否切换）
         DMA2_Stream1->M0AR = (u32)current_capture_buf->buffer;
         DMA2_Stream1->NDTR = JPEG_MAX_SIZE / 4;
         
         DMA_ClearFlag(DMA2_Stream1, DMA_FLAG_TCIF1 | DMA_FLAG_HTIF1 | DMA_FLAG_TEIF1 | DMA_FLAG_DMEIF1 | DMA_FLAG_FEIF1);
         DCMI->ICR = 0x1F; 
-        
-        // 重新开启 DMA，等待下一帧到来
         DMA_Cmd(DMA2_Stream1, ENABLE);
         
         DCMI_ClearITPendingBit(DCMI_IT_FRAME);
-        
-        if (xHigherPriorityTaskWoken) {
-            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-        }
+        if (xHigherPriorityTaskWoken) portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
 }
+
 
 //DCMI DMA配置
 //DMA_Memory0BaseAddr:存储器0地址    即要存储摄像头数据的内存地址(也可以是外设地址)
@@ -184,7 +157,7 @@ void My_DCMI_Init(void)
 	DCMI_DeInit();//还原默认配置 
  
  
-  DCMI_InitStructure.DCMI_CaptureMode=DCMI_CaptureMode_Continuous;
+  DCMI_InitStructure.DCMI_CaptureMode=DCMI_CaptureMode_SnapShot;
 	DCMI_InitStructure.DCMI_CaptureRate=DCMI_CaptureRate_All_Frame;//全帧捕获（参考成功案例配置）
 	DCMI_InitStructure.DCMI_ExtendedDataMode= DCMI_ExtendedDataMode_8b;//8位数据格式  
 	DCMI_InitStructure.DCMI_HSPolarity= DCMI_HSPolarity_Low;//HSYNC 低电平有效（成功案例配置）
@@ -202,6 +175,8 @@ void My_DCMI_Init(void)
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority =0;		//子优先级2
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			//IRQ通道使能
 	NVIC_Init(&NVIC_InitStructure);	//根据指定的参数初始化VIC寄存器
+
+
 } 
 
 //DCMI,开启捕获

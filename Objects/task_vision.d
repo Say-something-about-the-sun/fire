@@ -52,3 +52,6 @@
 .\objects\task_vision.o: .\System\usart2\usart2.h
 .\objects\task_vision.o: .\ai_decision\ai_decision.h
 .\objects\task_vision.o: .\ESP8266\esp8266_report.h
+.\objects\task_vision.o: .\ov5640\dcmi.h
+.\objects\task_vision.o: .\FreeRTOS\include\semphr.h
+.\objects\task_vision.o: .\FreeRTOS\include\queue.h

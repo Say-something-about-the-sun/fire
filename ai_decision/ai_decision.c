@@ -11,6 +11,7 @@ static SystemCoreState_t g_core_state;
 extern FireDetectionResult g_latest_fire_result; // 暂时保留，由 JPEG 任务更新
 static FireDetectionResult s_latest_vision_result; // 保存最新的图像检测结果
 
+extern void Safe_Printf(char *format, ...);
 
 // 核心状态保护锁
 static SemaphoreHandle_t Mutex_CoreState = NULL;
@@ -86,11 +87,11 @@ void AI_Execute_Cloud_Command(const char* cmd)
     }
     else if (strstr(cmd, "CMD:MODE:0") != NULL) {
         g_core_state.mode = SYS_MODE_AUTO;
-        printf("=> 已恢复 AI 自动托管！\r\n");
+        Safe_Printf("=> 已恢复 AI 自动托管！\r\n");
     }
     else if (strstr(cmd, "CMD:MODE:1") != NULL) {
         g_core_state.mode = SYS_MODE_MANUAL;
-        printf("=> 已切入人工接管模式！\r\n");
+        Safe_Printf("=> 已切入人工接管模式！\r\n");
     }
     
     if(Mutex_CoreState != NULL) xSemaphoreGive(Mutex_CoreState);
@@ -105,7 +106,7 @@ void AI_Emergency_Override(void)
     g_core_state.virtual_current = 15.0f;
     WaterPump_On();
     g_core_state.pump_status = 1;
-    printf("\r\n>>> [EMERGENCY] Manual Override Activated! Pump ON! <<<\r\n");
+    Safe_Printf("\r\n>>> [EMERGENCY] Manual Override Activated! Pump ON! <<<\r\n");
     
     if(Mutex_CoreState != NULL) xSemaphoreGive(Mutex_CoreState);
 }

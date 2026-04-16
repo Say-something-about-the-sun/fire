@@ -70,7 +70,6 @@
 .\objects\main.o: .\FreeRTOS\include\list.h
 .\objects\main.o: .\FreeRTOS\include\semphr.h
 .\objects\main.o: .\FreeRTOS\include\queue.h
-.\objects\main.o: .\LWIP\MALLOC\malloc.h
 .\objects\main.o: .\ai_decision\ai_decision.h
 .\objects\main.o: .\ESP8266\esp8266_report.h
 .\objects\main.o: .\task\task_hmi.h

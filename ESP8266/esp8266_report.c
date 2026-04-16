@@ -187,7 +187,7 @@ u8 ESP8266_Report_SendSensorData(void)
     if (json_packet.json_len == 0) return 1; 
     
     USART3_Send_Data((u8*)json_packet.json_str, json_packet.json_len);
-    Safe_Printf("[ESP8266 Report] Pushed JSON to Gateway (%d bytes)\r\n", json_packet.json_len);
+    //Safe_Printf("[ESP8266 Report] Pushed JSON to Gateway (%d bytes)\r\n", json_packet.json_len);
     
     return 1; 
 }

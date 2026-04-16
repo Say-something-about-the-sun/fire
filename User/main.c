@@ -26,9 +26,6 @@
 #include "task.h"
 #include "semphr.h"
 
-//lwip
-#include "malloc.h"
-
 
 // 引入三大总线和 AI 大脑
 #include "ai_decision.h"
@@ -44,7 +41,7 @@
 SemaphoreHandle_t Mutex_USART1;
 
 // 2. 打造工业级的安全打印函数
-
+/*
 void Safe_Printf(char *format, ...)
 {
     // 如果操作系统已经启动，才使用锁机制
@@ -72,6 +69,24 @@ void Safe_Printf(char *format, ...)
         xSemaphoreGive(Mutex_USART1);
     }
 }
+*/
+
+extern volatile u8 g_uart_is_sending_image; // 引入刚刚建的标志位
+
+void Safe_Printf(char *format, ...)
+{
+    // 如果视觉任务正在发图片，立刻闭嘴扔掉日志！保卫图像数据！
+    // 这种做法完全不调用 RTOS API，绝对不会引发绿灯死机！
+    if (g_uart_is_sending_image == 1) {
+        return; 
+    }
+
+    va_list args;
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
+}
+
 
 
 // 摄像头参数
@@ -203,6 +218,8 @@ int main(void)
     ESP8266_Init();
     ESP8266_Report_Init();  
     
+		delay_ms(200);
+		
     // 8. 初始化DCMI（后初始化DCMI）
     My_DCMI_Init();
     
