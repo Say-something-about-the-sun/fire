@@ -1,6 +1,6 @@
-.\objects\usart3.o: System\usart3\usart3.c
-.\objects\usart3.o: System\usart3\usart3.h
-.\objects\usart3.o: .\System\sys\sys.h
+.\objects\usart3.o: Core\src\usart3.c
+.\objects\usart3.o: .\Core\inc\usart3.h
+.\objects\usart3.o: .\Core\inc\sys.h
 .\objects\usart3.o: .\Start\stm32f4xx.h
 .\objects\usart3.o: .\CMSIS\core_cm4.h
 .\objects\usart3.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdint.h
@@ -37,5 +37,5 @@
 .\objects\usart3.o: .\Library\inc\stm32f4xx_dcmi.h
 .\objects\usart3.o: .\Library\inc\stm32f4xx_fsmc.h
 .\objects\usart3.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h
-.\objects\usart3.o: .\System\delay\delay.h
+.\objects\usart3.o: .\Core\inc\delay.h
 .\objects\usart3.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h

@@ -1,6 +1,6 @@
-.\objects\dht11.o: dht11\dht11.c
-.\objects\dht11.o: dht11\dht11.h
-.\objects\dht11.o: .\System\sys\sys.h
+.\objects\dht11.o: Hardware_BSP\src\dht11.c
+.\objects\dht11.o: .\Hardware_BSP\inc\dht11.h
+.\objects\dht11.o: .\Core\inc\sys.h
 .\objects\dht11.o: .\Start\stm32f4xx.h
 .\objects\dht11.o: .\CMSIS\core_cm4.h
 .\objects\dht11.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdint.h
@@ -36,4 +36,4 @@
 .\objects\dht11.o: .\Library\inc\stm32f4xx_dac.h
 .\objects\dht11.o: .\Library\inc\stm32f4xx_dcmi.h
 .\objects\dht11.o: .\Library\inc\stm32f4xx_fsmc.h
-.\objects\dht11.o: .\System\delay\delay.h
+.\objects\dht11.o: .\Core\inc\delay.h

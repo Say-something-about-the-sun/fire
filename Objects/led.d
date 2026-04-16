@@ -1,5 +1,5 @@
-.\objects\led.o: Hardware\led.c
-.\objects\led.o: Hardware\led.h
+.\objects\led.o: Hardware_BSP\src\led.c
+.\objects\led.o: .\Hardware_BSP\inc\led.h
 .\objects\led.o: .\Library\inc\stm32f4xx_gpio.h
 .\objects\led.o: .\Start\stm32f4xx.h
 .\objects\led.o: .\CMSIS\core_cm4.h

@@ -1,6 +1,6 @@
-.\objects\ov5640.o: ov5640\ov5640.c
-.\objects\ov5640.o: ov5640\ov5640.h
-.\objects\ov5640.o: .\System\sys\sys.h
+.\objects\ov5640.o: Hardware_BSP\ov5640\ov5640.c
+.\objects\ov5640.o: Hardware_BSP\ov5640\ov5640.h
+.\objects\ov5640.o: .\Core\inc\sys.h
 .\objects\ov5640.o: .\Start\stm32f4xx.h
 .\objects\ov5640.o: .\CMSIS\core_cm4.h
 .\objects\ov5640.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdint.h
@@ -36,9 +36,9 @@
 .\objects\ov5640.o: .\Library\inc\stm32f4xx_dac.h
 .\objects\ov5640.o: .\Library\inc\stm32f4xx_dcmi.h
 .\objects\ov5640.o: .\Library\inc\stm32f4xx_fsmc.h
-.\objects\ov5640.o: ov5640\sccb.h
-.\objects\ov5640.o: ov5640\ov5640cfg.h
-.\objects\ov5640.o: .\System\delay\delay.h
-.\objects\ov5640.o: .\System\usart\usart.h
+.\objects\ov5640.o: Hardware_BSP\ov5640\sccb.h
+.\objects\ov5640.o: Hardware_BSP\ov5640\ov5640cfg.h
+.\objects\ov5640.o: .\Core\inc\delay.h
+.\objects\ov5640.o: .\Core\inc\usart.h
 .\objects\ov5640.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\ov5640.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h

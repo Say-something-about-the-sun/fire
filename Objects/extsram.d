@@ -1,6 +1,6 @@
-.\objects\extsram.o: Hardware\extsram.c
-.\objects\extsram.o: Hardware\extsram.h
-.\objects\extsram.o: .\System\sys\sys.h
+.\objects\extsram.o: Hardware_BSP\src\extsram.c
+.\objects\extsram.o: .\Hardware_BSP\inc\extsram.h
+.\objects\extsram.o: .\Core\inc\sys.h
 .\objects\extsram.o: .\Start\stm32f4xx.h
 .\objects\extsram.o: .\CMSIS\core_cm4.h
 .\objects\extsram.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdint.h
@@ -36,6 +36,6 @@
 .\objects\extsram.o: .\Library\inc\stm32f4xx_dac.h
 .\objects\extsram.o: .\Library\inc\stm32f4xx_dcmi.h
 .\objects\extsram.o: .\Library\inc\stm32f4xx_fsmc.h
-.\objects\extsram.o: .\System\delay\delay.h
-.\objects\extsram.o: .\System\usart\usart.h
+.\objects\extsram.o: .\Core\inc\delay.h
+.\objects\extsram.o: .\Core\inc\usart.h
 .\objects\extsram.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h

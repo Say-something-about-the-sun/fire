@@ -37,39 +37,10 @@
 
 
 
-// 1. 定义一把全局串口互斥锁
+//  定义一把全局串口互斥锁
 SemaphoreHandle_t Mutex_USART1;
 
-// 2. 打造工业级的安全打印函数
-/*
-void Safe_Printf(char *format, ...)
-{
-    // 如果操作系统已经启动，才使用锁机制
-    if(xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) 
-    {
-        // 尝试拿锁，只等 1 毫秒。拿不到说明别人在用串口，直接闭嘴退出
-        if (xSemaphoreTake(Mutex_USART1, pdMS_TO_TICKS(1)) != pdTRUE) {
-            return; 
-        }
-        
-        // 🚨 核心手术：如果底层 DMA（图片传输）正在高速运行，绝对不准插嘴！
-        // 直接释放锁并扔掉这条打印信息，保卫图片完整性！
-        if ((DMA2_Stream7->CR & DMA_SxCR_EN) != RESET) {
-            xSemaphoreGive(Mutex_USART1);
-            return; 
-        }
-    }
 
-    va_list args;
-    va_start(args, format);
-    vprintf(format, args);
-    va_end(args);
-
-    if(xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) {
-        xSemaphoreGive(Mutex_USART1);
-    }
-}
-*/
 
 extern volatile u8 g_uart_is_sending_image; // 引入刚刚建的标志位
 
