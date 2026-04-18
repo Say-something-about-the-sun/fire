@@ -60,5 +60,6 @@ void ESP8266_Report_PackageJSON(SensorDataPacket* packet, JsonDataPacket* json);
 void ESP8266_Report_CollectSensorData(SensorDataPacket* packet);
 
 extern SensorDataPacket g_sys_data;
+void ESP8266_Report_PollCommands(void);
 
 #endif

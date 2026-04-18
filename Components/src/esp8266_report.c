@@ -55,6 +55,7 @@ void ESP8266_Report_CollectSensorData(SensorDataPacket* packet)
     AI_Fire_Decision_Center(packet);
 }
 
+/*
 // 解析网络指令的轻量化处理
 static void Process_Cloud_Commands(void)
 {
@@ -69,7 +70,26 @@ static void Process_Cloud_Commands(void)
         USART3_RX_STA = 0; 
     }
 }
+*/
 
+
+// 将这个函数名添加到 esp8266_report.h 中：void ESP8266_Report_PollCommands(void);
+void ESP8266_Report_PollCommands(void)
+{
+    if (USART3_RX_STA & 0x8000)
+    {
+        USART3_RX_BUF[USART3_RX_STA & 0x3FFF] = '\0';
+        
+        // 🚨 终极调试探针：无论收到什么，只要被中断认定为一帧，就全部打印出来！
+        Safe_Printf("\r\n[NET_RX_DEBUG] %s\r\n", USART3_RX_BUF);
+        
+        // 扔给 AI 大脑处理
+        AI_Execute_Cloud_Command((const char*)USART3_RX_BUF);
+        
+        memset(USART3_RX_BUF, 0, sizeof(USART3_RX_BUF));
+        USART3_RX_STA = 0; 
+    }
+}
 
 // 3. 将数据打包成 JSON 字符串 (防死机纯整数版)
 // [esp8266_report.c 中替换]
@@ -178,7 +198,7 @@ u8 ESP8266_Report_SendSensorData(void)
     static JsonDataPacket json_packet; 
     
     // 1. 处理积压的云端指令
-    Process_Cloud_Commands();
+    //Process_Cloud_Commands();
 
     // 2. 采集并打包
     ESP8266_Report_CollectSensorData(&sensor_packet);

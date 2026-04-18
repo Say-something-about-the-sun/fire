@@ -22,6 +22,10 @@ typedef struct {
     float total_confidence;      // 综合置信度
 } SystemCoreState_t;
 
+
+
+	
+
 // 1. 系统初始化
 void AI_Decision_Init(void);
 

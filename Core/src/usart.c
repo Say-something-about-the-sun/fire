@@ -264,7 +264,4 @@ void usart1_dma_send(uint8_t* data, uint16_t len)
     // DMA发送完成会在中断中清除 usart1_dma_busy 标志
 }	
 
- 
-
-
 

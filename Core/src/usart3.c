@@ -1,6 +1,7 @@
 #include "usart3.h"
 #include "delay.h"
 #include <string.h>
+#include "usart.h"
 
 
 // ===================================================
@@ -57,9 +58,9 @@ void USART3_Init(u32 bound)
     // 使能USART3
     USART_Cmd(USART3, ENABLE);
 
-    Safe_Printf("[USART3] 初始化完成，波特率: %lu\r\n", bound);
-    Safe_Printf("[USART3] 连接: STM32 PB10 (TX) -> ESP8266 RX\r\n");
-    Safe_Printf("[USART3] 连接: STM32 PB11 (RX) -> ESP8266 TX\r\n");
+    Safe_Printf("[USART3] bound: %lu\r\n", bound);
+    Safe_Printf("[USART3] : STM32 PB10 (TX) -> ESP8266 RX\r\n");
+    Safe_Printf("[USART3] : STM32 PB11 (RX) -> ESP8266 TX\r\n");
 }
 
 // 配置USART3中断
@@ -77,7 +78,7 @@ void USART3_ConfigInterrupt(void)
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
-    Safe_Printf("[USART3] 中断配置完成\r\n");
+    Safe_Printf("[USART3] down-sucess\r\n");
 }
 
 // 发送字符串
@@ -168,10 +169,26 @@ void USART3_IRQHandler(void)
                     // 把数据存入缓冲区
                     USART3_RX_BUF[USART3_RX_STA & 0X3FFF] = Res;
                     USART3_RX_STA++;
+                    
                     // 防止缓冲区溢出
                     if(USART3_RX_STA > (USART3_RX_BUF_SIZE - 1)) {
-                        USART3_RX_STA = 0; // 接收错误，重新开始
+                        USART3_RX_STA = 0; 
                     }
+                    
+                    // ==========================================================
+                    // 🚨 新增：JSON 雷达！拦截 OneNET 下发的不带 \r\n 的指令
+                    // ==========================================================
+                    if(Res == '}') 
+                    {
+                        USART3_RX_BUF[USART3_RX_STA] = '\0'; // 临时封口
+                        // 只要扫描到我们关心的关键字，强行置位 0x8000 触发大脑解析！
+                        if(strstr((char*)USART3_RX_BUF, "pump_status") != NULL || 
+                           strstr((char*)USART3_RX_BUF, "system_mode") != NULL) 
+                        {
+                            USART3_RX_STA |= 0x8000; 
+                        }
+                    }
+                    // ==========================================================
                 }
             }
         }

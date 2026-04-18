@@ -28,6 +28,9 @@ void usart1_dma_send(uint8_t* data, uint16_t len);
 // USART1 DMA发送完成标志（外部访问）
 extern volatile uint8_t usart1_dma_complete;
 
+
+void Safe_Printf(char *format, ...);
+
 #endif
 
 

@@ -70,6 +70,7 @@ void AI_Update_Virtual_Current(float current)
     }
 }
 
+/*
 // 执行云端下发的命令（解耦：网络层只负责传递字符串，由这里负责控制硬件）
 void AI_Execute_Cloud_Command(const char* cmd)
 {
@@ -87,15 +88,16 @@ void AI_Execute_Cloud_Command(const char* cmd)
     }
     else if (strstr(cmd, "CMD:MODE:0") != NULL) {
         g_core_state.mode = SYS_MODE_AUTO;
-        Safe_Printf("=> 已恢复 AI 自动托管！\r\n");
+        Safe_Printf("AI\r\n");
     }
     else if (strstr(cmd, "CMD:MODE:1") != NULL) {
         g_core_state.mode = SYS_MODE_MANUAL;
-        Safe_Printf("=> 已切入人工接管模式！\r\n");
+        Safe_Printf("=> HUMAN！\r\n");
     }
     
     if(Mutex_CoreState != NULL) xSemaphoreGive(Mutex_CoreState);
 }
+*/
 
 // 紧急超驰接管（按键2触发）
 void AI_Emergency_Override(void)
@@ -129,7 +131,7 @@ void AI_Fire_Decision_Center(SensorDataPacket* packet)
     u8 is_fire_real = packet->image_fire_detected || packet->fire_detected || packet->flame_do == 1;
 
     // 🚨 绝对优先级：严重过载（模拟漏电/短路），无视任何模式，立刻断电停泵！
-    if (g_core_state.virtual_current > 10.0) 
+    if (g_core_state.virtual_current > 10.0f) 
     {
         g_core_state.risk_level = 2; // 高危预警
         g_core_state.total_confidence = 100.0f;
@@ -188,4 +190,41 @@ void AI_Fire_Decision_Center(SensorDataPacket* packet)
 
     if(Mutex_CoreState != NULL) xSemaphoreGive(Mutex_CoreState);
 }
+
+
+// ==================================================================
+// 🌩️ 云端指令执行器（精准匹配物理探针抓取的真实数据）
+// ==================================================================
+void AI_Execute_Cloud_Command(const char* json_str)
+{
+    // 1. 拦截【强制开启水泵】 -> 对应你抓到的 CMD:PUMP:1
+    if (strstr(json_str, "CMD:PUMP:1") != NULL) 
+    {
+        g_core_state.mode = SYS_MODE_MANUAL; 
+        g_core_state.pump_status = 1;
+        WaterPump_On();
+        Safe_Printf("[Cloud CMD] 🚨 MANUAL OVERRIDE: PUMP ON!\r\n");
+    }
+    // 2. 拦截【强制关闭水泵】 -> 对应你抓到的 CMD:PUMP:0
+    else if (strstr(json_str, "CMD:PUMP:0") != NULL) 
+    {
+        g_core_state.mode = SYS_MODE_MANUAL; 
+        g_core_state.pump_status = 0;
+        WaterPump_Off();
+        Safe_Printf("[Cloud CMD] 🚨 MANUAL OVERRIDE: PUMP OFF!\r\n");
+    }
+    
+    // 3. 拦截【恢复AI托管】
+    // (注意：如果你不知道恢复AI会发什么，可以点一下App上的恢复按钮，看看串口打印什么，然后填到这里)
+    // 这里预留常见的几种格式防弹：
+    else if (strstr(json_str, "CMD:MODE:0") != NULL || strstr(json_str, "\"system_mode\":0") != NULL) 
+    {
+        g_core_state.mode = SYS_MODE_AUTO;   
+        g_core_state.pump_status = 0; // 交还控制权后默认关水，等待AI下一秒判断
+        WaterPump_Off();
+        Safe_Printf("[Cloud CMD] 🤖 AI AUTO MODE RESTORED!\r\n");
+    }
+}
+
+
 

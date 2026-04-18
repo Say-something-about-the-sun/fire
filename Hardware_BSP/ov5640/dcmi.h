@@ -54,5 +54,7 @@ void DCMI_Stop(void);
 u32 dcmi_get_error_count(void);
 void dcmi_diagnose(void);
 
+void DCMI_DMA_Init(u32 DMA_Memory0BaseAddr,u16 DMA_BufferSize,u32 DMA_MemoryDataSize,u32 DMA_MemoryInc);
+void My_DCMI_Init(void);
 
 #endif

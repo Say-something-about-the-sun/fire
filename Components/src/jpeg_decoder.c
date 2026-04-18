@@ -5,6 +5,7 @@
 #include "delay.h"
 #include "tjpgd.h"
 #include "extsram.h"
+#include <stdio.h>
 
 
 // 外部SRAM RGB缓冲区配置
@@ -75,7 +76,7 @@ static uint32_t input_func(JDEC* jd, uint8_t* buff, uint32_t nbyte)
 }
 
 // TJpgDec输出回调函数
-static uint32_t output_func(JDEC* jd, void* bitmap, JRECT* rect)
+static int output_func(JDEC* jd, void* bitmap, JRECT* rect)
 {
     uint16_t* src = (uint16_t*)bitmap;
     uint16_t* dst;
@@ -127,7 +128,7 @@ u8 jpeg_decoder_decode(const uint8_t* jpeg_data, uint32_t jpeg_size)
 {
     JDEC jdec;
     uint8_t result;
-    uint32_t start_time, end_time;
+    //uint32_t start_time, end_time;
     jpeg_stream_t stream;
 
 	/*
@@ -182,7 +183,7 @@ u8 jpeg_decoder_decode(const uint8_t* jpeg_data, uint32_t jpeg_size)
         return result;
     }
     
-    end_time = millis();
+    //end_time = millis();
     // printf("[JPEG Decoder] Decode completed in %dms\r\n", end_time - start_time);
     decode_state.decode_status = 1;
     

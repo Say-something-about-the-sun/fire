@@ -1,4 +1,6 @@
 #include "smoke.h"
+#include <stdio.h>
+
 
 // ADC初始化，内部函数，直接配置PA1
 static void Smoke_ADC_Init(void)

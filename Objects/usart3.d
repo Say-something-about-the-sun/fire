@@ -39,3 +39,4 @@
 .\objects\usart3.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\usart3.o: .\Core\inc\delay.h
 .\objects\usart3.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h
+.\objects\usart3.o: .\Core\inc\usart.h

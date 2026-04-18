@@ -40,3 +40,4 @@
 .\objects\jpeg_decoder.o: .\Middlewares\TJpgDec\tjpgdcnf.h
 .\objects\jpeg_decoder.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h
 .\objects\jpeg_decoder.o: .\Hardware_BSP\inc\extsram.h
+.\objects\jpeg_decoder.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h

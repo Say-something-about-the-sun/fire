@@ -7,9 +7,6 @@
 #include <string.h>
 #include "sccb.h"
 
-
-#define OV5640_ADDR     0X78        //OV5640的IIC地址
-
 //OV5640写寄存器 - 16位地址
 //返回值:0,成功;1,失败.
 u8 OV5640_WR_Reg(u16 reg,u8 data)
@@ -249,7 +246,7 @@ u8 OV5640_Init(void)
     
     // 动态设置输出尺寸（正点原子的关键步骤）
     printf("[10] Setting output size (640x480)...\r\n");
-    OV5640_OutSize_Set(4, 0, 640, 480);
+    OV5640_OutSize_Set(4, 0, 320, 240);
     
     // 使能输出
     printf("[11] Enabling output...\r\n");

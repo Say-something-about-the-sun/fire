@@ -173,7 +173,7 @@ void USART2_Process_ESP32_Data(void)
             RTC_Set_Time(str + 5); 
             
             // 打印调试信息，确认校准成功
-            Safe_Printf("[RTC] Synced with ESP32: %s\r\n", str + 5);
+            //Safe_Printf("[RTC] Synced with ESP32: %s\r\n", str + 5);
             
             // 回复 OK
             USART2_Send_String("OK\r\n");

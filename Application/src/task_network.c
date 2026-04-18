@@ -11,20 +11,26 @@ static TaskHandle_t NetworkTask_Handler;
 // 具体的任务实现（内部函数，无需暴露）
 static void report_task(void *pvParameters)
 {
-    // 这里调用我们第一阶段净化后的初始化
     ESP8266_Report_Init();
-    
-    printf("[System] Network Task Started. Periodic Report: 5s\r\n");
+    printf("[System] Network Task Started. TX: 5s, RX Poll: 100ms\r\n");
 
     while(1)
     {
-        // 调用第一阶段净化的发送函数，它内部会去向 AI 大脑索要最新状态
+        // 1. 每 5 秒执行一次数据上报
         ESP8266_Report_SendSensorData();
         
-        // 严格遵守 5 秒间隔
-        vTaskDelay(pdMS_TO_TICKS(5000));
+        // 2. 切碎延时：循环 50 次，每次等 100ms（总计仍是 5 秒）
+        for(int i = 0; i < 50; i++)
+        {
+            // 每 100 毫秒就查一次有没有云端发来的控制指令！
+            ESP8266_Report_PollCommands();
+            
+            // 短暂休眠，让出 CPU 给视觉任务和 AI 任务
+            vTaskDelay(pdMS_TO_TICKS(100));
+        }
     }
 }
+
 
 // 对外暴露的初始化函数
 void Network_Task_Init(void)
