@@ -1,208 +1,101 @@
-// main.c - 主程序 - 战略降级稳定版 (MVP)
+// main.c - 主程序 - 工业级清爽版
 #include "sys.h"
 #include "delay.h"
 #include "usart.h"
 #include "usart2.h"
 #include "usart3.h"
-#include "ov5640.h"
 
-#include "dcmi.h"
-#include "extsram.h"
-#include "jpeg_serial.h"
-#include "smoke.h"
-#include "task_network.h"
-#include "RTC.h"
+// 硬件驱动层 (BSP)
 #include "led.h"
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include  "water_pump.h"
 #include "key.h"
-#include <stdarg.h>
+#include "extsram.h"
+#include "RTC.h"
 #include "dht11.h"
+#include "smoke.h"
+#include "water_pump.h"
+#include "ov5640.h"
+#include "dcmi.h"
 #include "ESP8266.h"
+#include "iwdg.h"
 
-// 引入 FreeRTOS 头文件
+// 业务组件层
+#include "jpeg_serial.h"
+
+// RTOS与核心调度层
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
-
-
-// 引入三大总线和 AI 大脑
 #include "ai_decision.h"
 #include "task_hmi.h"
 #include "task_network.h"
 #include "task_vision.h"
 
+#include <stdio.h>
+#include <stdarg.h>
 
-
-
-
-//  定义一把全局串口互斥锁
+// 全局互斥锁与标志位
 SemaphoreHandle_t Mutex_USART1;
+extern volatile u8 g_uart_is_sending_image; 
 
-
-
-extern volatile u8 g_uart_is_sending_image; // 引入刚刚建的标志位
-
+// 线程安全的纯净打印输出
 void Safe_Printf(char *format, ...)
 {
-    // 如果视觉任务正在发图片，立刻闭嘴扔掉日志！保卫图像数据！
-    // 这种做法完全不调用 RTOS API，绝对不会引发绿灯死机！
-    if (g_uart_is_sending_image == 1) {
-        return; 
-    }
-
+    if (g_uart_is_sending_image == 1) return; // 保护图像通道
     va_list args;
     va_start(args, format);
     vprintf(format, args);
     va_end(args);
 }
 
-
-
-// 摄像头参数
+// 摄像头参数宏
 #define CAMERA_WIDTH  320
 #define CAMERA_HEIGHT 240
 
-// 系统参数
-#define SENSOR_INTERVAL    5000    // 传感器采集间隔（ms）
-#define DATA_SAVE_INTERVAL 1000    // 数据保存间隔（ms）
-#define DAILY_REPORT_INTERVAL 86400000  // 日报生成间隔（24小时）
-#define CLEANUP_INTERVAL   86400000  // 清理数据间隔（24小时）
-
-
- void OV5640_Hue_Set(u8 hue)
-{
-    switch(hue)
-    {
-        case 0:  // 0度
-            OV5640_WR_Reg(0x5001, 0xFF);
-            OV5640_WR_Reg(0x5580, 0x01);
-            OV5640_WR_Reg(0x5581, 0x80);
-            OV5640_WR_Reg(0x5582, 0x00);
-            OV5640_WR_Reg(0x5588, 0x01);
-            break;
-        case 1:  // +30度
-            OV5640_WR_Reg(0x5001, 0xFF);
-            OV5640_WR_Reg(0x5580, 0x01);
-            OV5640_WR_Reg(0x5581, 0x6F);
-            OV5640_WR_Reg(0x5582, 0x40);
-            OV5640_WR_Reg(0x5588, 0x01);
-            break;
-        case 2:  // +60度
-            OV5640_WR_Reg(0x5001, 0xFF);
-            OV5640_WR_Reg(0x5580, 0x01);
-            OV5640_WR_Reg(0x5581, 0x40);
-            OV5640_WR_Reg(0x5582, 0x6F);
-            OV5640_WR_Reg(0x5588, 0x01);
-            break;
-        case 3:  // +90度
-            OV5640_WR_Reg(0x5001, 0xFF);
-            OV5640_WR_Reg(0x5580, 0x01);
-            OV5640_WR_Reg(0x5581, 0x00);
-            OV5640_WR_Reg(0x5582, 0x80);
-            OV5640_WR_Reg(0x5588, 0x01);
-            break;
-        case 4:  // -30度
-            OV5640_WR_Reg(0x5001, 0xFF);
-            OV5640_WR_Reg(0x5580, 0x01);
-            OV5640_WR_Reg(0x5581, 0x6F);
-            OV5640_WR_Reg(0x5582, 0x40);
-            OV5640_WR_Reg(0x5588, 0x02);
-            break;
-        case 5:  // -60度
-            OV5640_WR_Reg(0x5001, 0xFF);
-            OV5640_WR_Reg(0x5580, 0x01);
-            OV5640_WR_Reg(0x5581, 0x40);
-            OV5640_WR_Reg(0x5582, 0x6F);
-            OV5640_WR_Reg(0x5588, 0x02);
-            break;
-        case 6:  // -90度
-            OV5640_WR_Reg(0x5001, 0xFF);
-            OV5640_WR_Reg(0x5580, 0x01);
-            OV5640_WR_Reg(0x5581, 0x00);
-            OV5640_WR_Reg(0x5582, 0x80);
-            OV5640_WR_Reg(0x5588, 0x02);
-            break;
-        default:
-            break;
-    }
-} 
-
-       
-
-/* ================== FreeRTOS 任务句柄与函数声明 ================== */
+// 任务句柄
 TaskHandle_t StartTask_Handler;
-
 void start_task(void *pvParameters);
-
-/* ==================================== */
-
-
-
 
 int main(void)
 {
+    // 1. 基础系统时钟与外设初始化
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
     delay_init(168);
     uart_init(921600);
     
-    // 初始化LED
+    // 2. 纯硬件设备初始化
     LED_Init();
-    
-    // 1. 初始化RTC
-    RTC_Init_Custom();
-    // 2. 初始化JPEG和串口系统
-    jpeg_serial_init();
-    
-	
-	
-    Extsram_Init();
-    // 3. 初始化摄像头
-    if( OV5640_Init() != 0) {
-        Safe_Printf("[ERROR] OV5640 initialization failed!\r\n");
-    }
-    
-    OV5640_OutSize_Set(4, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-    OV5640_Hue_Set(0);
-        
-    //水泵初始化
-    WaterPump_Init();
-        
-  
-
-
-    // 4. 初始化烟雾传感器
-    Smoke_Sensor_Init();
-        
-    //温湿度初始化
-    DHT11_Init();
     KEY_Init();
-        
-    // 5. 初始化USART2（用于ESP32通信）
+    Extsram_Init();
+    RTC_Init_Custom();
+    DHT11_Init();
+    Smoke_Sensor_Init();
+    WaterPump_Init();
+    
+    // 3. 通信总线初始化
     USART2_Init(115200);
     USART2_ConfigInterrupt();
-    
-    // 6. 初始化ESP8266（WiFi通信）
     USART3_Init(9600);  
     USART3_ConfigInterrupt();  
-    ESP8266_Init();
-    ESP8266_Report_Init();  
     
-		delay_ms(200);
-		
-    // 8. 初始化DCMI（后初始化DCMI）
+    // 4. 摄像头与 JPEG 系统初始化
+    jpeg_serial_init();
+    if(OV5640_Init() != 0) {
+        Safe_Printf("[ERROR] OV5640 initialization failed!\r\n");
+    }
+    OV5640_OutSize_Set(4, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
+    OV5640_Hue_Set(0); // 这个函数已经移入 ov5640.c
     My_DCMI_Init();
     
-		
+    // 5. 耗时最长的网络模块初始化 (此时还没有放狗！)
+    ESP8266_Init();
+    delay_ms(200);
     
-    Safe_Printf("[OK] Hardware initialized! Starting FreeRTOS Scheduler...\r\n");
+    Safe_Printf("[OK] All Hardware initialized! Starting FreeRTOS...\r\n");
         
-    // 创建这把互斥锁
+    // 6. 创建互斥锁
     Mutex_USART1 = xSemaphoreCreateMutex();
     
-    // 2. 创建【启动任务】 (分配 256 字节栈，优先级最低设为 1)
+    // 7. 创建并启动 FreeRTOS 引导任务
     xTaskCreate((TaskFunction_t )start_task,            
                 (const char* )"start_task",          
                 (uint16_t       )1024,                   
@@ -210,38 +103,35 @@ int main(void)
                 (UBaseType_t    )1,                     
                 (TaskHandle_t* )&StartTask_Handler);   
 
-    // 3. 开启 FreeRTOS 任务调度器！
     vTaskStartScheduler();
     
+    // 正常情况永远不会执行到这里
     while(1) {
-        Safe_Printf("[ERROR] FreeRTOS Scheduler failed to start! Check Memory.\r\n");
+        Safe_Printf("[ERROR] Scheduler Failed!\r\n");
         delay_ms(1000);
     }
 }
 
-/* ================== FreeRTOS 任务实现 ================== */
-
-// 【启动任务】
+/* ================== FreeRTOS 引导任务 ================== */
 void start_task(void *pvParameters)
 {
     taskENTER_CRITICAL(); // 进入临界区
     
-    // 1. 初始化 AI 大脑核心锁
+    // 1. 初始化所有业务层任务
     AI_Decision_Init();
-
-    // 2. 启动 HMI 按键人机交互任务 (假设你已经封装了 HMI_Task_Init)
-     HMI_Task_Init(); 
-
-    // 3. 启动 网络处理任务 (黑盒调用)
+    HMI_Task_Init(); 
     Network_Task_Init();
+    Vision_Task_Init();
 
-    // 4. 启动 视觉处理任务 (接下来我们要做的)
-     Vision_Task_Init();
+    // 2. 🚨 终极防御：在系统即将全面运转的最后一刻，放出看门狗！
+    // 预分频 64 (prer=4), 重装载 2500 -> 溢出时间 = (64 * 2500) / 32 = 5000ms (5秒)
+    // 给 5 秒是为了防止偶尔网络波动导致任务短暂阻塞
+    //IWDG_Init(4, 2500); 
 
-    vTaskDelete(StartTask_Handler); // 启动完成，自毁过河拆桥
-    taskEXIT_CRITICAL();  // 退出临界区
+    // 3. 自毁引导任务，释放内存
+   
+    taskEXIT_CRITICAL();  // 退出临界区，系统正式起飞
+		vTaskDelete(NULL);
+	
 }
-
-
-
 

@@ -70,5 +70,5 @@ void OV5640_Color_Saturation(u8 sat);
 void OV5640_Brightness(u8 bright);
 void OV5640_Contrast(u8 contrast);
 void OV5640_Sharpness(u8 sharp);
-
+void OV5640_Hue_Set(u8 hue);
 #endif

@@ -47,7 +47,7 @@ static const uint16_t ov5640_jpeg_reg_tbl[][2] =
     0x3002, 0x00,  // enable JFIFO, SFIFO, JPG
     0x3006, 0xff,  // enable clock of JPEG2x, JPEG
     0x4713, 0x03,  // JPEG mode 3
-    0x4407, 0x04,  // Quantization scale (0x04 for better quality)
+    0x4407, 0x0C,  // Quantization scale (0x04 for better quality)
     0x460b, 0x35,
     0x460c, 0x22,
     0x4837, 0x16,  // MIPI global timing

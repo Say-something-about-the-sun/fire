@@ -42,4 +42,8 @@ void AI_Fire_Decision_Center(SensorDataPacket* packet);
 void AI_Execute_Cloud_Command(const char* cmd);
 void AI_Emergency_Override(void);
 
+
+
+SystemCoreState_t AI_Get_Core_State_Safe(void);
+FireDetectionResult AI_Get_Vision_Result_Safe(void);
 #endif

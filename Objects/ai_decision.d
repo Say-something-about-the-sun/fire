@@ -50,5 +50,7 @@
 .\objects\ai_decision.o: .\Middlewares\FreeRTOS\include\deprecated_definitions.h
 .\objects\ai_decision.o: .\Middlewares\FreeRTOS\ARM_CM4F\portmacro.h
 .\objects\ai_decision.o: .\Middlewares\FreeRTOS\include\mpu_wrappers.h
+.\objects\ai_decision.o: .\Middlewares\FreeRTOS\include\task.h
+.\objects\ai_decision.o: .\Middlewares\FreeRTOS\include\list.h
 .\objects\ai_decision.o: .\Middlewares\FreeRTOS\include\semphr.h
 .\objects\ai_decision.o: .\Middlewares\FreeRTOS\include\queue.h

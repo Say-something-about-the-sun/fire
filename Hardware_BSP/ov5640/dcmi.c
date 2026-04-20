@@ -40,45 +40,39 @@ extern volatile BufferControl buf_ctrl_a;
 extern volatile BufferControl buf_ctrl_b;
 extern volatile u32 dropped_frames;
 
-//DCMI中断服务函数 - 
+
+//DCMI中断服务函数 
 void DCMI_IRQHandler(void)
 {
+    // 1. 🚨 清除所有可能导致“中断风暴”的异常标志
+    if (DCMI_GetITStatus(DCMI_IT_ERR) != RESET) DCMI_ClearITPendingBit(DCMI_IT_ERR);
+    if (DCMI_GetITStatus(DCMI_IT_OVF) != RESET) DCMI_ClearITPendingBit(DCMI_IT_OVF);
+    
+    // 闪烁红灯作为底层心跳
     static u8 led1_state = 0;
     if(led1_state == 0) { led_on(led1); led1_state = 1; } 
     else { led_off(led1); led1_state = 0; }
     
     if(DCMI_GetITStatus(DCMI_IT_FRAME) != RESET)
     {
-        g_raw_frame_count++;
+        // 2. 瞬间向 DMA 发出关闭指令（不在这里等，交给任务去等！）
+        DMA_Cmd(DMA2_Stream1, DISABLE); 
         
-        DMA_Cmd(DMA2_Stream1, DISABLE);
-        while((DMA2_Stream1->CR & DMA_SxCR_EN) != RESET); 
-        
-        u32 words_remaining = DMA_GetCurrDataCounter(DMA2_Stream1);
-        current_capture_buf->data_len = (JPEG_MAX_SIZE - (words_remaining * 4));
-        
-        volatile BufferControl* next_buf = (current_capture_buf == &buf_ctrl_a) ? &buf_ctrl_b : &buf_ctrl_a;
+        // 3. 唤醒视觉任务
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
-        // 正常交接乒乓缓存
-        current_capture_buf->state = BUF_READY;
-        current_capture_buf = next_buf; 
-        
         if(VisionTask_Handler != NULL) {
             vTaskNotifyGiveFromISR(VisionTask_Handler, &xHigherPriorityTaskWoken);
         }
-        
-        DMA2_Stream1->M0AR = (u32)current_capture_buf->buffer;
-        DMA2_Stream1->NDTR = JPEG_MAX_SIZE / 4;
-        
-        DMA_ClearFlag(DMA2_Stream1, DMA_FLAG_TCIF1 | DMA_FLAG_HTIF1 | DMA_FLAG_TEIF1 | DMA_FLAG_DMEIF1 | DMA_FLAG_FEIF1);
-        DCMI->ICR = 0x1F; 
-        DMA_Cmd(DMA2_Stream1, ENABLE);
-        
+
         DCMI_ClearITPendingBit(DCMI_IT_FRAME);
-        if (xHigherPriorityTaskWoken) portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        
+        if(xHigherPriorityTaskWoken) {
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        }
     }
 }
+
+
 
 
 //DCMI DMA配置

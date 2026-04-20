@@ -514,3 +514,62 @@ void OV5640_Sharpness(u8 sharp)
         OV5640_WR_Reg(0x530a, 0x30);
     }
 }
+
+void OV5640_Hue_Set(u8 hue)
+{
+    switch(hue)
+    {
+        case 0:  // 0度
+            OV5640_WR_Reg(0x5001, 0xFF);
+            OV5640_WR_Reg(0x5580, 0x01);
+            OV5640_WR_Reg(0x5581, 0x80);
+            OV5640_WR_Reg(0x5582, 0x00);
+            OV5640_WR_Reg(0x5588, 0x01);
+            break;
+        case 1:  // +30度
+            OV5640_WR_Reg(0x5001, 0xFF);
+            OV5640_WR_Reg(0x5580, 0x01);
+            OV5640_WR_Reg(0x5581, 0x6F);
+            OV5640_WR_Reg(0x5582, 0x40);
+            OV5640_WR_Reg(0x5588, 0x01);
+            break;
+        case 2:  // +60度
+            OV5640_WR_Reg(0x5001, 0xFF);
+            OV5640_WR_Reg(0x5580, 0x01);
+            OV5640_WR_Reg(0x5581, 0x40);
+            OV5640_WR_Reg(0x5582, 0x6F);
+            OV5640_WR_Reg(0x5588, 0x01);
+            break;
+        case 3:  // +90度
+            OV5640_WR_Reg(0x5001, 0xFF);
+            OV5640_WR_Reg(0x5580, 0x01);
+            OV5640_WR_Reg(0x5581, 0x00);
+            OV5640_WR_Reg(0x5582, 0x80);
+            OV5640_WR_Reg(0x5588, 0x01);
+            break;
+        case 4:  // -30度
+            OV5640_WR_Reg(0x5001, 0xFF);
+            OV5640_WR_Reg(0x5580, 0x01);
+            OV5640_WR_Reg(0x5581, 0x6F);
+            OV5640_WR_Reg(0x5582, 0x40);
+            OV5640_WR_Reg(0x5588, 0x02);
+            break;
+        case 5:  // -60度
+            OV5640_WR_Reg(0x5001, 0xFF);
+            OV5640_WR_Reg(0x5580, 0x01);
+            OV5640_WR_Reg(0x5581, 0x40);
+            OV5640_WR_Reg(0x5582, 0x6F);
+            OV5640_WR_Reg(0x5588, 0x02);
+            break;
+        case 6:  // -90度
+            OV5640_WR_Reg(0x5001, 0xFF);
+            OV5640_WR_Reg(0x5580, 0x01);
+            OV5640_WR_Reg(0x5581, 0x00);
+            OV5640_WR_Reg(0x5582, 0x80);
+            OV5640_WR_Reg(0x5588, 0x02);
+            break;
+        default:
+            break;
+    }
+} 
+

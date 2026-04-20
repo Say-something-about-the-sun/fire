@@ -54,6 +54,7 @@
 ".\objects\usart.o"
 ".\objects\usart2.o"
 ".\objects\usart3.o"
+".\objects\iwdg.o"
 ".\objects\dht11.o"
 ".\objects\esp8266.o"
 ".\objects\extsram.o"
