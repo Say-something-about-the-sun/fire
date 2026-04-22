@@ -53,5 +53,7 @@
 .\objects\jpeg_serial.o: .\Middlewares\FreeRTOS\include\deprecated_definitions.h
 .\objects\jpeg_serial.o: .\Middlewares\FreeRTOS\ARM_CM4F\portmacro.h
 .\objects\jpeg_serial.o: .\Middlewares\FreeRTOS\include\mpu_wrappers.h
+.\objects\jpeg_serial.o: .\Middlewares\FreeRTOS\include\task.h
+.\objects\jpeg_serial.o: .\Middlewares\FreeRTOS\include\list.h
 .\objects\jpeg_serial.o: .\Middlewares\FreeRTOS\include\semphr.h
 .\objects\jpeg_serial.o: .\Middlewares\FreeRTOS\include\queue.h

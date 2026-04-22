@@ -40,11 +40,14 @@ extern volatile u8 g_uart_is_sending_image;
 // 线程安全的纯净打印输出
 void Safe_Printf(char *format, ...)
 {
+	/*
     if (g_uart_is_sending_image == 1) return; // 保护图像通道
     va_list args;
     va_start(args, format);
     vprintf(format, args);
     va_end(args);
+	*/
+	return;
 }
 
 // 摄像头参数宏

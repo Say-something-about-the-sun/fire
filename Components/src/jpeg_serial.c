@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include "FreeRTOS.h"
+#include "task.h"
 #include "semphr.h"
 
 extern SemaphoreHandle_t Mutex_USART1;
@@ -206,13 +207,13 @@ void serial_send_jpeg_data(u8* jpeg_data, u32 jpeg_len)
     usart1_dma_send(jpeg_data, (uint16_t)jpeg_len);
     
     // 发送校验和（轮询方式）
-    uart_send_byte(checksum);
+    //uart_send_byte(checksum);
     
     //printf("[Serial Display] JPEG data sent: %d bytes (DMA)\r\n", jpeg_len);
 }
 
 
-
+/*
 //JPEG数据处理函数（参考探索者项目实现）
 void jpeg_data_process(void)
 {
@@ -222,21 +223,21 @@ void jpeg_data_process(void)
 
     if(jpeg_data_ok == 0)  // 数据未处理，开始处理
     {
-        /* 1️⃣ 停止DCMI捕获 */
+        
         DCMI_CaptureCmd(DISABLE);
         while(DCMI->CR & DCMI_CR_CAPTURE);   // 等待完全停止
 
-        /* 2️⃣ 关闭DMA */
+        
         DMA_Cmd(DMA2_Stream1, DISABLE);
         while(DMA_GetCmdStatus(DMA2_Stream1) != DISABLE);
 
-        /* 3️⃣ 计算本帧实际长度 */
+       
         u32 words_transferred = (JPEG_MAX_SIZE / 4) - DMA_GetCurrDataCounter(DMA2_Stream1);
         actual_bytes = words_transferred * 4;
 
         jpeg_data_len = actual_bytes;
 
-        /* 4️⃣ 保存帧信息 */
+       
         if(actual_bytes > 0 && actual_bytes <= JPEG_MAX_SIZE)
         {
             frame_info.length = actual_bytes;
@@ -247,10 +248,10 @@ void jpeg_data_process(void)
     }
     if(jpeg_data_ok == 2)  // 准备下一次捕获
     {
-        /* 5️⃣ 重新配置DMA长度 */
+       
         DMA2_Stream1->NDTR = JPEG_MAX_SIZE / 4;
 
-        /* 6️⃣ 清除DMA标志 */
+     
         DMA_ClearFlag(DMA2_Stream1,
                       DMA_FLAG_TCIF1 |
                       DMA_FLAG_HTIF1 |
@@ -258,15 +259,15 @@ void jpeg_data_process(void)
                       DMA_FLAG_DMEIF1 |
                       DMA_FLAG_FEIF1);
 
-        /* 7️⃣ 重新启动DMA */
+     
         DMA_Cmd(DMA2_Stream1, ENABLE);
 
-        /* 8️⃣ 重新启动DCMI捕获 */
+      
         DCMI_CaptureCmd(ENABLE);
         jpeg_data_ok = 0;  // 重置状态
     }
 }
-
+*/
 
 
 // Snapshot JPEG采集 - 启动一帧采集（双缓冲版本）
@@ -389,16 +390,35 @@ u8 process_jpeg_frame(u8 do_fire_detection, FireDetectionResult* out_result)
         
         // 确保数据大小合理（至少100字节）
         if(jpeg_size > 100) {
-            
-					// 🚨 【加上这三行】：拿锁 -> 发图片指令 -> 瞬间还锁
-            // 这样能保证在启动 DMA 的瞬间，绝对没有人在 printf
+            // 1. 拿到互斥锁
             if(Mutex_USART1 != NULL) xSemaphoreTake(Mutex_USART1, portMAX_DELAY);
             
+            // 2. 启动发送（这里会调用非阻塞的 DMA）
             serial_send_jpeg_data(&p[jpeg_start], jpeg_size);
             
-            if(Mutex_USART1 != NULL) xSemaphoreGive(Mutex_USART1);
-            // 增加处理成功帧计数
+            // 3. 🚨 核心重构：直接查底层寄存器，决不允许幽灵变量拖后腿！
+        u32 wait_time = 0;
+        // 注意：如果你用的不是 DMA2_Stream7，请改成你实际的 USART1_TX DMA流
+        while(DMA_GetFlagStatus(DMA2_Stream7, DMA_FLAG_TCIF7) == RESET) {
+            vTaskDelay(pdMS_TO_TICKS(2)); // 让出CPU给网络任务
+            wait_time += 2;
+            
+            // 921600 波特率发 8KB 只需要 86ms。如果超过 200ms 还没发完，说明底层彻底挂了
+            if(wait_time > 200) { 
+                break; // 触发硬件级超时熔断
+            }
+        }
+        // 清除硬件发送完成标志位
+        DMA_ClearFlag(DMA2_Stream7, DMA_FLAG_TCIF7);
+        
+        // 4. 放开互斥锁
+        if(Mutex_USART1 != NULL) xSemaphoreGive(Mutex_USART1);
+        
+        // 5. 保留 20ms 的防粘包间隙
+        vTaskDelay(pdMS_TO_TICKS(20));
+            
             g_processed_frame_count++;
+						
             
             // 翻转LED0状态作为处理成功的指示
             static u8 led_state = 0;
@@ -411,39 +431,28 @@ u8 process_jpeg_frame(u8 do_fire_detection, FireDetectionResult* out_result)
             }
             
             // 根据参数决定是否进行火焰检测
-            if(do_fire_detection) {
-                fire_detection_frame_count++;
+            // 🚨 必须恢复限流！例如每 5 帧（约半秒）只做 1 次 AI 运算
+            if(fire_detection_frame_count % 5 == 0) { 
                 
-                // 🚨 修复一：暂时注释掉内部限流，只要外部让测，我们就测！
-                // if(fire_detection_frame_count % FIRE_DETECTION_INTERVAL == 0) {
+                // 1. 软件解码 JPEG (极其耗时)
+                int decode_res = jpeg_decoder_process(&p[jpeg_start], jpeg_size);
+                
+                if(decode_res == 0) {
+                    JpegDecodeState* dec = jpeg_decoder_get_state();
                     
-                    //printf("\r\n[Vision] 1. Start decoding JPEG...\r\n");
+                    // 2. RGB转HSV (耗时)
+                    image_preprocess_frame_rgb_to_hsv(dec->dst_buf, 
+                                                     (hsv_t*)DETECT_HSV_BUF_ADDR, 
+                                                     dec->width, dec->height);
                     
-                    // 1. 解码JPEG
-                    int decode_res = jpeg_decoder_process(&p[jpeg_start], jpeg_size);
+                    // 3. 火焰检测逻辑
+                    FireDetectionResult fire_result;
+                    fire_detection_process_frame((hsv_t*)DETECT_HSV_BUF_ADDR, 
+                                                dec->width, dec->height, 
+                                                &fire_result);
                     
-                    if(decode_res == 0) {
-                       // printf("[Vision] 2. Decode SUCCESS! Processing pixels...\r\n");
-                        
-                        JpegDecodeState* dec = jpeg_decoder_get_state();
-                        
-                        // 3. RGB转HSV
-                        image_preprocess_frame_rgb_to_hsv(dec->dst_buf, 
-                                                         (hsv_t*)DETECT_HSV_BUF_ADDR, 
-                                                         dec->width, dec->height);
-                        
-                        // 4. 火焰检测
-                        FireDetectionResult fire_result;
-                        fire_detection_process_frame((hsv_t*)DETECT_HSV_BUF_ADDR, 
-                                                    dec->width, dec->height, 
-                                                    &fire_result);
-                        
-											// 如果调用者需要结果，我们就把算好的 fire_result 拷贝给他
-											if (out_result != NULL) 
-											{
-												
-													*out_result = fire_result;
-												
+                    if (out_result != NULL) {
+                        *out_result = fire_result;
 											}
 										
                         
@@ -464,7 +473,7 @@ u8 process_jpeg_frame(u8 do_fire_detection, FireDetectionResult* out_result)
     
     // 处理完成后标记为空闲
     ready_buf->state = BUF_IDLE;
-    
+    DCMI_StartOneFrame();
     return 0;
 }
 

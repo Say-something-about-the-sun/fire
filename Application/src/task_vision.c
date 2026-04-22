@@ -99,7 +99,7 @@ static void camera_task(void *pvParameters)
             g_uart_is_sending_image = 0;
         }
         
-        vTaskDelay(pdMS_TO_TICKS(15)); // 帧间隙
+        vTaskDelay(pdMS_TO_TICKS(40)); // 帧间隙
         
         // 🚨 7. 在 SnapShot 模式下，必须手动按下快门，拍下一张！
         DCMI_CaptureCmd(ENABLE);

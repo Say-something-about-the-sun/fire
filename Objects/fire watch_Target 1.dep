@@ -1757,7 +1757,7 @@ I (.\Components\inc\esp8266_report.h)(0x69E32289)
 I (.\Components\inc\fire_detection.h)(0x69A4E716)
 I (.\Components\inc\image_preprocess.h)(0x69A4E716)
 I (D:\QRS\MDK514\ARM\ARMCC\include\stdio.h)(0x69E3074E)
-F (.\Application\src\task_vision.c)(0x69E8CE5F)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .\CMSIS -I .\Library\inc -I .\Library\src -I .\Start -I .\Application\inc -I .\Components\inc -I .\Core\inc -I .\Hardware_BSP\inc -I .\Hardware_BSP\ov5640 -I .\Middlewares\TJpgDec -I .\Middlewares\FreeRTOS\include -I .\Middlewares\FreeRTOS\ARM_CM4F --diag_suppress=177 --cpu Cortex-M4.fp -I"C:\Users\mywife\Desktop\毕业材料\毕设（基于stm32的火情监测系统）\code（keil - test\RTE"-ID:\QRS\MDK514\ARM\PACK\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-ID:\QRS\MDK514\ARM\CMSIS\Include-D__UVISION_VERSION="521" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER-o .\objects\task_vision.o --omf_browse .\objects\task_vision.crf --depend .\objects\task_vision.d)
+F (.\Application\src\task_vision.c)(0x69E8F288)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .\CMSIS -I .\Library\inc -I .\Library\src -I .\Start -I .\Application\inc -I .\Components\inc -I .\Core\inc -I .\Hardware_BSP\inc -I .\Hardware_BSP\ov5640 -I .\Middlewares\TJpgDec -I .\Middlewares\FreeRTOS\include -I .\Middlewares\FreeRTOS\ARM_CM4F --diag_suppress=177 --cpu Cortex-M4.fp -I"C:\Users\mywife\Desktop\毕业材料\毕设（基于stm32的火情监测系统）\code（keil - test\RTE"-ID:\QRS\MDK514\ARM\PACK\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-ID:\QRS\MDK514\ARM\CMSIS\Include-D__UVISION_VERSION="521" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER-o .\objects\task_vision.o --omf_browse .\objects\task_vision.crf --depend .\objects\task_vision.d)
 I (.\Application\inc\task_vision.h)(0x69DBBFBA)
 I (.\Core\inc\sys.h)(0x69C2911E)
 I (.\Start\stm32f4xx.h)(0x697AF96E)
@@ -1860,7 +1860,7 @@ I (.\Middlewares\FreeRTOS\ARM_CM4F\portmacro.h)(0x69BA9BBC)
 I (.\Middlewares\FreeRTOS\include\mpu_wrappers.h)(0x69BA9BB6)
 I (.\Middlewares\FreeRTOS\include\task.h)(0x69BA9BB6)
 I (.\Middlewares\FreeRTOS\include\list.h)(0x69BA9BB6)
-F (.\Core\src\main.c)(0x69E7A32D)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .\CMSIS -I .\Library\inc -I .\Library\src -I .\Start -I .\Application\inc -I .\Components\inc -I .\Core\inc -I .\Hardware_BSP\inc -I .\Hardware_BSP\ov5640 -I .\Middlewares\TJpgDec -I .\Middlewares\FreeRTOS\include -I .\Middlewares\FreeRTOS\ARM_CM4F --diag_suppress=177 --cpu Cortex-M4.fp -I"C:\Users\mywife\Desktop\毕业材料\毕设（基于stm32的火情监测系统）\code（keil - test\RTE"-ID:\QRS\MDK514\ARM\PACK\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-ID:\QRS\MDK514\ARM\CMSIS\Include-D__UVISION_VERSION="521" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
+F (.\Core\src\main.c)(0x69E8F544)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .\CMSIS -I .\Library\inc -I .\Library\src -I .\Start -I .\Application\inc -I .\Components\inc -I .\Core\inc -I .\Hardware_BSP\inc -I .\Hardware_BSP\ov5640 -I .\Middlewares\TJpgDec -I .\Middlewares\FreeRTOS\include -I .\Middlewares\FreeRTOS\ARM_CM4F --diag_suppress=177 --cpu Cortex-M4.fp -I"C:\Users\mywife\Desktop\毕业材料\毕设（基于stm32的火情监测系统）\code（keil - test\RTE"-ID:\QRS\MDK514\ARM\PACK\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-ID:\QRS\MDK514\ARM\CMSIS\Include-D__UVISION_VERSION="521" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
 I (.\Core\inc\sys.h)(0x69C2911E)
 I (.\Start\stm32f4xx.h)(0x697AF96E)
 I (.\CMSIS\core_cm4.h)(0x697300C8)
@@ -3137,7 +3137,7 @@ I (.\Middlewares\TJpgDec\tjpgdcnf.h)(0x69B2B3B1)
 I (D:\QRS\MDK514\ARM\ARMCC\include\string.h)(0x574E3E26)
 I (.\Hardware_BSP\inc\extsram.h)(0x699FF035)
 I (D:\QRS\MDK514\ARM\ARMCC\include\stdio.h)(0x69E3074E)
-F (.\Components\src\jpeg_serial.c)(0x69DBB34D)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .\CMSIS -I .\Library\inc -I .\Library\src -I .\Start -I .\Application\inc -I .\Components\inc -I .\Core\inc -I .\Hardware_BSP\inc -I .\Hardware_BSP\ov5640 -I .\Middlewares\TJpgDec -I .\Middlewares\FreeRTOS\include -I .\Middlewares\FreeRTOS\ARM_CM4F --diag_suppress=177 --cpu Cortex-M4.fp -I"C:\Users\mywife\Desktop\毕业材料\毕设（基于stm32的火情监测系统）\code（keil - test\RTE"-ID:\QRS\MDK514\ARM\PACK\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-ID:\QRS\MDK514\ARM\CMSIS\Include-D__UVISION_VERSION="521" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER-o .\objects\jpeg_serial.o --omf_browse .\objects\jpeg_serial.crf --depend .\objects\jpeg_serial.d)
+F (.\Components\src\jpeg_serial.c)(0x69E8F8DD)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I .\CMSIS -I .\Library\inc -I .\Library\src -I .\Start -I .\Application\inc -I .\Components\inc -I .\Core\inc -I .\Hardware_BSP\inc -I .\Hardware_BSP\ov5640 -I .\Middlewares\TJpgDec -I .\Middlewares\FreeRTOS\include -I .\Middlewares\FreeRTOS\ARM_CM4F --diag_suppress=177 --cpu Cortex-M4.fp -I"C:\Users\mywife\Desktop\毕业材料\毕设（基于stm32的火情监测系统）\code（keil - test\RTE"-ID:\QRS\MDK514\ARM\PACK\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-ID:\QRS\MDK514\ARM\CMSIS\Include-D__UVISION_VERSION="521" -DSTM32F407xx -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER-o .\objects\jpeg_serial.o --omf_browse .\objects\jpeg_serial.crf --depend .\objects\jpeg_serial.d)
 I (.\Core\inc\sys.h)(0x69C2911E)
 I (.\Start\stm32f4xx.h)(0x697AF96E)
 I (.\CMSIS\core_cm4.h)(0x697300C8)
@@ -3191,5 +3191,7 @@ I (.\Middlewares\FreeRTOS\include\portable.h)(0x69BA9BB6)
 I (.\Middlewares\FreeRTOS\include\deprecated_definitions.h)(0x69BA9BB6)
 I (.\Middlewares\FreeRTOS\ARM_CM4F\portmacro.h)(0x69BA9BBC)
 I (.\Middlewares\FreeRTOS\include\mpu_wrappers.h)(0x69BA9BB6)
+I (.\Middlewares\FreeRTOS\include\task.h)(0x69BA9BB6)
+I (.\Middlewares\FreeRTOS\include\list.h)(0x69BA9BB6)
 I (.\Middlewares\FreeRTOS\include\semphr.h)(0x69BA9BB6)
 I (.\Middlewares\FreeRTOS\include\queue.h)(0x69BA9BB6)
