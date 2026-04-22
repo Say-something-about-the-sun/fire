@@ -6,6 +6,10 @@
 #include "esp8266_report.h" // 借用你的 SensorDataPacket 定义
 #include "fire_detection.h"
 
+
+
+
+
 // 系统运行模式枚举
 typedef enum {
     SYS_MODE_AUTO = 0,
@@ -24,7 +28,7 @@ typedef struct {
 
 
 
-	
+	extern SystemCoreState_t g_core_state;
 
 // 1. 系统初始化
 void AI_Decision_Init(void);

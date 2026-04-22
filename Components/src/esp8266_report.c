@@ -30,16 +30,10 @@ void ESP8266_Report_CollectSensorData(SensorDataPacket* packet)
     packet->smoke_adc = Smoke_Get_ADC_Value();
     packet->smoke_detected = (packet->smoke_ppm > 50.0f) ? 1 : 0;
     
+   
     packet->frame_count = jpeg_serial_get_frame_count();
     packet->dropped_frames = jpeg_serial_get_dropped_frames();
 
-    // 🚨 修复 1：桥接 HMI 任务产生的虚拟电流与主电状态
-    SystemCoreState_t safe_state = AI_Get_Core_State_Safe();
-    
-    packet->virtual_current = safe_state.virtual_current;
-    packet->main_power_status = safe_state.main_power_status;
-	
-	
     // ESP32 数据
     packet->flame_adc = g_esp32_data.flame_adc;
     packet->flame_do = g_esp32_data.flame_do;
@@ -57,28 +51,26 @@ void ESP8266_Report_CollectSensorData(SensorDataPacket* packet)
     packet->temperature = (float)last_good_temp;
     packet->humidity = (float)last_good_humi;
 
-		
-		FireDetectionResult safe_vision = AI_Get_Vision_Result_Safe();
-    packet->image_fire_detected = safe_vision.fire_detected;
-    packet->image_confidence    = safe_vision.confidence;
-    packet->fire_area           = safe_vision.fire_area;
-    packet->fire_center_x       = safe_vision.fire_center_x;
-    packet->fire_center_y       = safe_vision.fire_center_y;
-    packet->flicker_detected    = safe_vision.flicker_detected;
-		
-		
-		
-		
-    // 呼叫 AI 大脑进行决策和填装最终状态
+    // 数据收集完毕，呼叫 AI 大脑进行决策和填装最终状态
     AI_Fire_Decision_Center(packet);
-
-    // 🚨 修复 2：AI 决策完成后，必须把最新的控制模式同步给 packet，供 JSON 打包！
-    safe_state = AI_Get_Core_State_Safe(); 
-    packet->system_mode = safe_state.mode;
-    packet->pump_status = safe_state.pump_status;
 }
 
-
+/*
+// 解析网络指令的轻量化处理
+static void Process_Cloud_Commands(void)
+{
+    if (USART3_RX_STA & 0x8000) 
+    {
+        USART3_RX_BUF[USART3_RX_STA & 0x3FFF] = '\0'; 
+        
+        // 直接将字符串扔给 AI 大脑处理，网络层不直接操作硬件！
+        AI_Execute_Cloud_Command((const char*)USART3_RX_BUF);
+        
+        memset(USART3_RX_BUF, 0, sizeof(USART3_RX_BUF));
+        USART3_RX_STA = 0; 
+    }
+}
+*/
 
 
 // 将这个函数名添加到 esp8266_report.h 中：void ESP8266_Report_PollCommands(void);

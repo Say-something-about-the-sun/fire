@@ -3,9 +3,16 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "uni-app"
+				"navigationBarTitleText": "火情监控中心"
 			}
-		}
+		},
+		{
+					"path": "pages/chart/chart",
+					"style": {
+						"navigationBarTitleText": "历史趋势分析",
+						"navigationBarBackgroundColor": "#ffffff"
+					}
+				}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

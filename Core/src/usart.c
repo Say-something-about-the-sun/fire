@@ -236,6 +236,7 @@ void DMA2_Stream7_IRQHandler(void)
 // USART1 DMA��������
 // data: ���ͻ�������ַ
 // len:  ���ͳ���
+// USART1 DMA发送函数
 void usart1_dma_send(uint8_t* data, uint16_t len)
 {
     if(len == 0) return;

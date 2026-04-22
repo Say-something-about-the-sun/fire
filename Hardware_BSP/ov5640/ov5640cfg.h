@@ -100,7 +100,7 @@ static const uint16_t ov5640_rgb565_reg_tbl[][2] =
 	0x3002, 0x1c, // reset JFIFO, SFIFO, JPG
 	0x3006, 0xc3, // disable clock of JPEG2x, JPEG
 	0x4713, 0x03, // JPEG mode 3
-	0x4407, 0x04, // Quantization scale
+	0x4407, 0x0C, // Quantization scale
 	0x460b, 0x37,
 	0x460c, 0x20,
 	0x4837, 0x16, // MIPI global timing
