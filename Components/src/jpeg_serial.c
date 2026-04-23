@@ -328,154 +328,107 @@ u32 DCMI_GetFrameLength(void)
  */
 u8 process_jpeg_frame(u8 do_fire_detection, FireDetectionResult* out_result)
 {
-    // 增加帧计数
     frame_count++;
     
-    // 关键修改：不再依赖completed_buffer
-    // 直接判断当前哪个缓冲区是READY状态
     volatile BufferControl* ready_buf = NULL;
-    
     if(buf_ctrl_a.state == BUF_READY) {
         ready_buf = &buf_ctrl_a;
     } else if(buf_ctrl_b.state == BUF_READY) {
         ready_buf = &buf_ctrl_b;
     } else {
-        return 1;  // 没有准备好的缓冲区
+        return 1;  
     }
     
-    // 标记为发送中
     ready_buf->state = BUF_SENDING;
-    
     u8* p = ready_buf->buffer;
-    u32 jpeg_start = 0;
-    u32 jpeg_end = 0;
-    u32 jpeg_size = 0;
-    
-    // 获取帧长度
+    u32 jpeg_start = 0, jpeg_end = 0, jpeg_size = 0;
     frame_length = ready_buf->data_len;
     
-    // 直接使用原始JPEG数据（内部SRAM不需要重排）
     if(frame_length > 0 && frame_length <= JPEG_MAX_SIZE) {
-        // 恢复搜索逻辑，查看FF D8到底偏移了多少
         for(u32 i = 0; i < 512 && i < frame_length - 1; i++) {
             if(p[i] == 0xFF && p[i+1] == 0xD8) {
-                jpeg_start = i;
-                break;
+                jpeg_start = i; break;
             }
         }
         
-        // 检查是否找到JPEG头
         if(jpeg_start == 0 && (p[0] != 0xFF || p[1] != 0xD8)) {
-            // 未找到JPEG头，跳过此帧
             ready_buf->state = BUF_IDLE;
             return 1;
         }
         
-        // 搜索JPEG文件尾（0xFF 0xD9）
         for(u32 i = jpeg_start; i < frame_length - 1; i++) {
             if(p[i] == 0xFF && p[i+1] == 0xD9) {
-                jpeg_end = i + 2;
-                break;
+                jpeg_end = i + 2; break;
             }
         }
         
-        // 强制发送数据，不管是否找到JPEG尾
-        // 如果找到JPEG尾，使用找到的；否则使用从jpeg_start开始到帧结束的所有数据
         if(jpeg_end > jpeg_start) {
             jpeg_size = jpeg_end - jpeg_start;
         } else {
-            // 没找到JPEG尾，使用从jpeg_start开始到帧结束的所有数据
             jpeg_size = frame_length - jpeg_start;
         }
         
-        // 确保数据大小合理（至少100字节）
         if(jpeg_size > 100) {
-            // 1. 拿到互斥锁
+            // 1. 获取串口总线控制权
             if(Mutex_USART1 != NULL) xSemaphoreTake(Mutex_USART1, portMAX_DELAY);
             
-            // 2. 启动发送（这里会调用非阻塞的 DMA）
+            // 2. 启动 DMA 非阻塞发送
             serial_send_jpeg_data(&p[jpeg_start], jpeg_size);
             
-            // 3. 🚨 核心重构：直接查底层寄存器，决不允许幽灵变量拖后腿！
-        u32 wait_time = 0;
-        // 注意：如果你用的不是 DMA2_Stream7，请改成你实际的 USART1_TX DMA流
-        while(DMA_GetFlagStatus(DMA2_Stream7, DMA_FLAG_TCIF7) == RESET) {
-            vTaskDelay(pdMS_TO_TICKS(2)); // 让出CPU给网络任务
-            wait_time += 2;
-            
-            // 921600 波特率发 8KB 只需要 86ms。如果超过 200ms 还没发完，说明底层彻底挂了
-            if(wait_time > 200) { 
-                break; // 触发硬件级超时熔断
+            // 3. 🚨 终极硬件轮询：查询 DMA 使能位状态！
+            // 只要 DMA 还在工作，CMDStatus 就是 ENABLE。一旦发完，硬件自动切换为 DISABLE。
+            // 这彻底绕开了你不工作的中断标志位和清除标志位的繁琐逻辑！
+            u32 dma_wait = 0;
+            while(DMA_GetCmdStatus(DMA2_Stream7) != DISABLE && dma_wait < 100) { 
+                vTaskDelay(pdMS_TO_TICKS(2)); 
+                dma_wait++; // 最多等待 200ms (921600下发30KB只需约30ms)
             }
-        }
-        // 清除硬件发送完成标志位
-        DMA_ClearFlag(DMA2_Stream7, DMA_FLAG_TCIF7);
-        
-        // 4. 放开互斥锁
-        if(Mutex_USART1 != NULL) xSemaphoreGive(Mutex_USART1);
-        
-        // 5. 保留 20ms 的防粘包间隙
-        vTaskDelay(pdMS_TO_TICKS(20));
             
+            if(Mutex_USART1 != NULL) xSemaphoreGive(Mutex_USART1);
+            
+            // 强制上位机防粘包间隙
+            vTaskDelay(pdMS_TO_TICKS(20));
             g_processed_frame_count++;
-						
             
-            // 翻转LED0状态作为处理成功的指示
+            // 状态灯翻转
             static u8 led_state = 0;
-            if(led_state == 0) {
-                led_on(led0);
-                led_state = 1;
-            } else {
-                led_off(led0);
-                led_state = 0;
-            }
+            if(led_state == 0) { led_on(led0); led_state = 1; } 
+            else { led_off(led0); led_state = 0; }
             
-            // 根据参数决定是否进行火焰检测
-            // 🚨 必须恢复限流！例如每 5 帧（约半秒）只做 1 次 AI 运算
-            if(fire_detection_frame_count % 5 == 0) { 
+            // 4. 🚨 修复 AI 算力限流器
+            if(do_fire_detection) {
+                // 必须自增！否则永远是对 0 取余！
+                fire_detection_frame_count++; 
                 
-                // 1. 软件解码 JPEG (极其耗时)
-                int decode_res = jpeg_decoder_process(&p[jpeg_start], jpeg_size);
-                
-                if(decode_res == 0) {
-                    JpegDecodeState* dec = jpeg_decoder_get_state();
-                    
-                    // 2. RGB转HSV (耗时)
-                    image_preprocess_frame_rgb_to_hsv(dec->dst_buf, 
-                                                     (hsv_t*)DETECT_HSV_BUF_ADDR, 
-                                                     dec->width, dec->height);
-                    
-                    // 3. 火焰检测逻辑
-                    FireDetectionResult fire_result;
-                    fire_detection_process_frame((hsv_t*)DETECT_HSV_BUF_ADDR, 
-                                                dec->width, dec->height, 
-                                                &fire_result);
-                    
-                    if (out_result != NULL) {
-                        *out_result = fire_result;
-											}
-										
+                // 严格遵守每 5 帧测 1 次的物理规律
+                if(fire_detection_frame_count % 5 == 0) { 
+                    int decode_res = jpeg_decoder_process(&p[jpeg_start], jpeg_size);
+                    if(decode_res == 0) {
+                        JpegDecodeState* dec = jpeg_decoder_get_state();
+                        image_preprocess_frame_rgb_to_hsv(dec->dst_buf, 
+                                                         (hsv_t*)DETECT_HSV_BUF_ADDR, 
+                                                         dec->width, dec->height);
                         
-                       // printf("[Vision] 3. Algorithm done! Fire: %d, Area: %d\r\n", 
-                        //       fire_result.fire_detected, fire_result.fire_area);
-                    } 
-                    else {
-                        // 🚨 修复二：如果解码失败，大声喊出来错在哪！
-                        printf("[Vision] ERROR: JPEG Decode FAILED! Error Code: %d\r\n", decode_res);
-                    }
-                
-            }
+                        FireDetectionResult fire_result;
+                        fire_detection_process_frame((hsv_t*)DETECT_HSV_BUF_ADDR, 
+                                                    dec->width, dec->height, 
+                                                    &fire_result);
+                        
+                        if (out_result != NULL) {
+                            *out_result = fire_result;
+                        }
                     }
                 }
-            
-        
+            }
+        }
+    }
     
-    
-    // 处理完成后标记为空闲
+    // 清理现场，重置硬件
     ready_buf->state = BUF_IDLE;
     DCMI_StartOneFrame();
     return 0;
 }
+
 
 /**
  * @brief  初始化JPEG串口系统（双缓冲版本）

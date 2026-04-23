@@ -231,9 +231,9 @@ void readSensors() {
 void processData() {
   // 检测火焰（同时使用模拟值和数字值）
   if (sensorData.flameValue > FLAME_THRESHOLD || !sensorData.flameDigital) {
-    sensorData.fireDetected = true;
-  } else {
     sensorData.fireDetected = false;
+  } else {
+    sensorData.fireDetected = true;
   }
 }
 

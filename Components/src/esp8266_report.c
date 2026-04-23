@@ -51,8 +51,20 @@ void ESP8266_Report_CollectSensorData(SensorDataPacket* packet)
     packet->temperature = (float)last_good_temp;
     packet->humidity = (float)last_good_humi;
 
+		
+		
+		
+		
+		
+		
     // 数据收集完毕，呼叫 AI 大脑进行决策和填装最终状态
     AI_Fire_Decision_Center(packet);
+		
+		packet->virtual_current   = g_core_state.virtual_current;
+    packet->main_power_status = g_core_state.main_power_status;
+    packet->system_mode       = g_core_state.mode;
+    packet->pump_status       = g_core_state.pump_status;
+		
 }
 
 /*
