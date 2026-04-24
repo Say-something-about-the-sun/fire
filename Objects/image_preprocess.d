@@ -1,6 +1,6 @@
-.\objects\image_preprocess.o: Hardware\image_preprocess.c
-.\objects\image_preprocess.o: Hardware\image_preprocess.h
-.\objects\image_preprocess.o: .\System\sys\sys.h
+.\objects\image_preprocess.o: Components\src\image_preprocess.c
+.\objects\image_preprocess.o: .\Components\inc\image_preprocess.h
+.\objects\image_preprocess.o: .\Core\inc\sys.h
 .\objects\image_preprocess.o: .\Start\stm32f4xx.h
 .\objects\image_preprocess.o: .\CMSIS\core_cm4.h
 .\objects\image_preprocess.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdint.h

@@ -1,5 +1,5 @@
-.\objects\jpeg_decoder.o: Hardware\jpeg_decoder.c
-.\objects\jpeg_decoder.o: .\System\sys\sys.h
+.\objects\jpeg_decoder.o: Components\src\jpeg_decoder.c
+.\objects\jpeg_decoder.o: .\Core\inc\sys.h
 .\objects\jpeg_decoder.o: .\Start\stm32f4xx.h
 .\objects\jpeg_decoder.o: .\CMSIS\core_cm4.h
 .\objects\jpeg_decoder.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdint.h
@@ -35,8 +35,9 @@
 .\objects\jpeg_decoder.o: .\Library\inc\stm32f4xx_dac.h
 .\objects\jpeg_decoder.o: .\Library\inc\stm32f4xx_dcmi.h
 .\objects\jpeg_decoder.o: .\Library\inc\stm32f4xx_fsmc.h
-.\objects\jpeg_decoder.o: .\System\delay\delay.h
-.\objects\jpeg_decoder.o: .\TJpgDec\tjpgd.h
-.\objects\jpeg_decoder.o: .\TJpgDec\tjpgdcnf.h
+.\objects\jpeg_decoder.o: .\Core\inc\delay.h
+.\objects\jpeg_decoder.o: .\Middlewares\TJpgDec\tjpgd.h
+.\objects\jpeg_decoder.o: .\Middlewares\TJpgDec\tjpgdcnf.h
 .\objects\jpeg_decoder.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h
-.\objects\jpeg_decoder.o: Hardware\extsram.h
+.\objects\jpeg_decoder.o: .\Hardware_BSP\inc\extsram.h
+.\objects\jpeg_decoder.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h

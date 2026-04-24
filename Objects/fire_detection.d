@@ -1,6 +1,6 @@
-.\objects\fire_detection.o: Hardware\fire_detection.c
-.\objects\fire_detection.o: Hardware\fire_detection.h
-.\objects\fire_detection.o: .\System\sys\sys.h
+.\objects\fire_detection.o: Components\src\fire_detection.c
+.\objects\fire_detection.o: .\Components\inc\fire_detection.h
+.\objects\fire_detection.o: .\Core\inc\sys.h
 .\objects\fire_detection.o: .\Start\stm32f4xx.h
 .\objects\fire_detection.o: .\CMSIS\core_cm4.h
 .\objects\fire_detection.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdint.h
@@ -36,6 +36,6 @@
 .\objects\fire_detection.o: .\Library\inc\stm32f4xx_dac.h
 .\objects\fire_detection.o: .\Library\inc\stm32f4xx_dcmi.h
 .\objects\fire_detection.o: .\Library\inc\stm32f4xx_fsmc.h
-.\objects\fire_detection.o: Hardware\image_preprocess.h
+.\objects\fire_detection.o: .\Components\inc\image_preprocess.h
 .\objects\fire_detection.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\fire_detection.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\string.h

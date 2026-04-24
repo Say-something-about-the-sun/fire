@@ -1,6 +1,6 @@
-.\objects\water_pump.o: water_pump\water_pump.c
-.\objects\water_pump.o: water_pump\water_pump.h
-.\objects\water_pump.o: .\System\sys\sys.h
+.\objects\water_pump.o: Hardware_BSP\src\water_pump.c
+.\objects\water_pump.o: .\Hardware_BSP\inc\water_pump.h
+.\objects\water_pump.o: .\Core\inc\sys.h
 .\objects\water_pump.o: .\Start\stm32f4xx.h
 .\objects\water_pump.o: .\CMSIS\core_cm4.h
 .\objects\water_pump.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdint.h

@@ -1,5 +1,5 @@
-.\objects\rtc.o: Hardware\RTC.c
-.\objects\rtc.o: Hardware\RTC.h
+.\objects\rtc.o: Hardware_BSP\src\RTC.c
+.\objects\rtc.o: .\Hardware_BSP\inc\RTC.h
 .\objects\rtc.o: .\Start\stm32f4xx.h
 .\objects\rtc.o: .\CMSIS\core_cm4.h
 .\objects\rtc.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdint.h

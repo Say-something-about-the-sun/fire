@@ -1,5 +1,5 @@
-.\objects\usart.o: System\usart\usart.c
-.\objects\usart.o: .\System\sys\sys.h
+.\objects\usart.o: Core\src\usart.c
+.\objects\usart.o: .\Core\inc\sys.h
 .\objects\usart.o: .\Start\stm32f4xx.h
 .\objects\usart.o: .\CMSIS\core_cm4.h
 .\objects\usart.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdint.h
@@ -35,5 +35,5 @@
 .\objects\usart.o: .\Library\inc\stm32f4xx_dac.h
 .\objects\usart.o: .\Library\inc\stm32f4xx_dcmi.h
 .\objects\usart.o: .\Library\inc\stm32f4xx_fsmc.h
-.\objects\usart.o: System\usart\usart.h
+.\objects\usart.o: .\Core\inc\usart.h
 .\objects\usart.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h

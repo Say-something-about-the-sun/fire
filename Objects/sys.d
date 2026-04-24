@@ -1,5 +1,5 @@
-.\objects\sys.o: System\sys\sys.c
-.\objects\sys.o: System\sys\sys.h
+.\objects\sys.o: Core\src\sys.c
+.\objects\sys.o: .\Core\inc\sys.h
 .\objects\sys.o: .\Start\stm32f4xx.h
 .\objects\sys.o: .\CMSIS\core_cm4.h
 .\objects\sys.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdint.h

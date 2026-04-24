@@ -1,5 +1,5 @@
-.\objects\smoke.o: Hardware\smoke.c
-.\objects\smoke.o: Hardware\smoke.h
+.\objects\smoke.o: Hardware_BSP\src\smoke.c
+.\objects\smoke.o: .\Hardware_BSP\inc\smoke.h
 .\objects\smoke.o: .\Start\stm32f4xx.h
 .\objects\smoke.o: .\CMSIS\core_cm4.h
 .\objects\smoke.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdint.h
@@ -35,3 +35,4 @@
 .\objects\smoke.o: .\Library\inc\stm32f4xx_dac.h
 .\objects\smoke.o: .\Library\inc\stm32f4xx_dcmi.h
 .\objects\smoke.o: .\Library\inc\stm32f4xx_fsmc.h
+.\objects\smoke.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdio.h

@@ -1,6 +1,6 @@
-.\objects\key.o: key\key.c
-.\objects\key.o: key\key.h
-.\objects\key.o: .\System\sys\sys.h
+.\objects\key.o: Hardware_BSP\src\key.c
+.\objects\key.o: .\Hardware_BSP\inc\key.h
+.\objects\key.o: .\Core\inc\sys.h
 .\objects\key.o: .\Start\stm32f4xx.h
 .\objects\key.o: .\CMSIS\core_cm4.h
 .\objects\key.o: D:\QRS\MDK514\ARM\ARMCC\Bin\..\include\stdint.h
@@ -36,4 +36,4 @@
 .\objects\key.o: .\Library\inc\stm32f4xx_dac.h
 .\objects\key.o: .\Library\inc\stm32f4xx_dcmi.h
 .\objects\key.o: .\Library\inc\stm32f4xx_fsmc.h
-.\objects\key.o: .\System\delay\delay.h
+.\objects\key.o: .\Core\inc\delay.h
