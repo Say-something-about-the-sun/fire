@@ -1,16 +1,20 @@
+/**
+ * @file    image_preprocess.h
+ * @brief   图像空间转换与降噪滤波处理接口
+ */
 #ifndef __IMAGE_PREPROCESS_H
 #define __IMAGE_PREPROCESS_H
 
 #include "sys.h"
 
-// HSV颜色空间结构
+/* HSV色彩空间抽象数据结构 */
 typedef struct {
-    uint8_t h;  // 色调 (0-180, OpenCV格式)
-    uint8_t s;  // 饱和度 (0-255)
-    uint8_t v;  // 明度 (0-255)
+    uint8_t h;  /* 色调通道 (0-180, 符合标准OpenCV约定规范) */
+    uint8_t s;  /* 饱和度通道 (0-255) */
+    uint8_t v;  /* 明度通道 (0-255) */
 } hsv_t;
 
-// 函数声明
+/* 数据转换及空间滤波功能声明 */
 void image_preprocess_rgb_to_hsv(uint16_t rgb565, hsv_t* hsv);
 void image_preprocess_row_rgb_to_hsv(uint16_t* rgb_row, hsv_t* hsv_row, uint16_t width);
 void image_preprocess_frame_rgb_to_hsv(uint16_t* rgb_data, hsv_t* hsv_data, uint16_t width, uint16_t height);

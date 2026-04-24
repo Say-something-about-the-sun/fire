@@ -1,7 +1,13 @@
+/**
+ * @file    dht11.c
+ * @brief   DHT11 温湿度传感器单总线协议实现
+ */
 #include "dht11.h"
 #include "delay.h"
 
-// 快速切换 GPIO 方向的内部函数
+/**
+ * @brief  配置为输出模式
+ */
 static void DHT11_IO_OUT(void) {
     GPIO_InitTypeDef GPIO_InitStructure;
     GPIO_InitStructure.GPIO_Pin = DHT11_PIN;
@@ -12,6 +18,9 @@ static void DHT11_IO_OUT(void) {
     GPIO_Init(DHT11_PORT, &GPIO_InitStructure);
 }
 
+/**
+ * @brief  配置为输入模式
+ */
 static void DHT11_IO_IN(void) {
     GPIO_InitTypeDef GPIO_InitStructure;
     GPIO_InitStructure.GPIO_Pin = DHT11_PIN;
@@ -20,12 +29,12 @@ static void DHT11_IO_IN(void) {
     GPIO_Init(DHT11_PORT, &GPIO_InitStructure);
 }
 
-// 设置数据线高低电平
 #define DHT11_DQ_OUT(x) do{ if(x) GPIO_SetBits(DHT11_PORT,DHT11_PIN); else GPIO_ResetBits(DHT11_PORT,DHT11_PIN); }while(0)
-// 读取数据线电平
 #define DHT11_DQ_IN  GPIO_ReadInputDataBit(DHT11_PORT, DHT11_PIN)
 
-// 复位 DHT11
+/**
+ * @brief  主设备发送复位/起始信号
+ */
 static void DHT11_Rst(void) {                 
     DHT11_IO_OUT(); 
     DHT11_DQ_OUT(0); 
@@ -34,7 +43,9 @@ static void DHT11_Rst(void) {
     delay_us(30);    // 拉高 20~40us
 }
 
-// 等待 DHT11 回应
+/**
+ * @brief  检测 DHT11 的响应信号
+ */
 static u8 DHT11_Check(void) {   
     u8 retry = 0;
     DHT11_IO_IN(); // 设为输入
@@ -45,17 +56,21 @@ static u8 DHT11_Check(void) {
     return 0;
 }
 
-// 从 DHT11 读取一个位
+/**
+ * @brief  读取总线单比特数据
+ */
 static u8 DHT11_Read_Bit(void) {
     u8 retry = 0;
     while(DHT11_DQ_IN && retry < 100) { retry++; delay_us(1); }
     retry = 0;
     while(!DHT11_DQ_IN && retry < 100) { retry++; delay_us(1); }
-    delay_us(40); // 等待 40us
+    delay_us(40); // 等待 40us 判定电平长短
     if(DHT11_DQ_IN) return 1; else return 0;
 }
 
-// 从 DHT11 读取一个字节
+/**
+ * @brief  读取总线单字节数据
+ */
 static u8 DHT11_Read_Byte(void) {        
     u8 i, dat;
     dat = 0;
@@ -66,12 +81,18 @@ static u8 DHT11_Read_Byte(void) {
     return dat;
 }
 
-// 核心：读取一次温湿度数据
+/**
+ * @brief  读取完整温湿度数据包
+ * @param  temp 温度结果输出指针
+ * @param  humi 湿度结果输出指针
+ * @return u8   状态 (0:成功; 1:失败)
+ */
 u8 DHT11_Read_Data(u8 *temp, u8 *humi) {        
     u8 buf[5], i;
     DHT11_Rst();
     if(DHT11_Check() == 0) {
         for(i = 0; i < 5; i++) { buf[i] = DHT11_Read_Byte(); }
+        // 校验和机制
         if((buf[0] + buf[1] + buf[2] + buf[3]) == buf[4]) {
             *humi = buf[0];
             *temp = buf[2];
@@ -80,6 +101,9 @@ u8 DHT11_Read_Data(u8 *temp, u8 *humi) {
     return 0;      
 }
 
+/**
+ * @brief  传感器引脚初始化
+ */
 u8 DHT11_Init(void) {
     RCC_AHB1PeriphClockCmd(DHT11_RCC, ENABLE);
     DHT11_Rst();

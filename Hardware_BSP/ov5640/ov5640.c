@@ -1,4 +1,8 @@
-// ov5640.c - 参考正点原子成功案例编写
+/**
+ * @file    ov5640.c
+ * @brief   OV5640 摄像头驱动核心实现
+ * @note    基于 SCCB 总线实现图像传感器参数配置、ISP 控制及数据流输出。
+ */
 #include "ov5640.h"
 #include "ov5640cfg.h"
 #include "delay.h"
@@ -7,8 +11,12 @@
 #include <string.h>
 #include "sccb.h"
 
-//OV5640写寄存器 - 16位地址
-//返回值:0,成功;1,失败.
+/**
+ * @brief  OV5640 写寄存器 (支持 16位 地址)
+ * @param  reg  寄存器地址
+ * @param  data 待写入数据
+ * @return u8   状态 (0:成功, 1:失败)
+ */
 u8 OV5640_WR_Reg(u16 reg,u8 data)
 {
     u8 res=0;
@@ -24,8 +32,11 @@ u8 OV5640_WR_Reg(u16 reg,u8 data)
     return res;
 }
 
-//OV5640读寄存器 - 16位地址
-//返回值:读到的寄存器值
+/**
+ * @brief  OV5640 读寄存器 (支持 16位 地址)
+ * @param  reg 寄存器地址
+ * @return u8  读取到的数据
+ */
 u8 OV5640_RD_Reg(u16 reg)
 {
     u8 val=0;
@@ -47,7 +58,10 @@ u8 OV5640_RD_Reg(u16 reg)
     return val;
 }
 
-//读取OV5640 ID
+/**
+ * @brief  获取设备 ID 以验证通信是否正常
+ * @return u16 摄像头芯片 ID
+ */
 u16 OV5640_Read_ID(void)
 {
     u8 id_h, id_l;
@@ -97,9 +111,15 @@ static void ov5640_apply_jpeg_regs(void)
     delay_ms(10);
 }
 
-// 设置输出尺寸（正点原子的关键函数）
-// offx, offy: 输出图像的偏移量
-// width, height: 实际输出图像的宽度和高度
+/**
+ * @brief  设置图像输出尺寸及裁剪窗口
+ * @param  offx   X轴偏移量
+ * @param  offy   Y轴偏移量
+ * @param  width  目标输出宽度
+ * @param  height 目标输出高度
+ * @return u8     状态 (0:成功)
+ * @note   此函数控制 ISP (Image Signal Processor) 的取像范围及最终尺寸。
+ */
 u8 OV5640_OutSize_Set(u16 offx, u16 offy, u16 width, u16 height)
 {
     OV5640_WR_Reg(0X3212, 0X03);   // 启动组3
@@ -179,7 +199,10 @@ static void ov5640_apply_rgb565_regs(void)
     delay_ms(10);
 }
 
-// 正点原子参考的初始化
+/**
+ * @brief  OV5640 综合初始化流程
+ * @return u8 初始化状态 (0:成功, 1:失败)
+ */
 u8 OV5640_Init(void)
 {
     u16 i;
@@ -235,7 +258,7 @@ u8 OV5640_Init(void)
     ov5640_apply_jpeg_regs();
     delay_ms(50);
     
-    // 设置图像质量参数（成功案例的关键步骤）
+    // 设置图像质量参数
     printf("[9] Setting image quality parameters...\r\n");
     OV5640_Light_Mode(0);        // 自动模式
     OV5640_Color_Saturation(0);   // 色彩饱和度0（默认）
@@ -244,7 +267,7 @@ u8 OV5640_Init(void)
     OV5640_Sharpness(15);         // 锐度15（适中）
     delay_ms(50);
     
-    // 动态设置输出尺寸（正点原子的关键步骤）
+    // 动态设置输出尺寸
     printf("[10] Setting output size (640x480)...\r\n");
     OV5640_OutSize_Set(4, 0, 320, 240);
     

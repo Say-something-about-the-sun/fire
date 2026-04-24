@@ -1,14 +1,21 @@
-// task_network.c
+/**
+ * @file    task_network.c
+ * @brief   网络通讯与数据上报任务实现
+ * @note    负责协调传感器数据向云端链路的定期推送，并进行下行控制流的高频轮询。
+ */
 #include "task_network.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "esp8266_report.h" // 网络层只与具体的协议/组件通信
+#include "esp8266_report.h" 
 #include <stdio.h>
 
-// 任务句柄设为静态，严禁外部 extern 窃取
+/* 任务资源句柄私有化管理 */
 static TaskHandle_t NetworkTask_Handler;
 
-// 具体的任务实现（内部函数，无需暴露）
+/**
+ * @brief  网络状态监测与调度控制线程
+ * @param  pvParameters 传入参数 (未使用)
+ */
 static void report_task(void *pvParameters)
 {
     ESP8266_Report_Init();
@@ -16,31 +23,29 @@ static void report_task(void *pvParameters)
 
     while(1)
     {
-        // 1. 每 5 秒执行一次数据上报
+        /* 1. 触发周期性数据帧聚合与上报 (周期: 5秒) */
         ESP8266_Report_SendSensorData();
         
-        // 2. 切碎延时：循环 50 次，每次等 100ms（总计仍是 5 秒）
+        /* 2. 分时切片逻辑：利用循环实现细粒度延时，兼顾数据上传与控制流高频监听 */
         for(int i = 0; i < 50; i++)
         {
-            // 每 100 毫秒就查一次有没有云端发来的控制指令！
             ESP8266_Report_PollCommands();
             
-            // 短暂休眠，让出 CPU 给视觉任务和 AI 任务
+            /* 释放时间片，供视觉算法等高计算密度任务运行 */
             vTaskDelay(pdMS_TO_TICKS(100));
         }
     }
 }
 
-
-// 对外暴露的初始化函数
+/**
+ * @brief  网络传输任务资源配置与初始化
+ */
 void Network_Task_Init(void)
 {
-    // 在这里统一配置网络任务的参数（栈大小，优先级）
-    // 防止在 main.c 中出现满天飞的宏定义
     xTaskCreate((TaskFunction_t )report_task,             
                 (const char* )"report_task",           
-                (uint16_t       )1024, // 网络封包耗费内存，分配 1024 字              
+                (uint16_t       )1024, /* 考虑到 JSON 拼装负荷，预留充分的堆栈空间 */              
                 (void* )NULL,                  
-                (UBaseType_t    )2,    // 优先级建议设为中等              
+                (UBaseType_t    )2,    /* 调整为中等优先级级别 */              
                 (TaskHandle_t* )&NetworkTask_Handler); 
 }

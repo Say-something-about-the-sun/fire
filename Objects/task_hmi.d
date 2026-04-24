@@ -51,3 +51,4 @@
 .\objects\task_hmi.o: .\Components\inc\fire_detection.h
 .\objects\task_hmi.o: .\Components\inc\image_preprocess.h
 .\objects\task_hmi.o: .\Hardware_BSP\inc\water_pump.h
+.\objects\task_hmi.o: .\Application\inc\task_hmi.h

@@ -1,11 +1,13 @@
-// task_network.h
+/**
+ * @file    task_network.h
+ * @brief   网络数据中转与长连接维护任务头文件
+ */
 #ifndef __TASK_NETWORK_H
 #define __TASK_NETWORK_H
 
 #include "sys.h"
 
-// 仅暴露初始化接口
-// main.c 只需要调用这个函数，网络任务就会自己在后台跑起来
+/* 主程序入口调用接口 */
 void Network_Task_Init(void);
 
-#endif
+#endif /* __TASK_NETWORK_H */

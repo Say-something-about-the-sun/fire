@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\fire watch.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\fire watch.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060300: Last Updated: Thu Apr 23 21:09:03 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060300: Last Updated: Fri Apr 24 21:19:05 2026
 <BR><P>
 <H3>Maximum Stack Usage =        464 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -619,7 +619,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESP8266_Report_PollCommands
 </UL>
 
-<P><STRONG><a name="[89]"></a>AI_Fire_Decision_Center</STRONG> (Thumb, 1244 bytes, Stack size 24 bytes, ai_decision.o(i.AI_Fire_Decision_Center))
+<P><STRONG><a name="[89]"></a>AI_Fire_Decision_Center</STRONG> (Thumb, 1260 bytes, Stack size 24 bytes, ai_decision.o(i.AI_Fire_Decision_Center))
 <BR><BR>[Stack]<UL><LI>Max Depth = 128<LI>Call Chain = AI_Fire_Decision_Center &rArr; xQueueGenericSend &rArr; vTaskPlaceOnEventList &rArr; prvAddCurrentTaskToDelayedList &rArr; vListInsert
 </UL>
 <BR>[Calls]<UL><LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueGenericSend
@@ -1271,8 +1271,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[f0]"></a>RCC_APB1PeriphClockCmd</STRONG> (Thumb, 26 bytes, Stack size 0 bytes, stm32f4xx_rcc.o(i.RCC_APB1PeriphClockCmd))
-<BR><BR>[Called By]<UL><LI><a href="#[f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_Set_Time
-<LI><a href="#[115]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART3_Init
+<BR><BR>[Called By]<UL><LI><a href="#[115]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART3_Init
 <LI><a href="#[10a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART2_Init
 <LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_Init_Custom
 </UL>
@@ -1326,7 +1325,6 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_Bcd2ToByte
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_Get_Time
-<LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_Init_Custom
 </UL>
 
 <P><STRONG><a name="[ea]"></a>RTC_GetTime</STRONG> (Thumb, 72 bytes, Stack size 16 bytes, stm32f4xx_rtc.o(i.RTC_GetTime))
@@ -1335,7 +1333,6 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_Bcd2ToByte
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_Get_Time
-<LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_Init_Custom
 </UL>
 
 <P><STRONG><a name="[b5]"></a>RTC_Get_Time</STRONG> (Thumb, 64 bytes, Stack size 24 bytes, rtc.o(i.RTC_Get_Time))
@@ -1358,22 +1355,19 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_Init_Custom
 </UL>
 
-<P><STRONG><a name="[ef]"></a>RTC_Init_Custom</STRONG> (Thumb, 218 bytes, Stack size 32 bytes, rtc.o(i.RTC_Init_Custom))
-<BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = RTC_Init_Custom &rArr; RTC_SetTime &rArr; RTC_WaitForSynchro
+<P><STRONG><a name="[ef]"></a>RTC_Init_Custom</STRONG> (Thumb, 118 bytes, Stack size 16 bytes, rtc.o(i.RTC_Init_Custom))
+<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = RTC_Init_Custom &rArr; RTC_SetTime &rArr; RTC_WaitForSynchro
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PWR_BackupAccessCmd
 <LI><a href="#[eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_WaitForSynchro
 <LI><a href="#[f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_SetTime
 <LI><a href="#[f7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_SetDate
 <LI><a href="#[ec]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_Init
-<LI><a href="#[ea]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_GetTime
-<LI><a href="#[e8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_GetDate
 <LI><a href="#[f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RCC_RTCCLKConfig
 <LI><a href="#[f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RCC_RTCCLKCmd
 <LI><a href="#[f2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RCC_LSICmd
 <LI><a href="#[f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RCC_GetFlagStatus
 <LI><a href="#[f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RCC_APB1PeriphClockCmd
-<LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -1404,14 +1398,13 @@ Global Symbols
 <LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_Init_Custom
 </UL>
 
-<P><STRONG><a name="[f9]"></a>RTC_Set_Time</STRONG> (Thumb, 112 bytes, Stack size 48 bytes, rtc.o(i.RTC_Set_Time))
+<P><STRONG><a name="[f9]"></a>RTC_Set_Time</STRONG> (Thumb, 104 bytes, Stack size 48 bytes, rtc.o(i.RTC_Set_Time))
 <BR><BR>[Stack]<UL><LI>Max Depth = 264<LI>Call Chain = RTC_Set_Time &rArr; __0sscanf &rArr; __vfscanf_char &rArr; __vfscanf &rArr; _scanf_int
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PWR_BackupAccessCmd
 <LI><a href="#[eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_WaitForSynchro
 <LI><a href="#[f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_SetTime
 <LI><a href="#[f7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_SetDate
-<LI><a href="#[f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RCC_APB1PeriphClockCmd
 <LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0sscanf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[10e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART2_Process_ESP32_Data
@@ -1784,7 +1777,6 @@ Global Symbols
 <LI><a href="#[b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESP8266_SetMuxMode
 <LI><a href="#[af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESP8266_SendATCommand
 <LI><a href="#[13d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;jpeg_serial_init
-<LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_Init_Custom
 <LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OV5640_Init
 <LI><a href="#[c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Extsram_Init
 <LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESP8266_Init
